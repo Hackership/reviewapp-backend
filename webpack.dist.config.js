@@ -1,67 +1,74 @@
 /*
- * Webpack distribution configuration
+ * Webpack development server configuration
  *
- * This file is set up for serving the distribution version. It will be compiled to dist/ by default
+ * This file is set up for serving the webpack-dev-server, which will watch for changes and recompile as required if
+ * the subfolder /webpack-dev-server/ is visited. Visiting the root will not automatically reload.
  */
-
 'use strict';
-
 var webpack = require('webpack');
 
 module.exports = {
 
   output: {
-    publicPath: '/assets/',
-    path: 'dist/assets/',
-    filename: 'main.jsx'
+    filename: 'main.js',
+    publicPath: '/assets/'
   },
 
-  debug: false,
+  cache: true,
+  debug: true,
   devtool: false,
   entry: ['./src/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
 
   stats: {
     colors: true,
-    reasons: false
+    reasons: true
   },
-
-  plugins: [
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.AggressiveMergingPlugin()
-  ],
 
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+    alias: {
+    }
   },
-
   module: {
     preLoaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
+      test: '\\.js$',
+      exclude: 'node_modules',
       loader: 'jsxhint'
     }],
-
     loaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
+      test: /\.jsx$/,
+      exclude: 'node_modules',
       loader: 'jsx-loader?harmony'
-    },{ 
+    },{
       test: /\.less/,
       loader: 'style-loader!css-loader!less-loader'
     },{
       test: /\.jsx$/,
       loader: 'jsx-loader?harmony'
     },{
-      test: /\.css$/,
-      loader: 'style-loader!css-loader'
-    }, {
       test: /\.sass/,
       loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
-    }, {
+    },{
+      test: /\.css$/,
+      loader: 'style-loader!css-loader'
+    },{
       test: /\.(png|jpg)$/,
       loader: 'url-loader?limit=8192'
+    },{
+      test: /\.gif/,
+      loader: "url-loader?limit=10000&minetype=image/gif"
+    },{
+      test: /\.woff([0-9]*)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: "url-loader?limit=10000&minetype=application/font-woff"
+    },{
+      test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: "file-loader"
     }]
-  }
+  },
+
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin()
+  ]
+
 };
