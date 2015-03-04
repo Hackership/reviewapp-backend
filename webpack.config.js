@@ -10,14 +10,14 @@ var webpack = require('webpack');
 module.exports = {
 
   output: {
-    filename: 'main.js',
+    filename: 'main.jsx',
     publicPath: '/assets/'
   },
 
   cache: true,
   debug: true,
   devtool: false,
-  entry: './src/scripts/components/main.js',
+  entry: './src/scripts/components/main.jsx',
 
   stats: {
     colors: true,
@@ -39,7 +39,11 @@ module.exports = {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'react-hot!jsx-loader?harmony'
-    }, {
+    }, 
+    {
+      test: /\.jsx$/,
+      loader: 'jsx-loader?harmony'
+    },{
       test: /\.sass/,
       loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
     }, {

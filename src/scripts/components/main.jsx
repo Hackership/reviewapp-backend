@@ -1,3 +1,9 @@
+/**
+ * @jsx React.DOM
+ */
+
+'use strict';
+
 var ReviewsApp = require('./ReviewsApp');
 var React = require('react');
 var Router = require('react-router');

@@ -13,12 +13,12 @@ module.exports = {
   output: {
     publicPath: '/assets/',
     path: 'dist/assets/',
-    filename: 'main.js'
+    filename: 'main.jsx'
   },
 
   debug: false,
   devtool: false,
-  entry: './src/scripts/components/main.js',
+  entry: './src/scripts/components/main.jsx',
 
   stats: {
     colors: true,
@@ -33,7 +33,7 @@ module.exports = {
   ],
 
   resolve: {
-    extensions: ['', '.js']
+    extensions: ['', '.js', '.jsx']
   },
 
   module: {
@@ -47,7 +47,10 @@ module.exports = {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'jsx-loader?harmony'
-    }, {
+    },{
+      test: /\.jsx$/,
+      loader: 'jsx-loader?harmony'
+    },{
       test: /\.css$/,
       loader: 'style-loader!css-loader'
     }, {
