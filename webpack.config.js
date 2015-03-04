@@ -31,30 +31,38 @@ module.exports = {
   },
   module: {
     preLoaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
+      test: '\\.js$',
+      exclude: 'node_modules',
       loader: 'jsxhint'
     }],
     loaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'react-hot!jsx-loader?harmony'
-    },{ 
+      test: /\.jsx$/,
+      exclude: 'node_modules',
+      loader: 'jsx-loader?harmony'
+    },{
       test: /\.less/,
       loader: 'style-loader!css-loader!less-loader'
-    }, 
-    {
+    },{
       test: /\.jsx$/,
       loader: 'jsx-loader?harmony'
     },{
       test: /\.sass/,
       loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
-    }, {
+    },{
       test: /\.css$/,
       loader: 'style-loader!css-loader'
-    }, {
+    },{
       test: /\.(png|jpg)$/,
       loader: 'url-loader?limit=8192'
+    },{
+      test: /\.gif/,
+      loader: "url-loader?limit=10000&minetype=image/gif"
+    },{
+      test: /\.woff([0-9]*)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: "url-loader?limit=10000&minetype=application/font-woff"
+    },{
+      test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+      loader: "file-loader"
     }]
   },
 
