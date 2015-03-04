@@ -5,6 +5,7 @@
 'use strict';
 
 var ReviewsApp = require('./ReviewsApp');
+var ApplicationList = require('./ApplicationList');
 var React = require('react');
 var Router = require('react-router');
 var Route = Router.Route;
