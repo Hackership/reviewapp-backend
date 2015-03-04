@@ -18,7 +18,7 @@ module.exports = {
 
   debug: false,
   devtool: false,
-  entry: './src/scripts/components/main.jsx',
+  entry: ['./src/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
 
   stats: {
     colors: true,
@@ -47,6 +47,9 @@ module.exports = {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'jsx-loader?harmony'
+    },{ 
+      test: /\.less/,
+      loader: 'style-loader!css-loader!less-loader'
     },{
       test: /\.jsx$/,
       loader: 'jsx-loader?harmony'
