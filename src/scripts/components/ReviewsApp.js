@@ -9,7 +9,7 @@ require('../../styles/main.css');
 
 var imageURL = require('../../images/yeoman.png');
 
-var ReviewsappApp = React.createClass({
+var ReviewsApp = React.createClass({
   render: function() {
     return (
       <div className='main'>
@@ -21,4 +21,4 @@ var ReviewsappApp = React.createClass({
   }
 });
 
-module.exports = ReviewsappApp;
+module.exports = ReviewsApp;

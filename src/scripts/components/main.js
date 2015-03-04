@@ -1,4 +1,4 @@
-var ReviewsappApp = require('./ReviewsappApp');
+var ReviewsApp = require('./ReviewsApp');
 var React = require('react');
 var Router = require('react-router');
 var Route = Router.Route;
@@ -6,8 +6,8 @@ var Route = Router.Route;
 var content = document.getElementById('content');
 
 var Routes = (
-  <Route handler={ReviewsappApp}>
-    <Route name="/" handler={ReviewsappApp}/>
+  <Route handler={ReviewsApp}>
+    <Route name="/" handler={ReviewsApp}/>
   </Route>
 );
 
