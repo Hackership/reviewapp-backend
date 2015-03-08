@@ -2,3 +2,4 @@
 *.db
 flask/
 *.pyc
+test_post.py
