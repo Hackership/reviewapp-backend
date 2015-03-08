@@ -7,11 +7,7 @@ stages = ('processing', 'to_anon', 'in_review',
           'inactive')
 
 
-Base = db.make_declarative_base()
-
-
-class User(Base):
-    __tablename__ = 'user'
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(120), unique=True)
@@ -22,8 +18,7 @@ class User(Base):
         return '<User: {}>'.format(self.email)
 
 
-class Application(Base):
-    __tablename__ = 'application'
+class Application(db.Model):
     id = db.Column(db.String(255), primary_key=True)
     createdAt = db.Column(db.DateTime)
     changedStageAt = db.Column(db.DateTime)
@@ -45,7 +40,7 @@ class Application(Base):
         return '<Application: {}, {}>'.format(self.createdAt, self.id)
 
 
-members_table = db.Table('members', Base.metadata,
+members_table = db.Table('members',
     db.Column('user_id', db.Integer, db.ForeignKey("user.id"),
            primary_key=True),
     db.Column('application_id', db.String, db.ForeignKey("application.id"),
@@ -53,8 +48,7 @@ members_table = db.Table('members', Base.metadata,
 )
 
 
-class Comment(Base):
-    __tablename__ = 'comment'
+class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(120), unique=True)
     content = db.Column(db.Text)
@@ -66,8 +60,7 @@ class Comment(Base):
         return '<Comment: {}, {}>'.format(self.createdAt, self.id)
 
 
-class Email(Base):
-    __tablename__ = 'email'
+class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime)
     author = db.Column(db.String(120), unique=True)

@@ -10,6 +10,8 @@ def select_reviewers():
     #select two reviewers
     return ['reviewerOne', 'reviewerTwo']
 
+def parse_application(application):
+    return application
 
 @app.route('/')
 @app.route('/ping')
@@ -45,8 +47,7 @@ def new_application(request):
 def add_reviewer(request):
     user = models.User(name=request.form['name'],
                        email=request.form['email'],
-                       role=request.form['role'],
-                       password=)
+                       role=request.form['role'])
     user.save()
 
     #only if user.role is admin
