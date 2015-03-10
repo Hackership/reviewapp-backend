@@ -3,3 +3,4 @@
 flask/
 *.pyc
 test_post.py
+local_config.py

@@ -1,4 +1,5 @@
 from app import db
+from flask.ext.login import UserMixin
 
 stages = ('processing', 'to_anon', 'in_review',
           'email_send', 'reply_received', 'skyped',
@@ -6,24 +7,44 @@ stages = ('processing', 'to_anon', 'in_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
 
+roles = ('admin', 'moderator', 'reviewer')
 
-class User(db.Model):
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(120), unique=True)
-    role = db.Column(db.String(120), unique=False)
-    isActive = db.Column(db.Boolean)
+    role = db.Column(db.Enum(*roles))
+    status = db.Column(db.String)
+    
+    def is_admin(self):
+        if self.role == 'admin':
+            return True
+        else:
+            return False
+
+    def is_reviewer(self):
+        if self.role == 'reviewer':
+            return True
+        else:
+            return False
+
+    def is_moderator(self):
+        if self.role == 'moderator':
+            return True
+        else:
+            return False
 
     def __repr__(self):
         return '<User: {}>'.format(self.email)
 
 
 class Application(db.Model):
-    id = db.Column(db.String(255), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime)
     changedStageAt = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True)
-    name = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(120))
     content = db.Column(db.Text, unique=True)
     anon_content = db.Column(db.Text, unique=True)
     fizzbuzz = db.Column(db.Text, unique=True)
@@ -43,7 +64,7 @@ class Application(db.Model):
 members_table = db.Table('members',
     db.Column('user_id', db.Integer, db.ForeignKey("user.id"),
            primary_key=True),
-    db.Column('application_id', db.String, db.ForeignKey("application.id"),
+    db.Column('application_id', db.Integer, db.ForeignKey("application.id"),
            primary_key=True)
 )
 
