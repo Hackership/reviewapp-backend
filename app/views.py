@@ -155,7 +155,7 @@ def new_application():
         
         email_content = """Dear {},\n\nThank you for applying to Hackership.
 We will get back to you within 2 weeks!
-\n\nGreetings,\nthe Hackership Team""".format(application.name)
+\nGreetings,\nthe Hackership Team""".format(application.name)
         
         #E-mail Applicant
         email_applicant(application.id, 'Application Received',
