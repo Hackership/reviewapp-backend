@@ -82,14 +82,38 @@ def parse_application(app):
     fizz = app['Hacking task']
     batch = app['batch']
     links = app['Links']
+    comments = app['Comments']
     grant = 'Applying for a Programme Fee Grant' in app
 
-    content = """##Background: {} ##Learning Focus: {} ##Project: {} 
-##Cost: {} ##Job: {} ##Links: {}""".format(back, focus, proj, cost, job, links)
+    grant_content = ""
+    if grant:
+        honesty = app["Declaration of Honesty"]
+        conf = app["Confirmation of Place"]
+        nxt_steps = app["Next Steps"]
+        strings = app["Strings Attached to the Grant"]
+        decl = app["Statement from you."]
+        elig = app["Eligibility to Apply"]
+        fin = app["Financial Information"]
+        outgoings = app["Outgoings, Living Costs"]
+        dep = app["Dependents"]
+        other = app["Other Outgoings"]
+
+        grant_content = """##Statement:{} \n ##Eligibility:{} 
+\n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {} 
+\n ##Strings Attached: {} \n 
+##Financial: {}, \n ###Outgoings: {}, \n ###Dependents: {} \n##Other: {}
+""".format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
+
+    content = """##Background: {}\n ##Learning Focus: {}\n ##Project: {}\n 
+##Cost: {}\n ##Job: {}\n ##Links: {}\n ##Comments:{}
+""".format(back, focus, proj, cost, job, links, comments)
+    
     anon = "##Background: {} ##Learning Focus: {} ##Project: {}".format(back, focus, proj)
 
     application = Application(name=name, email=email, content=content,
-                              anon_content=anon, fizzbuzz=fizz, stage="to_anon", batch=batch, grant=grant)
+                              anon_content=anon, fizzbuzz=fizz,
+                              stage="to_anon", batch=batch, grant=grant,
+                              grant_content=grant_content)
 
     return application
 
