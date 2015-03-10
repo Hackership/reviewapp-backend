@@ -29,7 +29,7 @@ def moderator_required(func):
 def send_email(recipients, subject, content, sender=None):
     if sender is None:
         sender = "no-reply@review.hackership.org"
-    msg = Message(content, recipients=recipients, sender=sender)
+    msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = content
     mail.send(msg)
 
@@ -100,6 +100,17 @@ def index():
     return "pong"
 
 
+@app.route('/test/email')
+def test_email():
+    content = """Dear {},\n\nThank you for applying to Hackership.
+We will get back to you within 2 weeks!
+\n\nGreetings,\nthe Hackership Team""".format('Anouk')
+
+    email_applicant('202', 'Application Received', content,
+                    'anoukruhaak@gmail.com')
+    return
+
+
 @app.route('/applications/all', methods=['GET'])
 # @login_required
 def get_applications():
@@ -141,14 +152,14 @@ def new_application():
         application.members = select_reviewers()
         db.session.add(application)
         db.session.commit()
-    
+        
+        email_content = """Dear {},\n\nThank you for applying to Hackership.
+We will get back to you within 2 weeks!
+\n\nGreetings,\nthe Hackership Team""".format(application.name)
+        
         #E-mail Applicant
         email_applicant(application.id, 'Application Received',
-                        'Dear {}, \n Thank you for applying to Hackership. \
-                        \n We will get back to you within 2 weeks! \
-                        \n Greetings, \n \
-                        the Hackership Team'.format(application.name),
-                        'anoukruhaak@gmail.com')
+                        email_content, 'EMAIL_APPLICANT')
 
         #Email Reviewers
         send_email(map(lambda x: x.email, application.members),
@@ -173,12 +184,14 @@ def add_reviewer():
     db.session.add(user)
     db.session.commit()
     
+    email_content = """Thank you for helping us review applications!\n
+Please head over to http://review.hackership.org
+and login with username: {} and password:{}
+\nThank you,\n the Hackership Team""".format(user.email, password)
     #Email Reviewer
     send_email(user.email, "Welcome to the Hackership Review Panel",
-               "Thank you for helping us review applications! \
-        Please head over to http://review.hackership.org \
-        and login with username: {} and password: \
-        {}".format(user.email, password))
+               email_content)
+               
     return {'success': 'false'}
 
 
