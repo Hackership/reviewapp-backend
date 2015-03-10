@@ -1,29 +1,16 @@
-from app import app, db, mail, login_manager
+from app import app, db, mail, user_datastore
 from app.models import User, Application, Email
-from flask.ext.login import login_user, logout_user, current_user, login_required
-from flask import Flask, session, redirect, url_for, escape, request, jsonify
-from functools import wraps
-import logging
+from app.utils import generate_password
+
+from flask.ext.security import login_required, roles_accepted
 from flask_mail import Message
 
+from flask import (Flask, session, redirect, url_for, escape,
+                   request, jsonify)
 
-#HELPER FUNCTIONS
-def admin_required(func):
-    @wraps(func)
-    def check_admin(*args, **kwargs):
-        if not current_user.is_admin:
-            return 401
-        return func(*args, **kwargs)
-    return check_admin
+import logging
 
-
-def moderator_required(func):
-    @wraps(func)
-    def check_mod(*args, **kwargs):
-        if not current_user.is_moderator:
-           return 401
-        return func(*args, **kwargs)
-    return check_mod
+SUCCESS = jsonify(success=True)
 
 
 def send_email(recipients, subject, content, sender=None):
@@ -45,29 +32,6 @@ def select_reviewers():
 
     return reviewers
 
-
-#LOGIN
-@login_manager.user_loader
-def load_user(userid):
-    return User.get(userid)
-
-
-@app.route("/login", methods=["POST"])
-def login():
-    user = User.query.find_by('email' == request.form['email'])
-
-    password = request.form['password'] #TODO: Hash
-    if user.password == password:
-        login_user(user)
-        return {'success': 'true'}
-    return {'success': 'false'}
-
-
-@app.route('/reviewer/logout', methods=['GET'])
-@login_required
-def logout(request):
-    logout_user()
-    return
 
 
 #APPLICATIONS
@@ -96,16 +60,16 @@ def parse_application(app):
 
 @app.route('/')
 @app.route('/ping')
+@login_required
 def index():
     return "pong"
 
 
 @app.route('/applications/all', methods=['GET'])
-# @login_required
+@login_required
 def get_applications():
 
     applications = Application.query.all()
-   
     return applications
 
 
@@ -121,7 +85,7 @@ def update_application():
 
 @app.route('/application/email/', methods=['POST'])
 @login_required
-@moderator_required
+@roles_accepted('admin', 'moderator')
 def follow_up_email():
 
     req = request.get_json()
@@ -130,7 +94,7 @@ def follow_up_email():
     recipient = req['email']
 
     email_applicant(app_id, 'Hackership Follow-Up', content, recipient)
-    return 'success'
+    return SUCCESS
 
 
 @app.route('/applications/new', methods=['POST'])
@@ -155,30 +119,26 @@ def new_application():
                    'TEST New Application',
                    'TESTING You have a new application waiting for review!')
 
-    return 'done'
+    return SUCCESS
 
 
-@app.route('/reviewer/new', methods=['POST'])
+@app.route('/reviewer/new', methods=['GET'])
 @login_required
-@admin_required
+@roles_accepted('admin')
 def add_reviewer():
     req = request.get_json()
     rev = req['reviewer']
 
-    password = 'test'
-    user = User(name=rev['name'],
-                    email=rev['email'],
-                    role=rev['role'],
-                    password=password)
-    db.session.add(user)
-    db.session.commit()
-    
+    password = generate_password()
+
+    user = user_datastore.create_user(name=rev['name'],
+                email=rev['email'], password=password)
     #Email Reviewer
     send_email(user.email, "Welcome to the Hackership Review Panel",
                "Thank you for helping us review applications! \
         Please head over to http://review.hackership.org \
         and login with username: {} and password: \
         {}".format(user.email, password))
-    return {'success': 'false'}
+    return SUCCESS
 
 

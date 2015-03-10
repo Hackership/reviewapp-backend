@@ -1,5 +1,8 @@
 from app import db
-from flask.ext.login import UserMixin
+from flask.ext.security import UserMixin, RoleMixin
+# from flask.ext.security import Security, SQLAlchemyUserDatastore, \
+    # UserMixin, RoleMixin,
+
 
 stages = ('processing', 'to_anon', 'in_review',
           'email_send', 'reply_received', 'skyped',
@@ -7,36 +10,39 @@ stages = ('processing', 'to_anon', 'in_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
 
-roles = ('admin', 'moderator', 'reviewer')
+
+roles_users = db.Table('roles_users',
+                       db.Column('user_id', db.Integer(),
+                                 db.ForeignKey('user.id')),
+                       db.Column('role_id', db.Integer(),
+                                 db.ForeignKey('role.id')))
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(120), unique=True)
-    role = db.Column(db.Enum(*roles))
+    password = db.Column(db.String(40))
     status = db.Column(db.String)
-    
-    def is_admin(self):
-        if self.role == 'admin':
-            return True
-        else:
-            return False
+    active = db.Column(db.Boolean())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
 
-    def is_reviewer(self):
-        if self.role == 'reviewer':
-            return True
-        else:
-            return False
+    def can_admin(self):
+        return self.has_role("admin")
 
-    def is_moderator(self):
-        if self.role == 'moderator':
-            return True
-        else:
-            return False
+    def can_moderate(self):
+        return self.has_role("moderator") or self.has_role("admin")
 
     def __repr__(self):
         return '<User: {}>'.format(self.email)
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
 
 
 class Application(db.Model):

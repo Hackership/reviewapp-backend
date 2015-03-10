@@ -40,7 +40,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
-    sa.Column('role', sa.Enum('admin', 'moderator', 'reviewer'), nullable=True),
     sa.Column('status', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),

@@ -28,6 +28,7 @@ guess-language==0.2
 itsdangerous==0.24
 passlib==1.6.2
 pbr==0.10.8
+py-bcrypt==0.4
 python-openid==2.2.5
 pytz==2014.10
 six==1.9.0
