@@ -10,13 +10,11 @@ from flask import (Flask, session, redirect, url_for, escape,
 
 import logging
 
-SUCCESS = jsonify(success=True)
-
 
 def send_email(recipients, subject, content, sender=None):
     if sender is None:
         sender = "no-reply@review.hackership.org"
-    msg = Message(content, recipients=recipients, sender=sender)
+    msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = content
     mail.send(msg)
 
@@ -46,14 +44,38 @@ def parse_application(app):
     fizz = app['Hacking task']
     batch = app['batch']
     links = app['Links']
+    comments = app['Comments']
     grant = 'Applying for a Programme Fee Grant' in app
 
-    content = """##Background: {} ##Learning Focus: {} ##Project: {} 
-##Cost: {} ##Job: {} ##Links: {}""".format(back, focus, proj, cost, job, links)
+    grant_content = ""
+    if grant:
+        honesty = app["Declaration of Honesty"]
+        conf = app["Confirmation of Place"]
+        nxt_steps = app["Next Steps"]
+        strings = app["Strings Attached to the Grant"]
+        decl = app["Statement from you."]
+        elig = app["Eligibility to Apply"]
+        fin = app["Financial Information"]
+        outgoings = app["Outgoings, Living Costs"]
+        dep = app["Dependents"]
+        other = app["Other Outgoings"]
+
+        grant_content = """##Statement:{} \n ##Eligibility:{} 
+\n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {} 
+\n ##Strings Attached: {} \n 
+##Financial: {}, \n ###Outgoings: {}, \n ###Dependents: {} \n##Other: {}
+""".format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
+
+    content = """##Background: {}\n ##Learning Focus: {}\n ##Project: {}\n 
+##Cost: {}\n ##Job: {}\n ##Links: {}\n ##Comments:{}
+""".format(back, focus, proj, cost, job, links, comments)
+    
     anon = "##Background: {} ##Learning Focus: {} ##Project: {}".format(back, focus, proj)
 
     application = Application(name=name, email=email, content=content,
-                              anon_content=anon, fizzbuzz=fizz, stage="to_anon", batch=batch, grant=grant)
+                              anon_content=anon, fizzbuzz=fizz,
+                              stage="to_anon", batch=batch, grant=grant,
+                              grant_content=grant_content)
 
     return application
 
@@ -63,6 +85,17 @@ def parse_application(app):
 @login_required
 def index():
     return "pong"
+
+
+@app.route('/test/email')
+def test_email():
+    content = """Dear {},\n\nThank you for applying to Hackership.
+We will get back to you within 2 weeks!
+\n\nGreetings,\nthe Hackership Team""".format('Anouk')
+
+    email_applicant('202', 'Application Received', content,
+                    'anoukruhaak@gmail.com')
+    return
 
 
 @app.route('/applications/all', methods=['GET'])
@@ -94,7 +127,7 @@ def follow_up_email():
     recipient = req['email']
 
     email_applicant(app_id, 'Hackership Follow-Up', content, recipient)
-    return SUCCESS
+    return jsonify(success=True)
 
 
 @app.route('/applications/new', methods=['POST'])
@@ -105,21 +138,21 @@ def new_application():
         application.members = select_reviewers()
         db.session.add(application)
         db.session.commit()
-    
+        
+        email_content = """Dear {},\n\nThank you for applying to Hackership.
+We will get back to you within 2 weeks!
+\nGreetings,\nthe Hackership Team""".format(application.name)
+        
         #E-mail Applicant
         email_applicant(application.id, 'Application Received',
-                        'Dear {}, \n Thank you for applying to Hackership. \
-                        \n We will get back to you within 2 weeks! \
-                        \n Greetings, \n \
-                        the Hackership Team'.format(application.name),
-                        'anoukruhaak@gmail.com')
+                        email_content, 'EMAIL_APPLICANT')
 
         #Email Reviewers
         send_email(map(lambda x: x.email, application.members),
                    'TEST New Application',
                    'TESTING You have a new application waiting for review!')
 
-    return SUCCESS
+    return jsonify(success=True)
 
 
 @app.route('/reviewer/new', methods=['GET'])
@@ -132,13 +165,15 @@ def add_reviewer():
     password = generate_password()
 
     user = user_datastore.create_user(name=rev['name'],
-                email=rev['email'], password=password)
+                                      email=rev['email'],
+                                      password=password)
+
+    email_content = """Thank you for helping us review applications!\n
+Please head over to http://review.hackership.org
+and login with username: {} and password:{}
+\nThank you,\n the Hackership Team""".format(user.email, password)
     #Email Reviewer
     send_email(user.email, "Welcome to the Hackership Review Panel",
-               "Thank you for helping us review applications! \
-        Please head over to http://review.hackership.org \
-        and login with username: {} and password: \
-        {}".format(user.email, password))
-    return SUCCESS
+               email_content)
 
-
+    return jsonify(success=True)
