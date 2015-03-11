@@ -21,6 +21,8 @@ SECURITY_REGISTERABLE = False
 SECURITY_SEND_REGISTER_EMAIL = False
 SECURITY_DEFAULT_REMEMBER_ME = True
 
+SCHEMA_TOKEN = os.environ.get("SCHEMA_TOKEN", 'THINGY')
+
 try:
     from local_config import *
 except ImportError:
@@ -34,6 +36,9 @@ if not DEBUG:
 
     if SECURITY_PASSWORD_SALT == "__DEV":
         raise ValueError("You need to set the environment variable 'SECURITY_PASSWORD_SALT'!")
+
+    if SCHEMA_TOKEN == "THINGY":
+        raise ValueError("You need to set the environment variable 'SCHEMA_TOKEN'!")
 
 
 

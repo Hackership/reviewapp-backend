@@ -134,25 +134,27 @@ def follow_up_email():
 
 @app.route('/applications/new', methods=['POST'])
 def new_application():
-    req = request.get_json()
-    if (req['_token'] == 'THINGY'):
-        application = parse_application(req)
-        application.members = select_reviewers()
-        db.session.add(application)
-        db.session.commit()
-        
-        email_content = """Dear {},\n\nThank you for applying to Hackership.
+    req = request.form
+    if not req['_token'] == app.config.get("SCHEMA_TOKEN"):
+        return jsonify(success=False)
+
+    application = parse_application(req)
+    application.members = select_reviewers()
+    db.session.add(application)
+    db.session.commit()
+
+    email_content = u"""Dear {},\n\nThank you for applying to Hackership.
 We will get back to you within 2 weeks!
 \nGreetings,\nthe Hackership Team""".format(application.name)
-        
-        #E-mail Applicant
-        email_applicant(application.id, 'Application Received',
-                        email_content, 'EMAIL_APPLICANT')
 
-        #Email Reviewers
-        send_email(map(lambda x: x.email, application.members),
-                   'TEST New Application',
-                   'TESTING You have a new application waiting for review!')
+    #E-mail Applicant
+    email_applicant(application.id, 'Application Received',
+                    email_content, 'EMAIL_APPLICANT')
+
+    #Email Reviewers
+    send_email(map(lambda x: x.email, application.members),
+               'TEST New Application',
+               'TESTING You have a new application waiting for review!')
 
     return jsonify(success=True)
 
