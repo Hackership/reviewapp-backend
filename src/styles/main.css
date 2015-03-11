@@ -1,0 +1,78 @@
+
+/* Stiziles */
+
+html, body {
+  background: #424242
+}
+
+/* main */
+.form-text {
+  margin-bottom: 10px;
+}
+.main {
+  width: 100vw;
+  height: 100%;
+  margin:0%;
+  background: #424242;
+  color: #fff;
+}
+
+.container {
+  width: 80vw;
+  height: 100%;
+  margin-left:5%;
+  margin-top:0%;
+  background: #00bfa5;
+  color: #424242 ;
+  position:relative;
+  padding:3%;
+  }
+
+.main img {
+  width: 103px;
+  height: 89px;
+  margin-bottom: 10px;
+  text-align: center;
+  background: #424242 ;
+}
+
+.applicationList {
+  width: 90%;
+  height: 80%;
+  background:  #00bfa5;
+  margin: 5%;
+  color:#424242;
+}
+
+.tabPanel {
+  background-color: #424242 ;
+  color:white;
+}
+
+.tabPanel a {
+  color:white;
+}
+
+.tapPanel .TabPane {
+  border-style: none;
+}
+
+/* transitions */
+
+.fade-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.fade-enter.fade-enter-active {
+  opacity: 1;
+}
+
+.fade-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.fade-leave.fade-leave-active {
+  opacity: 0.01;
+}
