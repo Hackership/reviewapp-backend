@@ -1,4 +1,5 @@
 from app import app, db, mail, user_datastore
+from app.schemas import users_schema, me_schema
 from app.models import User, Application, Email
 from app.utils import generate_password
 
@@ -177,3 +178,16 @@ and login with username: {} and password:{}
                email_content)
 
     return jsonify(success=True)
+
+
+## Generic API
+
+@app.route('/api/user/me', methods=['GET'])
+@login_required
+def me():
+    return jsonify(me_schema.dump(current_user._get_current_object()).data)
+
+@app.route('/api/users', methods=['GET'])
+@login_required
+def userlist():
+    return jsonify({"users": users_schema.dump(User.query.all()).data})
