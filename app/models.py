@@ -44,20 +44,19 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 
-
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime)
     changedStageAt = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True)
     name = db.Column(db.String(120))
-    content = db.Column(db.Text, unique=True)
-    anon_content = db.Column(db.Text, unique=True)
-    fizzbuzz = db.Column(db.Text, unique=True)
+    content = db.Column(db.Text)
+    anon_content = db.Column(db.Text)
+    fizzbuzz = db.Column(db.Text)
     stage = db.Column(db.Enum(*stages))
-    batch = db.Column(db.String(64), unique=False)
-    grant = db.Column(db.Boolean, unique=False)
-    grant_content = db.Column(db.Text, unique=False)
+    batch = db.Column(db.String(64))
+    grant = db.Column(db.Boolean)
+    grant_content = db.Column(db.Text)
     comments = db.relationship('Comment', backref='application')
     members = db.relationship('User', secondary=lambda: members_table,
                               backref='applications')
