@@ -63,8 +63,8 @@ def parse_application(app):
         dep = app["Dependents"]
         other = app["Other Outgoings"]
 
-        grant_content = """##Statement:{} \n ##Eligibility:{} 
-\n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {} 
+        grant_content = """##Statement:{} \n ##Eligibility:{}
+\n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {}
 \n ##Strings Attached: {} \n 
 ##Financial: {}, \n ###Outgoings: {}, \n ###Dependents: {} \n##Other: {}
 """.format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
@@ -158,25 +158,30 @@ We will get back to you within 2 weeks!
     return jsonify(success=True)
 
 
-@app.route('/reviewer/new', methods=['GET'])
+@app.route('/reviewer/new', methods=['POST'])
 @login_required
 @roles_accepted('admin')
 def add_reviewer():
+    print('HELLO')
     req = request.get_json()
-    rev = req['reviewer']
 
     password = generate_password()
 
-    user = user_datastore.create_user(name=rev['name'],
-                                      email=rev['email'],
+    user = user_datastore.create_user(name=req['name'],
+                                      email=req['email'],
+                                      status="active",
                                       password=password)
+    if 'role' in req:
+        user_datastore.add_role_to_user(user, req['role'])
 
     email_content = """Thank you for helping us review applications!\n
 Please head over to http://review.hackership.org
 and login with username: {} and password:{}
 \nThank you,\n the Hackership Team""".format(user.email, password)
+    
+    print(user.email)
     #Email Reviewer
-    send_email(user.email, "Welcome to the Hackership Review Panel",
+    send_email([user.email], "Welcome to the Hackership Review Panel",
                email_content)
 
     return jsonify(success=True)
