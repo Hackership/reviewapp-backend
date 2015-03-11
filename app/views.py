@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from flask.ext.security import login_required, roles_accepted, current_user
 from flask_mail import Message
 
@@ -63,17 +63,17 @@ def parse_application(app):
         dep = app["Dependents"]
         other = app["Other Outgoings"]
 
-        grant_content = """##Statement:{} \n ##Eligibility:{}
+        grant_content = u"""##Statement:{} \n ##Eligibility:{}
 \n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {}
-\n ##Strings Attached: {} \n 
+\n ##Strings Attached: {} \n
 ##Financial: {}, \n ###Outgoings: {}, \n ###Dependents: {} \n##Other: {}
 """.format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
 
-    content = """##Background: {}\n ##Learning Focus: {}\n ##Project: {}\n 
+    content = u"""##Background: {}\n ##Learning Focus: {}\n ##Project: {}\n 
 ##Cost: {}\n ##Job: {}\n ##Links: {}\n ##Comments:{}
 """.format(back, focus, proj, cost, job, links, comments)
-    
-    anon = "##Background: {} ##Learning Focus: {} ##Project: {}".format(back, focus, proj)
+
+    anon = u"##Background: {} ##Learning Focus: {} ##Project: {}".format(back, focus, proj)
 
     application = Application(name=name, email=email, content=content,
                               anon_content=anon, fizzbuzz=fizz,
