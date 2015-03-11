@@ -1,10 +1,12 @@
+
+from flask.ext.security import login_required, roles_accepted, current_user
+from flask_mail import Message
+
 from app import app, db, mail, user_datastore
 from app.schemas import users_schema, me_schema
 from app.models import User, Application, Email
 from app.utils import generate_password
 
-from flask.ext.security import login_required, roles_accepted
-from flask_mail import Message
 
 from flask import (Flask, session, redirect, url_for, escape,
                    request, jsonify)

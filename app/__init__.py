@@ -1,9 +1,10 @@
 from flask import Flask
+from flask.ext.security import Security, SQLAlchemyUserDatastore
+from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+
 from flask_mail import Mail
-from flask.ext.security import Security, SQLAlchemyUserDatastore
 
 # init app
 app = Flask(__name__)
@@ -17,6 +18,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
+# setup mail
 mail = Mail(app)
 
 # import models (only after the DB and everything has happened!)
