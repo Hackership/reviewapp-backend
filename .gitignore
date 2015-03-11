@@ -3,6 +3,7 @@
 flask/
 *.pyc
 test_post.py
+test_app.py
 local_config.py
 ### SublimeText ###
 *.sublime-workspace

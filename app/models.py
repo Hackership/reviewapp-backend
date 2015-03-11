@@ -46,7 +46,6 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
 
-
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime, server_default=text('NOW()'))

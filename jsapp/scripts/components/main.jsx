@@ -4,14 +4,14 @@
 
 'use strict';
 
-var ReviewsApp = require('./ReviewsApp');
-var AddReviewer = require('./AddReviewer');
-var ApplicationList = require('./ApplicationList');
-var React = require('react');
-var Router = require('react-router');
-var Route = Router.Route;
-var Link = require('react-router').Link;
-var RouteHandler = Router.RouteHandler;
+var ReviewsApp = require('./ReviewsApp'),
+	AddReviewer = require('./AddReviewer'),
+	ApplicationList = require('./ApplicationList'),
+	React = require('react'),
+	Router = require('react-router'),
+	Route = Router.Route,
+	Link = require('react-router').Link,
+	RouteHandler = Router.RouteHandler;
 
 var content = document.getElementById('content');
 

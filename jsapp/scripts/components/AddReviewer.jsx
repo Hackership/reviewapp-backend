@@ -16,24 +16,22 @@ var AddReviewer = React.createClass({
   submitForm: function(e){
     e.preventDefault();
     debugger;
-    var name = this.refs.name.getValue().trim(),
-          email = this.refs.email.getValue().trim(),
-          admin = this.refs.admin.getValue().trim(),
+    var   admin = this.refs.admin.getValue().trim(),
           mod = this.refs.mod.getValue().trim(),
           role;
+      
       if (admin){
         role = 'admin'
       }else if (mod){
         role='mod'
       }
 
-      if (!name || !email) {
+      if (!(this.state.name.length > 3) || !(this.state.email.length > 6)) {
         console.log('ERROR SENDING')
-        //SHOW A ERROR MESSAGE
+           alert("Name or Email is empty!")
           return;
       }else{
-        var rev_object = {"name": name, "email": email, "role": role};
-        // var endpoint = "http://127.0.0.1:5000";
+        var rev_object = {"name": this.state.name, "email": this.state.email, "role": role};
         var url = "/reviewer/new";
         
          $.ajax({
@@ -41,17 +39,29 @@ var AddReviewer = React.createClass({
           url: url,
           contentType: 'application/json',
           data: JSON.stringify(rev_object),
-          success: function(result) {
-              this.refs.name.getValue().value = '';
-              this.refs.email.getValue().value = '';       
+          success: function(result) {    
             }
           });
          
       } 
+
+      this.setState({name:'', email:''});
       return;
+  },
+  getInitialState: function() {
+    return {name: '', email: ''};
+  },
+  changeName: function(event) {
+    this.setState({name: event.target.value});
+  },
+  changeEmail: function(event) {
+    this.setState({email: event.target.value});
   },
 
   render: function() { 
+    var name = this.state.name,
+        email = this.state.email;
+
     return (
     <div className="main">
       <div className="container">
@@ -68,10 +78,10 @@ var AddReviewer = React.createClass({
                    label="Is Admin"/> 
          <Input type='text' label="Name:" labelClassName="col-xs-2" 
                       wrapperClassName="col-xs-8" 
-                      placeholder="Reviewer's Name" ref="name" />
+                      placeholder="Reviewer's Name" value={name} onChange={this.changeName} ref="name" />
          <Input type='text' label="Email:" labelClassName="col-xs-2" 
                       wrapperClassName="col-xs-8" 
-                      placeholder="Reviewer's Email" ref="email" />
+                      placeholder="Reviewer's Email" value={email} onChange={this.changeEmail} ref="email" />
           <button className="btn btn-primary btn-form" type="Post">Submit</button>
         </form>
         </div>
