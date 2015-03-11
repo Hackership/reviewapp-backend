@@ -84,7 +84,6 @@ def parse_application(app):
 
 
 @app.route('/')
-@app.route('/ping')
 @login_required
 def index():
     return app.send_static_file('index.html')
