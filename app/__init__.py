@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
@@ -32,7 +32,17 @@ def ensure_roles():
     for rolename in ["admin", "moderator"]:
         user_datastore.find_or_create_role(rolename)
 
-if app.debug:
+if app.debug:    
+    def add_cors_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        if request.method == 'OPTIONS':
+            response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, POST, PUT'
+            headers = request.headers.get('Access-Control-Request-Headers')
+            if headers:
+                response.headers['Access-Control-Allow-Headers'] = headers
+        return response
+    app.after_request(add_cors_headers)
+
     # Create a user to test with
     @app.before_first_request
     def create_user():
