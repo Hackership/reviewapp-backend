@@ -33,8 +33,8 @@ var AddReviewer = React.createClass({
           return;
       }else{
         var rev_object = {"name": name, "email": email, "role": role};
-        var endpoint = "http://127.0.0.1:5000";
-        var url = endpoint + "/reviewer/new";
+        // var endpoint = "http://127.0.0.1:5000";
+        var url = "/reviewer/new";
         
          $.ajax({
           type: 'POST',

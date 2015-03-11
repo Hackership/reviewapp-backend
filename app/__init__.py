@@ -8,7 +8,7 @@ from flask.ext.script import Manager
 from flask_mail import Mail
 
 # init app
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../assets", static_path="/assets")
 app.config.from_object('config')
 
 # setup DB
