@@ -4,7 +4,7 @@ from flask.ext.security import UserMixin, RoleMixin
     # UserMixin, RoleMixin,
 
 
-stages = ('processing', 'to_anon', 'in_review',
+stages = ('incoming', 'in_review',
           'email_send', 'reply_received', 'skyped',
           'accepted', 'rejected', 'grant_review',
           'grant_accepted', 'grant_rejected', 'archived',

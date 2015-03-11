@@ -77,7 +77,7 @@ def parse_application(app):
 
     application = Application(name=name, email=email, content=content,
                               anon_content=anon, fizzbuzz=fizz,
-                              stage="to_anon", batch=batch, grant=grant,
+                              stage="incoming", batch=batch, grant=grant,
                               grant_content=grant_content)
 
     return application
