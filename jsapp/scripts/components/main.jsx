@@ -11,11 +11,18 @@ var ReviewsApp = require('./ReviewsApp'),
 	Router = require('react-router'),
 	Route = Router.Route,
 	Link = require('react-router').Link,
+	dispatcher = require('../dispatchers/dispatcher'),
+	Actions = require('../actions/actions'),
 	RouteHandler = Router.RouteHandler;
 
 var content = document.getElementById('content');
 
 var MainAppWrap = React.createClass({
+	
+	componentDidMount: function() {
+		Actions.getApplications();
+	},
+
 	render: function(){
 		return (
 			<div>

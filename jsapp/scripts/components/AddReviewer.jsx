@@ -39,8 +39,8 @@ var AddReviewer = React.createClass({
           url: url,
           contentType: 'application/json',
           data: JSON.stringify(rev_object),
-          success: function(result) {    
-            }
+          }) .done(function( msg ) {
+            alert( "Reviewer Added: " + msg );
           });
          
       } 
