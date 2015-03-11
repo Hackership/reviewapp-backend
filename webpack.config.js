@@ -11,13 +11,14 @@ module.exports = {
 
   output: {
     filename: 'main.js',
+    path: 'assets',
     publicPath: '/assets/'
   },
 
   cache: true,
   debug: true,
   devtool: false,
-  entry: ['./src/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
+  entry: ['./jsapp/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
 
   stats: {
     colors: true,
