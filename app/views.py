@@ -3,8 +3,8 @@ from flask.ext.security import login_required, roles_accepted, current_user
 from flask_mail import Message
 
 from app import app, db, mail, user_datastore
-from app.schemas import users_schema, me_schema
-from app.models import User, Application, Email
+from app.schemas import users_schema, me_schema, admin_app_state, app_state
+from app.models import User, Application, Email, REVIEW_STAGES
 from app.utils import generate_password
 
 
@@ -77,7 +77,7 @@ def parse_application(app):
 
     application = Application(name=name, email=email, content=content,
                               anon_content=anon, fizzbuzz=fizz,
-                              stage="to_anon", batch=batch, grant=grant,
+                              stage="incoming", batch=batch, grant=grant,
                               grant_content=grant_content)
 
     return application
@@ -98,6 +98,19 @@ We will get back to you within 2 weeks!
     email_applicant('202', 'Application Received', content,
                     'anoukruhaak@gmail.com')
     return
+
+
+@app.route('/api/app_state')
+@login_required
+def get_state():
+    schema = app_state
+    query = Application.query.filter(Application.stage in REVIEW_STAGES)
+    if current_user.has_role('admin'):
+        schema = admin_app_state
+        query = Application.query
+
+    return jsonify(schema.dump({"user": current_user._get_current_object(),
+                                "applications": query.all()}).data)
 
 
 @app.route('/applications/all', methods=['GET'])
