@@ -5,9 +5,12 @@
 'use strict';
 
 var React = require('react/addons'),
+  _ = require('underscore'),
 	rtbs  = require('react-bootstrap'),
   TabbedArea = rtbs.TabbedArea,
   TabPane = rtbs.TabPane,
+  Link = require('react-router').Link,
+  Route = require('react-router').Route,
   ApplicationList = require('./ApplicationList');
 
 // CSS
@@ -25,6 +28,7 @@ var ReviewsApp = React.createClass({
       
     return (
       <div className="main">
+       <Link to="reviewer">Reviewer</Link>
         <div className="container">
     	   <TabbedArea className="tabPanel" defaultActiveKey={1}>
           <TabPane className="tab" eventKey={1} tab={stageOne}><ApplicationList type="stage-1"/></TabPane>
