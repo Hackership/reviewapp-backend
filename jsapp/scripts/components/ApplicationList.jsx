@@ -19,8 +19,8 @@ var Application = React.createClass({
   
   render: function() {
     var  fieldOne = this.props.app_data['fieldOne'],
-          fieldTwo  = this.props.app_data['fieldTwo'];
-          console.log(this.props.app_data['fieldTwo']);
+         fieldTwo  = this.props.app_data['fieldTwo'];
+          
     return (
         <div>
          <Input type="textarea" className="form-text" placeholder={fieldOne} label="Background" labelClassName="col-xs-2" 
@@ -68,27 +68,23 @@ var ApproveQuestions = React.createClass({
 var ApplicationsList = React.createClass({
 
   render: function() {
-    var input_one =  {'fieldOne': 'test2', 
-               'fieldTwo': 'trying'},
-        input_two = {'fieldOne': 'stage2', 
-               'fieldTwo': 'trying2'},
-        app = this.props.type === 'stage-1' ? input_one : input_two;
-      
+    var input_one =  [{'fieldOne': 'test2','fieldTwo': 'trying'},{'fieldOne': 'stage2','fieldTwo': 'trying2'}],
+        app_input = input_one,
+        app = input_one[0];
 
     return (
        <div className="applicationList">
         <Accordion>
-          <Panel header="new">
-            <Application app_data={app} />
-            <FollowUpQuestions />
-          </Panel>
-           <Panel header="new">
-            <Application app_data={app} />
-            <ApproveQuestions questions="What is your project about?" />
-          </Panel>
-           <Panel header="new">
-            <Application app_data={app} />
-          </Panel>
+        {_.map(app_input, function(app_data, index){
+              
+              var hdr_str = app_data.fieldOne;
+              var hdr = (<h3>{hdr_str}</h3>);
+              
+              return(
+                <Panel header={hdr} bsStyle='info' eventKey={index}>
+                  <Application app_data={app_data} index={index} />
+                </Panel>)
+            })}
         </Accordion>
         </div>
     );

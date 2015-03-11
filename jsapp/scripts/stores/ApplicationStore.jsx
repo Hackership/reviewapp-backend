@@ -10,22 +10,14 @@
 });
 
 var Applications = Backbone.Collection.extend({
-    model: Application
+    model: Application,
 
  byStage: function(stage) {
-    filtered = this.filter(function(app) {
-      return app.get("stage") === stage;
-      });
-    return new Applications(filtered);
-  }
+ 	return this.where({"stage": stage});
+ },
 
 });
 
-var incoming = Applications.byStage("incoming");
-var in_review = Applications.byStage('in_review');
-var email_send = Applications.byStage('email_send');
-var reply_received = Applications.byStage('reply_received');
-var skyped = Applications.byStage('skyped');
+var applications = new Applications();
 
-
-module.exports = incoming, in_review, email_send, reply_received, skyped;
+module.exports = {applications: applications}
