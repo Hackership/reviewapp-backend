@@ -69,6 +69,9 @@ class Application(db.Model):
     members = db.relationship('User', secondary=lambda: members_table,
                               backref='applications')
 
+    comments = db.relationship('Comment')
+    emails = db.relationship('Email')
+
     def send_email(self, subject, content, recipients=None):
         if recipients is None:
             recipients = [self.email]

@@ -84,6 +84,7 @@ def get_applications(application):
     application.anonymizer = current_user._get_current_object().id
     application.members = _select_reviewers()
     application.stage = "in_review"
+    application.changedStageAt = datetime.now()
     db.session.add(application)
     db.session.commit()
 
@@ -104,8 +105,8 @@ def add_comment(application):
     # FIXME verification would be great...
     comment = Comment(content=content,
                       question=request.form.get("question", False),
-                      author=current_user,
-                      application_id=application.id,
+                      author=current_user.id,
+                      application=application.id,
                       stage=application.stage)
 
     db.session.add(comment)
@@ -147,6 +148,7 @@ def new_application():
                               fizzbuzz=form['Hacking task'],
                               stage="incoming", batch=form['batch'],
                               grant=grant,
+                              changedStageAt=datetime.now(),
                               grant_content=grant_content,
                               createdAt=datetime.now())
 
