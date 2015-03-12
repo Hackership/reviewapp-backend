@@ -1,11 +1,11 @@
-
+# -*- coding: utf-8 -*-
 from flask import Flask, request
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
 
-from flask_mail import Mail
+from flask_mail import Mail, email_dispatched
 
 # init app
 app = Flask(__name__, static_folder="../assets", static_path="/assets")
@@ -54,6 +54,13 @@ if app.debug:
                 email='admin@example.org',
                 password='password'),
             user_datastore.find_role("admin"))
+
+    def log_message(message, app):
+        app.logger.debug(u"Email {} from {} to {}:\n{}\n".format(
+                        message.subject, message.sender,
+                        message.recipients, message.body))
+
+    email_dispatched.connect(log_message)
 
 # this defines all the views
 # they rely on things everywhere, do this last!
