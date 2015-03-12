@@ -67,17 +67,6 @@ def index():
     return app.send_static_file('index.html')
 
 
-@app.route('/test/email')
-def test_email():
-    content = u"""Dear {},\n\nThank you for applying to Hackership.
-We will get back to you within 2 weeks!
-\n\nGreetings,\nthe Hackership Team""".format('Anouk')
-
-    email_applicant('202', 'Application Received', content,
-                    'anoukruhaak@gmail.com')
-    return
-
-
 @app.route('/api/app_state')
 @login_required
 def get_state():
@@ -134,18 +123,15 @@ def new_application():
     db.session.add(application)
     db.session.commit()
 
-    email_content = u"""Dear {},\n\nThank you for applying to Hackership.
-We will get back to you within 2 weeks!
-\nGreetings,\nthe Hackership Team""".format(application.name)
-
-    #E-mail Applicant
+    # E-mail Applicant
     email_applicant(application.id, 'Application Received',
-                    email_content, 'EMAIL_APPLICANT')
+                    render_template("emails/applicant/received.md", app=application),
+                    'EMAIL_APPLICANT')
 
-    #Email Reviewers
-    send_email(map(lambda x: x.email, application.members),
-               'TEST New Application',
-               'TESTING You have a new application waiting for review!')
+    # Email Reviewers
+    # send_email(map(lambda x: x.email, application.members),
+    #            'TEST New Application',
+    #            'TESTING You have a new application waiting for review!')
 
     return jsonify(success=True)
 
@@ -154,7 +140,6 @@ We will get back to you within 2 weeks!
 @login_required
 @roles_accepted('admin')
 def add_reviewer():
-    print('HELLO')
     req = request.get_json()
 
     password = generate_password()
@@ -166,15 +151,12 @@ def add_reviewer():
     if 'role' in req:
         user_datastore.add_role_to_user(user, req['role'])
 
-    email_content = """Thank you for helping us review applications!\n
-Please head over to http://review.hackership.org
-and login with username: {} and password:{}
-\nThank you,\n the Hackership Team""".format(user.email, password)
-    
-    print(user.email)
     #Email Reviewer
     send_email([user.email], "Welcome to the Hackership Review Panel",
-               email_content)
+               render_template("emails/reviewer/added.md",
+                               username=user.email,
+                               password=password,
+                               name=user.name))
 
     return jsonify(success=True)
 
@@ -185,6 +167,7 @@ and login with username: {} and password:{}
 @login_required
 def me():
     return jsonify(me_schema.dump(current_user._get_current_object()).data)
+
 
 @app.route('/api/users', methods=['GET'])
 @login_required

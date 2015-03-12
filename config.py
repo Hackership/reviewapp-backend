@@ -6,6 +6,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 HOSTNAME = os.environ.get("HOSTNAME", "review.hackership.org")
 DEBUG = os.environ.get("PRODUCTION", False) is False
 
+MAIL_SUPPRESS_SEND = DEBUG
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "__DEV")
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", 'sqlite:///{}'.format(os.path.join(basedir, 'app.db')))
