@@ -87,7 +87,7 @@ def get_state():
 @login_required
 @roles_accepted('admin')
 @with_application_at_stage("incoming")
-def get_applications(application):
+def switch_to_review(application):
     anon_content = request.args.get("anon_content", None)
     if anon_content:
         application.anon_content = anon_content
@@ -103,6 +103,39 @@ def get_applications(application):
                            render_template("emails/reviewer/new_application.md", app=application),
                            map(lambda x: x.email, application.members))
 
+    return _render_application(application)
+
+
+@app.route('/application/<id>/move_to_stage/email_send', methods=['GET'])
+@login_required
+@roles_accepted('moderator', 'admin')
+@with_application_at_stage("in_review")
+def switch_to_email_send(application):
+    email = request.args.get("email", None)
+    if not email:
+        abort(400, "Missing email")
+
+    content = render_template("emails/applicant/questions.md",
+                              app=application,
+                              content=email)
+
+    email = Email(author=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application=application.id,
+                  anon_content=email)
+
+    application.stage = "email_send"
+    application.changedStageAt = datetime.now()
+
+    db.session.add(email)
+    db.session.add(application)
+
+    # Email Reviewers
+    application.send_email('Your application to Hackership', content)
+
+    db.session.commit()
     return _render_application(application)
 
 
