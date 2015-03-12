@@ -23,7 +23,8 @@ class MeUserSchema(Schema):
 
 class CommentSchema(Schema):
     class Meta:
-        fields = ('id', 'author', 'content', 'stage', 'question')
+        fields = ('id', 'author', 'createdAt',
+                  'content', 'stage', 'question')
 
     author = fields.Nested(UserSchema)
 
@@ -48,6 +49,7 @@ class AnonymousApplicationSchema(Schema):
                   'members', 'fizzbuzz', 'stage', 'batch', 'comments',
                   'emails')
 
+    members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
     emails = fields.Nested(AnonEmailSchema, many=True)
 
@@ -59,6 +61,7 @@ class ApplicationSchema(Schema):
                   'anon_content', 'members', 'fizzbuzz', 'stage',
                   'batch', 'comments', 'emails')
 
+    members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
     emails = fields.Nested(EmailSchema, many=True)
 
