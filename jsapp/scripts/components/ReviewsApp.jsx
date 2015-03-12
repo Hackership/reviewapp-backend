@@ -42,8 +42,8 @@ var ReviewsApp = React.createClass({
     }
 
     if (user.attributes.can_moderate) {
-        apps.splice(2, 0, applications.byStage('in_review'));
-        titles.splice(2 ,0, 'To_Email');
+        apps.splice(2, 0, applications.toEmail());
+        titles.splice(2 ,0, 'To Email');
     }
 
     return (

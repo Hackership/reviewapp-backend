@@ -5,6 +5,8 @@
 'use strict';
  var Backbone = require('backbone'),
  	 Actions = require('../actions/actions'),
+ 	 moment = require('moment'),
+ 	 _ =require('underscore'),
  	 Dispatcher = require('../dispatchers/dispatcher');
 
 var $=require('jquery');
@@ -16,6 +18,12 @@ var $=require('jquery');
 var Applications = Backbone.Collection.extend({
     model: Application,
 
+    toEmail: function(){
+    	var weekAgo = moment().subtract(7, 'days');
+    
+    	return _.filter(this.where({"stage": 'in_review'}), 
+    		function(x){return moment(x.changedStageAt) < weekAgo});
+    },
 
  	byStage: function(stage) {
  		return this.where({"stage": stage});

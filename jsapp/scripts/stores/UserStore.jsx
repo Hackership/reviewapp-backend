@@ -20,7 +20,6 @@ Dispatcher.register(function(payload) {
   switch(payload.actionType) {
     case 'setUser':
 		user.set(payload.payload);
-        console.log('STORE:', payload.payload)
 		break;
 
     default:

@@ -30,7 +30,6 @@ var MainAppWrap = React.createClass({
 	},
 
 	render: function(){
-		console.log('USER:', user.attributes)
 
 		var content = user.attributes.can_admin ? <Link className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link> : "";
 		return (
