@@ -82,7 +82,7 @@ var AddReviewer = React.createClass({
          <Input type='text' label="Email:" labelClassName="col-xs-2" 
                       wrapperClassName="col-xs-8" 
                       placeholder="Reviewer's Email" value={email} onChange={this.changeEmail} ref="email" />
-          <button className="btn btn-primary btn-form" type="Post">Submit</button>
+          <button bsStyle="success" className="btn" type="Post">Submit</button>
         </form>
         </div>
       </div>
