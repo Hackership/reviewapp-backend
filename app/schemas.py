@@ -58,8 +58,8 @@ class AnonymousApplicationSchema(Schema):
 class ApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'content',
-                  'anon_content', 'members', 'fizzbuzz', 'stage',
-                  'batch', 'comments', 'emails')
+                  'name', 'email', 'anon_content', 'members',
+                  'fizzbuzz', 'stage', 'batch', 'comments', 'emails')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)

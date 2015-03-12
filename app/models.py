@@ -108,7 +108,7 @@ class Comment(db.Model):
 
 class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    createdAt = db.Column(db.DateTime)
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.now)
     author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     stage = db.Column(db.Enum(*stages))
     incoming = db.Column(db.Boolean, default=False)

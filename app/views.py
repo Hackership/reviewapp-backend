@@ -14,6 +14,8 @@ from functools import wraps
 
 import logging
 import random
+import json
+import re
 
 
 def _select_reviewers():
@@ -161,6 +163,76 @@ def new_application():
                                            app=application))
 
     return jsonify(success=True)
+
+
+EMAIL_MATCHER = re.compile("appl-15([\d]+)@.*")
+
+
+class BounceError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
+def _handle_email(email):
+    email_addr = email["email"]
+    match = EMAIL_MATCHER.match(email_addr)
+    if not match:
+        app.logger.warning("Weird email received: {}".format(email))
+        return
+
+    application = Application.query.get(int(match.group(1)))
+    if not application:
+        raise BounceError("Application not found")
+
+    sender = email['from_email'].strip().lower()
+
+    if application.email.lower() == sender:
+        db_mail = Email(incoming=True,
+                        stage=application.stage,
+                        application=application.id,
+                        content=email["text"])
+
+        if application.stage == 'email_send':
+            application.stage = "reply_received"
+            db.session.add(application)
+
+        db.session.add(db_mail)
+        db.session.commit()
+
+        return
+
+    user = User.query.filter(User.email == sender).first()
+    if not user:
+        raise BounceError("User unknown")
+
+    comment = Comment(author=user.id,
+                      application=application.id,
+                      stage=application.stage,
+                      content=email["text"])
+    db.session.add(comment)
+    db.session.commit()
+
+
+
+@app.route('/email/incoming', methods=['POST'])
+def incoming_email():
+    events = request.form.get("mandrill_events")
+
+    if not events:
+        return
+
+    events = json.loads(events)
+
+    for event in events:
+        if event["event"] != "inbound":
+            continue
+        try:
+            _handle_email(event["msg"])
+        # except BounceError as exc:
+        except Exception as exc:
+            app.logger.warning("Problem parsing email {}: {}({})".format(event, type(exc), exc))
+
+    return ""
 
 
 @app.route('/reviewer/new', methods=['POST'])
