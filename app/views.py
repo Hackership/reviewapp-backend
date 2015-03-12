@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 from flask import (Flask, session, redirect, url_for, escape,
-                   request, jsonify)
+                   request, jsonify, render_template)
 
 import logging
 
@@ -38,130 +38,25 @@ def select_reviewers():
 
 #APPLICATIONS
 def parse_application(app):
-    cost = app['Cost ']
-    back = app['Background and Motivation']
-    job = app['Job']
-    proj = app['Project Idea']
-    focus = app['Learning Focus']
     name = app['Name']
     email = app['Email']
     fizz = app['Hacking task']
     batch = app['batch']
-    links = app['Links']
-    comments = app['Comments']
     grant = 'Applying for a Programme Fee Grant' in app
 
     grant_content = ""
     if grant:
-        honesty = app["Declaration of Honesty"]
-        conf = app["Confirmation of Place"]
-        nxt_steps = app["Next Steps"]
-        strings = app["Strings Attached to the Grant"]
-        decl = app["Statement from you."]
-        elig = app["Eligibility to Apply"]
-        fin = app["Financial Information"]
-        outgoings = app["Outgoings, Living Costs"]
-        dep = app["Dependents"]
-        other = app["Other Outgoings"]
+        grant_content = render_template("forms/grant_content.md", app=app)
 
-        grant_content = u"""
+    content = render_template("forms/content.md", app=app)
 
-##Statement:
-
-{}
-
-
-##Eligibility:
-
-{}
-
-
-##Honesty:
-
-{}
-
-
-##Confirmatin:
-
-{}
-
-
-##Next Steps:
-
-{}
-
-
-##Strings Attached:
-
-{}
-
-
-##Financial:
-
-{}
-
-
-###Outgoings:
-
-{}
-
-###Dependents:
-
-{}
-
-#Other:
-
-{}
-""".format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
-
-    content = u"""
-## Background:
-
-{}
-
-## Learning Focus:
-
-{}
-
-## Project:
-
-{}
-
-## Cost:
-
-{}
-
-## Job:
-
-{}
-
-## Links:
-
-{}
-
-## Comments:
-
-{}
-""".format(back, focus, proj, cost, job, links, comments)
-
-    anon = u"""
-
-## Background:
-
-{}
-
-## Learning Focus:
-
-{}
-
-## Project:
-
-{}""".format(back, focus, proj)
+    anon = render_template("forms/content_anon.md", app=app)
 
     application = Application(name=name, email=email, content=content,
                               anon_content=anon, fizzbuzz=fizz,
                               stage="incoming", batch=batch, grant=grant,
-                              grant_content=grant_content, createdAt=datetime.now())
+                              grant_content=grant_content,
+                              createdAt=datetime.now())
 
     return application
 
