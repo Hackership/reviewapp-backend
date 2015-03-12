@@ -6,6 +6,7 @@ from app import app, db, mail, user_datastore
 from app.schemas import users_schema, me_schema, admin_app_state, app_state
 from app.models import User, Application, Email, REVIEW_STAGES
 from app.utils import generate_password
+from datetime import datetime
 
 
 from flask import (Flask, session, redirect, url_for, escape,
@@ -63,22 +64,104 @@ def parse_application(app):
         dep = app["Dependents"]
         other = app["Other Outgoings"]
 
-        grant_content = u"""##Statement:{} \n ##Eligibility:{}
-\n ##Honesty: {} \n ##Confirmatin: {} \n ##Next Steps: {}
-\n ##Strings Attached: {} \n
-##Financial: {}, \n ###Outgoings: {}, \n ###Dependents: {} \n##Other: {}
+        grant_content = u"""
+
+##Statement:
+
+{}
+
+
+##Eligibility:
+
+{}
+
+
+##Honesty:
+
+{}
+
+
+##Confirmatin:
+
+{}
+
+
+##Next Steps:
+
+{}
+
+
+##Strings Attached:
+
+{}
+
+
+##Financial:
+
+{}
+
+
+###Outgoings:
+
+{}
+
+###Dependents:
+
+{}
+
+#Other:
+
+{}
 """.format(decl, elig, honesty, conf, nxt_steps, strings, fin, outgoings, dep, other)
 
-    content = u"""##Background: {}\n ##Learning Focus: {}\n ##Project: {}\n 
-##Cost: {}\n ##Job: {}\n ##Links: {}\n ##Comments:{}
+    content = u"""
+## Background:
+
+{}
+
+## Learning Focus:
+
+{}
+
+## Project:
+
+{}
+
+## Cost:
+
+{}
+
+## Job:
+
+{}
+
+## Links:
+
+{}
+
+## Comments:
+
+{}
 """.format(back, focus, proj, cost, job, links, comments)
 
-    anon = u"##Background: {} ##Learning Focus: {} ##Project: {}".format(back, focus, proj)
+    anon = u"""
+
+## Background:
+
+{}
+
+## Learning Focus:
+
+{}
+
+## Project:
+
+{}""".format(back, focus, proj)
 
     application = Application(name=name, email=email, content=content,
                               anon_content=anon, fizzbuzz=fizz,
                               stage="incoming", batch=batch, grant=grant,
-                              grant_content=grant_content)
+                              grant_content=grant_content, createdAt=datetime.now())
 
     return application
 
@@ -91,7 +174,7 @@ def index():
 
 @app.route('/test/email')
 def test_email():
-    content = """Dear {},\n\nThank you for applying to Hackership.
+    content = u"""Dear {},\n\nThank you for applying to Hackership.
 We will get back to you within 2 weeks!
 \n\nGreetings,\nthe Hackership Team""".format('Anouk')
 
@@ -201,7 +284,7 @@ and login with username: {} and password:{}
     return jsonify(success=True)
 
 
-## Generic API
+##  Generic API
 
 @app.route('/api/user/me', methods=['GET'])
 @login_required

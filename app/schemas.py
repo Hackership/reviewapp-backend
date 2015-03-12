@@ -54,6 +54,11 @@ class AnonymousApplicationSchema(Schema):
 
 # this only goes to Admins
 class ApplicationSchema(Schema):
+    class Meta:
+        fields = ('id', 'createdAt', 'changedStageAt', 'content',
+                  'anon_content', 'members', 'fizzbuzz', 'stage',
+                  'batch', 'comments', 'emails')
+
     comments = fields.Nested(CommentSchema, many=True)
     emails = fields.Nested(EmailSchema, many=True)
 
