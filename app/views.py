@@ -2,7 +2,8 @@
 from flask.ext.security import login_required, roles_accepted, current_user
 
 from app import app, db, mail, user_datastore
-from app.schemas import users_schema, me_schema, admin_app_state, app_state
+from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
+                         AnonymousApplicationSchema, ApplicationSchema)
 from app.models import User, Application, Email, Comment, REVIEW_STAGES
 from app.utils import generate_password, send_email
 from datetime import datetime
@@ -97,6 +98,13 @@ def get_applications(application):
     return jsonify(success=True)
 
 
+def _render_application(application):
+    schema = AnonymousApplicationSchema()
+    if current_user.has_role("admin"):
+        schema = ApplicationSchema()
+    return jsonify({"application": schema.dump(application).data})
+
+
 @app.route('/application/<id>/comment', methods=['POST'])
 @login_required
 @with_application
@@ -116,7 +124,7 @@ def add_comment(application):
 
     # email to other reviewers or moderator?
 
-    return jsonify(success=True)
+    return _render_application(application)
 
 
 @app.route('/application/update', methods=['POST'])
