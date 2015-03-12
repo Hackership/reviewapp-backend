@@ -57,6 +57,13 @@ def with_application(func):
     return wrapper
 
 
+def _render_application(application):
+    schema = AnonymousApplicationSchema()
+    if current_user.has_role("admin"):
+        schema = ApplicationSchema()
+    return jsonify({"application": schema.dump(application).data})
+
+
 @app.route('/')
 @login_required
 def index():
@@ -95,14 +102,8 @@ def get_applications(application):
     application.send_email('New Application to review',
                            render_template("emails/reviewer/new_application.md", app=application),
                            map(lambda x: x.email, application.members))
-    return jsonify(success=True)
 
-
-def _render_application(application):
-    schema = AnonymousApplicationSchema()
-    if current_user.has_role("admin"):
-        schema = ApplicationSchema()
-    return jsonify({"application": schema.dump(application).data})
+    return _render_application(application)
 
 
 @app.route('/application/<id>/comment', methods=['POST'])
@@ -219,7 +220,6 @@ def _handle_email(email):
                       content=email["text"])
     db.session.add(comment)
     db.session.commit()
-
 
 
 @app.route('/email/incoming', methods=['POST'])
