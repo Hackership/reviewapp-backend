@@ -8,34 +8,50 @@ from app.utils import generate_password, send_email
 from datetime import datetime
 
 from flask import (Flask, session, redirect, url_for, escape,
-                   request, jsonify, render_template)
+                   request, jsonify, render_template, abort)
 
 from functools import wraps
 
-
-def select_reviewers():
-    reviewers = User.query.filter(User.status == 'active').limit(2).all()
-
-    return reviewers
+import logging
+import random
 
 
+def _select_reviewers():
+    # Find review only status
+    reviewers = User.query.outerjoin("roles"
+                         ).filter(User.roles == None).all()
+                # ).filter(User.status == 'active'
+
+    random.shuffle(reviewers)
+
+    return reviewers[:2]   # fetches a random two reviewers
 
 
 def with_application_at_stage(stages):
     if isinstance(stages, basestring):
         stages = [stages]
 
-    content = render_template("forms/content.md", app=app)
+    def outerwrap(func):
+        @wraps(func)
+        def innerwrap(id, *args, **kwargs):
+            application = db.session.query(Application).get(id)
+            if not application:
+                abort(404, "Application Not Found")
+            if application.stage not in stages:
+                abort(400, "Not at right stage")
+            return func(application, *args, **kwargs)
+        return innerwrap
+    return outerwrap
 
-    anon = render_template("forms/content_anon.md", app=app)
 
-    application = Application(name=name, email=email, content=content,
-                              anon_content=anon, fizzbuzz=fizz,
-                              stage="incoming", batch=batch, grant=grant,
-                              grant_content=grant_content,
-                              createdAt=datetime.now())
-
-    return application
+def with_application(func):
+    @wraps(func)
+    def wrapper(id, *args, **kwargs):
+        application = db.session.query(Application).get(id)
+        if not application:
+            abort(404, "Application Not Found")
+        return func(application, *args, **kwargs)
+    return wrapper
 
 
 @app.route('/')
@@ -57,12 +73,47 @@ def get_state():
                                 "applications": query.all()}).data)
 
 
-@app.route('/applications/all', methods=['GET'])
+@app.route('/application/<id>/move_to_stage/in_review', methods=['GET'])
 @login_required
-def get_applications():
+@roles_accepted('admin')
+@with_application_at_stage("incoming")
+def get_applications(application):
+    anon_content = request.args.get("anon_content", None)
+    if anon_content:
+        application.anon_content = anon_content
+    application.anonymizer = current_user._get_current_object().id
+    application.members = _select_reviewers()
+    application.stage = "in_review"
+    db.session.add(application)
+    db.session.commit()
 
-    applications = Application.query.all()
-    return applications
+    # Email Reviewers
+    application.send_email('New Application to review',
+                           render_template("emails/reviewer/new_application.md", app=application),
+                           map(lambda x: x.email, application.members))
+    return jsonify(success=True)
+
+
+@app.route('/application/<id>/comment', methods=['POST'])
+@login_required
+@with_application
+def add_comment(application):
+    content = request.form.get("comment") or request.args.get("comment")
+    if not content:
+        abort(400, "Please pass a comment")
+    # FIXME verification would be great...
+    comment = Comment(content=content,
+                      question=request.form.get("question", False),
+                      author=current_user,
+                      application_id=application.id,
+                      stage=application.stage)
+
+    db.session.add(comment)
+    db.session.commit()
+
+    # email to other reviewers or moderator?
+
+    return jsonify(success=True)
 
 
 @app.route('/application/update', methods=['POST'])
@@ -73,21 +124,6 @@ def update_application():
 
     application = Application.query.find_by(id=app['id'])
     #Renew application
-
-
-# @app.route('/application/email/', methods=['POST'])
-# @login_required
-# @roles_accepted('admin', 'moderator')
-# def follow_up_email():
-
-#     req = request.get_json()
-#     app_id = req['application_id']
-#     content = req['content']
-#     recipient = req['email']
-
-#     email_as_app(app_id, 'Hackership Follow-Up',
-#                     content, recipient)
-#     return jsonify(success=True)
 
 
 @app.route('/applications/new', methods=['POST'])

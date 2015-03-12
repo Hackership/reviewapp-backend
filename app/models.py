@@ -4,6 +4,8 @@ from sqlalchemy.sql.expression import text
 
 from app.utils import send_email
 
+import datetime
+
 
 stages = ('incoming', 'in_review',
           'email_send', 'reply_received', 'skyped',
@@ -50,7 +52,7 @@ class Role(db.Model, RoleMixin):
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    createdAt = db.Column(db.DateTime, server_default=text('NOW()'))
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.now)
     changedStageAt = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True)
     name = db.Column(db.String(120))
@@ -61,7 +63,9 @@ class Application(db.Model):
     batch = db.Column(db.String(64))
     grant = db.Column(db.Boolean)
     grant_content = db.Column(db.Text)
-    comments = db.relationship('Comment', backref='application')
+    anonymizer = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+    # backref from comments and emails come automatically
     members = db.relationship('User', secondary=lambda: members_table,
                               backref='applications')
 
@@ -88,11 +92,12 @@ members_table = db.Table('members',
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(120), unique=True)
+    createdAt = db.Column(db.DateTime, default=datetime.datetime.now)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'))
     content = db.Column(db.Text)
     stage = db.Column(db.Enum(*stages))
-    question = db.Column(db.Boolean, unique=False)
-    application_id = db.Column(db.String, db.ForeignKey('application.id'))
+    question = db.Column(db.Boolean, default=False)
+    application = db.Column(db.Integer, db.ForeignKey('application.id'))
 
     def __repr__(self):
         return '<Comment: {}, {}>'.format(self.createdAt, self.id)
@@ -101,12 +106,12 @@ class Comment(db.Model):
 class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime)
-    author = db.Column(db.String(120), unique=True)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     stage = db.Column(db.Enum(*stages))
-    incoming = db.Column(db.Boolean, unique=False)
-    application_id = db.Column(db.String, db.ForeignKey('application.id'))
-    content = db.Column(db.Text, unique=True)
-    anon_content = db.Column(db.Text, unique=True)
+    incoming = db.Column(db.Boolean, default=False)
+    application = db.Column(db.Integer, db.ForeignKey('application.id'))
+    content = db.Column(db.Text)
+    anon_content = db.Column(db.Text)
 
     def __repr__(self):
         return '<Email: {}, {}>'.format(self.createdAt, self.id)
