@@ -4,6 +4,7 @@
 
 'use strict';
  var Backbone = require('backbone'),
+ 	 Actions = require('../actions/actions'),
  	 Dispatcher = require('../dispatchers/dispatcher');
 
 var $=require('jquery');
@@ -15,16 +16,6 @@ var $=require('jquery');
 var Applications = Backbone.Collection.extend({
     model: Application,
 
-    getApps: function() {
-    	$.getJSON("url", function(data) {
-    		})
-    	.done(function(data){
-    		console.log(data)
-    	})
-    	.fail(function(){
-    		alert('Failed to get applications');
-    	});
-    },
 
  	byStage: function(stage) {
  		return this.where({"stage": stage});
@@ -34,12 +25,28 @@ var Applications = Backbone.Collection.extend({
 
 var applications = new Applications();
 
+function getApps() {
+	$.getJSON("/api/app_state", function(data) {
+		applications.set(data['applications']);
+    	Actions.setUser(data['user']);
+    })
+	.done(function(data){
+    })
+    
+    .fail(function(data){
+    	console.log(data)
+    	alert('Failed to get applications');
+   });
+}
+
+
+
 // Register dispatcher 
 Dispatcher.register(function(payload) {
   
   switch(payload.actionType) {
     case 'getApplications':
-		applications.getApps()
+		getApps()
 		break;
 
     default:

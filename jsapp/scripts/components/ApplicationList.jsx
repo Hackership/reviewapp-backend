@@ -10,6 +10,7 @@ var React = require('react/addons'),
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
   Accordion = rtbs.Accordion,
+  PanelGroup = rtbs.PanelGroup,
   Button = rtbs.Button,
 	ReactTransitionGroup = React.addons.TransitionGroup;
 
@@ -18,22 +19,70 @@ var React = require('react/addons'),
 var Application = React.createClass({
   
   render: function() {
-    var  fieldOne = this.props.app_data['fieldOne'],
-         fieldTwo  = this.props.app_data['fieldTwo'];
-          
+    var stage = this.props.app.get("stage");
+    return this["render_" + stage]();
+  },
+
+  render_email_send: function(){
+    var  content  = this.props.app.get('anon_content');
     return (
         <div>
-         <Input type="textarea" className="form-text" placeholder={fieldOne} label="Background" labelClassName="col-xs-2" 
-                    wrapperClassName="col-xs-10" disabled ref="fieldOne"/>
-        <Input type="textarea" className="form-text" placeholder={fieldTwo} label="Project" labelClassName="col-xs-2" 
-                    wrapperClassName="col-xs-10" disabled ref="fieldOne"/>
+         <h4><strong>Please Review</strong></h4>
+          <div className="content-app">
+          {content}
+          </div>
+        </div>      
+      );
+  },
+
+  render_in_review: function(){
+    var  content  = this.props.app.get('anon_content');
+    return (
+        <div>
+          <h4><strong>Please Review</strong></h4>
+          <div className="content-app">
+          {content}
+          </div>
+          <form>
+            <textarea className="form-text" value="" label="Question" labelClassName="col-xs-2" 
+                    wrapperClassName="col-xs-10" disabled ref="question"/>
+          </form>
+          <Questions />
         </div>
+      
+      );
+  },
+  
+  onSelect: function(evt) {
+    this.props.onSelect(evt);
+  },
+
+  render_incoming:function() {
+    var app = this.props.app;
+    var  content  = app.get('anon_content');
+    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Created: ';
+    var active = this.props.index === this.props.activeKey;
+    var hdr = (<h3>{hdr_str}<strong>{app.attributes.createdAt}</strong></h3>);
+    
+    return (
+       <Panel header={hdr} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        <div>
+          <h4><strong>Edit the Anonymized Output:</strong></h4>
+          <div className="content-app">
+          </div>
+          <form>
+            <textarea className="form-text" value={content} label="Anonymized" labelClassName="col-xs-2" 
+                    wrapperClassName="col-xs-10" ref="anon"/>
+          </form>
+          <Button>Submit and move to next stage</Button>
+        </div>
+      </Panel>
       
       );
   }
 });
 
-var FollowUpQuestions = React.createClass({
+var Questions = React.createClass({
   render: function() {
     return (
         <form>
@@ -67,25 +116,28 @@ var ApproveQuestions = React.createClass({
 
 var ApplicationsList = React.createClass({
 
+  getInitialState: function(){
+    return {'activeKey': 0};
+  },
+  
+  handleSelect: function(selectedKey) {
+    this.setState({'activeKey': selectedKey});
+  },
+
   render: function() {
-    var input_one =  [{'fieldOne': 'test2','fieldTwo': 'trying'},{'fieldOne': 'stage2','fieldTwo': 'trying2'}],
-        app_input = input_one,
-        app = input_one[0];
+    var apps = this.props.apps;
+    var app = apps[0],
+        self = this;
 
     return (
        <div className="applicationList">
-        <Accordion>
-        {_.map(app_input, function(app_data, index){
-              
-              var hdr_str = app_data.fieldOne;
-              var hdr = (<h3>{hdr_str}</h3>);
-              
+        <PanelGroup activeKey={this.state.activeKey}  onSelect={self.handleSelect} accordion>
+        {_.map(apps, function(app, index){ 
               return(
-                <Panel header={hdr} bsStyle='info' eventKey={index}>
-                  <Application app_data={app_data} index={index} />
-                </Panel>)
+                <Application app={app} activeKey={self.state.activeKey} index={index}/>
+                )
             })}
-        </Accordion>
+        </PanelGroup>
         </div>
     );
   }
