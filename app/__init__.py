@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from flask import Flask, request
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask.ext.migrate import Migrate, MigrateCommand
@@ -56,8 +56,9 @@ if app.debug:
             user_datastore.find_role("admin"))
 
     def log_message(message, app):
-        app.logger.debug("Email {} to {}:\n{}\n".format(message.recipients,
-                        message.subject, message.body))
+        app.logger.debug(u"Email {} from {} to {}:\n{}\n".format(
+                        message.subject, message.sender,
+                        message.recipients, message.body))
 
     email_dispatched.connect(log_message)
 

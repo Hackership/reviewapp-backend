@@ -1,32 +1,16 @@
 # -*- coding: utf-8 -*-
 from flask.ext.security import login_required, roles_accepted, current_user
-from flask_mail import Message
 
 from app import app, db, mail, user_datastore
 from app.schemas import users_schema, me_schema, admin_app_state, app_state
-from app.models import User, Application, Email, REVIEW_STAGES
-from app.utils import generate_password
+from app.models import User, Application, Email, Comment, REVIEW_STAGES
+from app.utils import generate_password, send_email
 from datetime import datetime
-
 
 from flask import (Flask, session, redirect, url_for, escape,
                    request, jsonify, render_template)
 
-import logging
-
-
-def send_email(recipients, subject, content, sender=None):
-    if sender is None:
-        sender = "no-reply@review.hackership.org"
-    msg = Message(subject, recipients=recipients, sender=sender)
-    msg.body = content
-    mail.send(msg)
-
-
-def email_applicant(app_id, subject, content, recipient):
-    sender = 'appl-15{}@review.hackership.org'.format(app_id)
-    recipients = [recipient]
-    send_email(recipients, subject, content, sender)
+from functools import wraps
 
 
 def select_reviewers():
@@ -36,17 +20,10 @@ def select_reviewers():
 
 
 
-#APPLICATIONS
-def parse_application(app):
-    name = app['Name']
-    email = app['Email']
-    fizz = app['Hacking task']
-    batch = app['batch']
-    grant = 'Applying for a Programme Fee Grant' in app
 
-    grant_content = ""
-    if grant:
-        grant_content = render_template("forms/grant_content.md", app=app)
+def with_application_at_stage(stages):
+    if isinstance(stages, basestring):
+        stages = [stages]
 
     content = render_template("forms/content.md", app=app)
 
@@ -98,40 +75,52 @@ def update_application():
     #Renew application
 
 
-@app.route('/application/email/', methods=['POST'])
-@login_required
-@roles_accepted('admin', 'moderator')
-def follow_up_email():
+# @app.route('/application/email/', methods=['POST'])
+# @login_required
+# @roles_accepted('admin', 'moderator')
+# def follow_up_email():
 
-    req = request.get_json()
-    app_id = req['application_id']
-    content = req['content']
-    recipient = req['email']
+#     req = request.get_json()
+#     app_id = req['application_id']
+#     content = req['content']
+#     recipient = req['email']
 
-    email_applicant(app_id, 'Hackership Follow-Up', content, recipient)
-    return jsonify(success=True)
+#     email_as_app(app_id, 'Hackership Follow-Up',
+#                     content, recipient)
+#     return jsonify(success=True)
 
 
 @app.route('/applications/new', methods=['POST'])
 def new_application():
-    req = request.form
-    if not req['_token'] == app.config.get("SCHEMA_TOKEN"):
+    form = request.form
+    if not form['_token'] == app.config.get("SCHEMA_TOKEN"):
         return jsonify(success=False)
 
-    application = parse_application(req)
-    application.members = select_reviewers()
+    grant = 'Applying for a Programme Fee Grant' in form
+
+    grant_content = ""
+    if grant:
+        grant_content = render_template("forms/grant_content.md", app=form)
+
+    content = render_template("forms/content.md", app=form)
+
+    anon = render_template("forms/content_anon.md", app=form)
+
+    application = Application(name=form['Name'], email=form['Email'],
+                              content=content, anon_content=anon,
+                              fizzbuzz=form['Hacking task'],
+                              stage="incoming", batch=form['batch'],
+                              grant=grant,
+                              grant_content=grant_content,
+                              createdAt=datetime.now())
+
     db.session.add(application)
     db.session.commit()
 
     # E-mail Applicant
-    email_applicant(application.id, 'Application Received',
-                    render_template("emails/applicant/received.md", app=application),
-                    'EMAIL_APPLICANT')
-
-    # Email Reviewers
-    # send_email(map(lambda x: x.email, application.members),
-    #            'TEST New Application',
-    #            'TESTING You have a new application waiting for review!')
+    application.send_email('Application Received',
+                           render_template("emails/applicant/received.md",
+                                           app=application))
 
     return jsonify(success=True)
 
@@ -152,11 +141,12 @@ def add_reviewer():
         user_datastore.add_role_to_user(user, req['role'])
 
     #Email Reviewer
-    send_email([user.email], "Welcome to the Hackership Review Panel",
+    send_email("Welcome to the Hackership Review Panel",
                render_template("emails/reviewer/added.md",
                                username=user.email,
                                password=password,
-                               name=user.name))
+                               name=user.name),
+               [user.email])
 
     return jsonify(success=True)
 

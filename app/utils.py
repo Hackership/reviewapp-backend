@@ -1,5 +1,6 @@
-
+from flask_mail import Message
 import random
+
 # YOU JUST GOTTA LOVE WIKIPEDIA LISTS:
 # http://en.wikipedia.org/wiki/List_of_Pixar_characters
 # http://en.wikipedia.org/wiki/List_of_The_Simpsons_characters
@@ -10,3 +11,14 @@ def generate_password():
                random.choice(NAMES)]
     random.shuffle(entropy)
     return "{}{}".format(random.choice(NAMES), "".join(entropy))
+
+
+def send_email(subject, content, recipients, sender=None):
+    from app import mail
+
+    if isinstance(recipients, basestring):
+        recipients = [recipients]
+
+    msg = Message(subject, recipients=recipients, sender=sender)
+    msg.body = content
+    mail.send(msg)

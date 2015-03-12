@@ -2,6 +2,8 @@ from app import db
 from flask.ext.security import UserMixin, RoleMixin
 from sqlalchemy.sql.expression import text
 
+from app.utils import send_email
+
 
 stages = ('incoming', 'in_review',
           'email_send', 'reply_received', 'skyped',
@@ -62,7 +64,15 @@ class Application(db.Model):
     comments = db.relationship('Comment', backref='application')
     members = db.relationship('User', secondary=lambda: members_table,
                               backref='applications')
-    emails = db.relationship('Email', backref='application')
+
+    def send_email(self, subject, content, recipients=None):
+        if recipients is None:
+            recipients = [self.email]
+        send_email(subject, content, recipients, self.from_email)
+
+    @property
+    def from_email(self):
+        return 'appl-15{}@review.hackership.org'.format(self.id)
 
     def __repr__(self):
         return '<Application: {}, {}>'.format(self.createdAt, self.id)
