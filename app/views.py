@@ -195,7 +195,7 @@ def new_application():
                               fizzbuzz=form['Hacking task'].encode("utf-8"),
                               stage="incoming",
                               batch=form['batch'].encode("utf-8"),
-                              grant=grant.encode("utf-8"),
+                              grant=grant,
                               changedStageAt=datetime.now(),
                               grant_content=grant_content.encode("utf-8"),
                               createdAt=datetime.now())
