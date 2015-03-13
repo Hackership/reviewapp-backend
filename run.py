@@ -1,3 +1,4 @@
 #!flask/bin/python
 from app import app
-app.run(debug=True)
+import os
+app.run(port=int(os.environ.get('PORT', 5000)))
