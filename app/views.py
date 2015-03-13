@@ -188,16 +188,16 @@ def new_application():
 
     anon = render_template("forms/content_anon.md", app=form)
 
-    application = Application(name=form['Name'].encode("utf-8"),
+    application = Application(name=form['Name'],
                               email=form['Email'],
-                              content=content.encode("utf-8"),
-                              anon_content=anon.encode("utf-8"),
-                              fizzbuzz=form['Hacking task'].encode("utf-8"),
+                              content=content,
+                              anon_content=anon,
+                              fizzbuzz=form['Hacking task'],
                               stage="incoming",
-                              batch=form['batch'].encode("utf-8"),
+                              batch=form['batch'],
                               grant=grant,
                               changedStageAt=datetime.now(),
-                              grant_content=grant_content.encode("utf-8"),
+                              grant_content=grant_content,
                               createdAt=datetime.now())
 
     db.session.add(application)
