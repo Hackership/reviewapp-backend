@@ -11,6 +11,7 @@ MAIL_SUPPRESS_SEND = DEBUG
 SECRET_KEY = os.environ.get("SECRET_KEY", "__DEV")
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", 'sqlite:///{}'.format(os.path.join(basedir, 'app.db')))
+SQLALCHEMY_NATIVE_UNICODE = False
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 # Flask-Security, For Login-and Such
