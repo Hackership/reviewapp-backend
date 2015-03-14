@@ -305,6 +305,9 @@ def add_reviewer():
                                name=user.name),
                [user.email])
 
+
+    user_datastore.commit()
+
     return jsonify(success=True)
 
 
