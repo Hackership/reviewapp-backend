@@ -31,6 +31,7 @@ MAIL_SERVER = os.environ.get("MAIL_SERVER", "")
 MAIL_PORT = int(os.environ.get("MAIL_PORT", 25))
 MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", SECURITY_EMAIL_SENDER)
 MAIL_SUPPRESS_SEND = DEBUG
 
 try:
