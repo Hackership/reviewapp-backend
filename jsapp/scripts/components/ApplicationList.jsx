@@ -17,6 +17,7 @@ var React = require('react/addons'),
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
   Action = require('../actions/actions'),
+  markdown = require( "markdown" ).markdown,
   moment = require('moment');
 
 var $=require('jquery');
@@ -69,7 +70,7 @@ var Application = React.createClass({
 
   render_in_review: function(){
     var app = this.props.app;
-    var content  = app.get('anon_content');
+    var content  = markdown.toHTML(app.get('anon_content'));
     var fizzbuzz = app.get('fizzbuzz');
     var active = this.props.index === this.props.activeKey;
     var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar();
@@ -81,11 +82,10 @@ var Application = React.createClass({
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <h4><strong>Please Review</strong></h4>
-          <div className="content-app">
-          {content}
-          <br />
-          <br />
-          {fizzbuzz}
+          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
+          <div>
+          <h4><strong>Coding Challenge</strong></h4>
+            {fizzbuzz}
           </div>
 
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
