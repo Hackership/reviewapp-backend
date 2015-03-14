@@ -32,7 +32,6 @@ var Application = React.createClass({
   },
 
   moveToReview: function(){
-    console.log('to review:', this.props.app.get('id'))
      Action.moveToReview({appId: this.props.app.get('id'), anon_content: this.state.anon_content});
   },
 
@@ -55,7 +54,7 @@ var Application = React.createClass({
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
     var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
-    
+
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
@@ -63,8 +62,8 @@ var Application = React.createClass({
           <div className="content-app">
           {content}
           </div>
-        </div>   
-      </Panel>   
+        </div>
+      </Panel>
       );
   },
 
@@ -77,7 +76,7 @@ var Application = React.createClass({
     var style = (deadline > moment())? 'danger' : 'success';
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'DEADLINE: ';
     var hdr = (<h3>{hdr_str}<strong>{deadline}</strong></h3>);
-        
+
     return (
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
@@ -94,10 +93,10 @@ var Application = React.createClass({
         </div>
         <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>
       </Panel>
-      
+
       );
   },
-  
+
   onSelect: function(evt) {
     this.props.onSelect(evt);
   },
@@ -109,7 +108,7 @@ var Application = React.createClass({
     var date = moment(app.attributes.createdAt).calendar();
     var content = this.state.anon_content || this.props.app.attributes.anon_content;
     var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
-    
+
     return (
        <Panel header={hdr} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
@@ -137,7 +136,6 @@ var Application = React.createClass({
 var CommentBox = React.createClass({
 
   postComment: function() {
-    console.log(this.props.appId);
 
     if (this.props.question) {
       Action.postComment({appId: this.props.appId, comment: this.state.comment, question: '1'});
@@ -163,28 +161,31 @@ var CommentBox = React.createClass({
       return (
           <div className="commentBox">
            <h3>{this.props.hdr}:</h3>
-         
+
           {_.map(comments, function(comment){
             var content = comment['content'],
                 author = comment['author']['name'] ? comment['author']['name'] : 'unknown',
                 date = ' '+ comment['createdAt'];
-                
+
                 return(
                   <div className="comment">
                     <p>
                     <strong>{content}</strong> <br />
-                    by: {author}, 
+                    by: {author},
                     {date}
                     </p>
                   </div>
                   )
               })}
               <form>
-            <Input type='textarea' 
-                        wrapperClassName="col-xs-9" 
-                        placeholder={this.props.place} onChange={this.commentChanged} ref="comment" /> 
-            
-            <button className="btn btn-primary btn-form" type="submit" onClick={this.postComment}>Add</button>
+            <Input type='textarea'
+                  wrapperClassName="col-xs-9"
+                  placeholder={this.props.place}
+                  onChange={this.commentChanged}
+                  ref="comment" />
+            <button className="btn btn-primary btn-form"
+                    type="submit"
+                    onClick={this.postComment}>Add</button>
         </form>
           </div>
         );
@@ -194,15 +195,14 @@ var CommentBox = React.createClass({
 
 var EmailCreate = React.createClass({
   mixins: [OverlayMixin],
- 
+
   getInitialState: function() {
     var comments = this.props.questions.concat(this.props.comments),
-    
+
     comment_str = _.map(comments, function(comment){
-            return (comment['content'])  
+            return (comment['content']);
           });
-     console.log('STRING',comment_str);
-      
+
     var com_str = '';
     var i;
     for(i = 0; i < comment_str.length; i++){
@@ -218,7 +218,7 @@ var EmailCreate = React.createClass({
     },
 
   handleToggle: function(evt) {
-  
+
       this.setState({
         isModalOpen: !this.state.isModalOpen
       });
@@ -259,7 +259,7 @@ var ApplicationsList = React.createClass({
   getInitialState: function(){
     return {'activeKey': 0};
   },
-  
+
   handleSelect: function(selectedKey) {
     this.setState({'activeKey': selectedKey});
   },
@@ -272,7 +272,7 @@ var ApplicationsList = React.createClass({
     return (
        <div className="applicationList">
         <PanelGroup activeKey={this.state.activeKey}  onSelect={self.handleSelect} accordion>
-        {_.map(apps, function(app, index){ 
+        {_.map(apps, function(app, index){
               return(
                 <Application app={app} activeKey={self.state.activeKey} index={index}/>
                 )
