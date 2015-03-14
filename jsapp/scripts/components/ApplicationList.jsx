@@ -56,7 +56,7 @@ var Application = React.createClass({
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
     var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
-
+ 
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
@@ -259,7 +259,7 @@ var EmailCreate = React.createClass({
 var ApplicationsList = React.createClass({
 
   getInitialState: function(){
-    return {'activeKey': 0};
+    return {};
   },
 
   handleSelect: function(selectedKey) {
@@ -273,7 +273,7 @@ var ApplicationsList = React.createClass({
 
     return (
        <div className="applicationList">
-        <PanelGroup activeKey={this.state.activeKey}  onSelect={self.handleSelect} accordion>
+        <PanelGroup activeKey={this.state.activeKey} onSelect={self.handleSelect} accordion>
         {_.map(apps, function(app, index){
               return(
                 <Application app={app} activeKey={self.state.activeKey} index={index}/>
