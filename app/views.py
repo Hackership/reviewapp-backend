@@ -207,7 +207,7 @@ def new_application():
     if not request.form.get('_skip_email', False):
         application.send_email('Application Received',
                                render_template("emails/applicant/received.md",
-                                               app=application))
+                                               app=application).encode("utf-8"))
 
     return jsonify(success=True)
 
