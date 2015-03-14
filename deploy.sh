@@ -11,4 +11,4 @@ git add -f assets/*
 git commit -m"Add compiled UIs for deploy"
 git push -f deploy $branch:master
 git tag -f deployed $current
-git push origin --tags
+git push -f origin --tags
