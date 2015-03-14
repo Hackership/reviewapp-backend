@@ -3,7 +3,7 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-HOSTNAME = os.environ.get("HOSTNAME", "review.hackership.org")
+HOSTNAME = os.environ.get("APP_HOSTNAME", "review.hackership.org")
 DEBUG = os.environ.get("PRODUCTION", False) is False
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "__DEV")
