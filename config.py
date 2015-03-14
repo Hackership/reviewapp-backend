@@ -6,8 +6,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 HOSTNAME = os.environ.get("HOSTNAME", "review.hackership.org")
 DEBUG = os.environ.get("PRODUCTION", False) is False
 
-MAIL_SUPPRESS_SEND = DEBUG
-
 SECRET_KEY = os.environ.get("SECRET_KEY", "__DEV")
 
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", 'sqlite:///{}'.format(os.path.join(basedir, 'app.db')))
@@ -29,6 +27,12 @@ SECURITY_DEFAULT_REMEMBER_ME = True
 
 SCHEMA_TOKEN = os.environ.get("SCHEMA_TOKEN", 'THINGY')
 
+MAIL_SERVER = os.environ.get("MAIL_SERVER", "")
+MAIL_PORT = int(os.environ.get("MAIL_PORT", 25))
+MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
+MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+MAIL_SUPPRESS_SEND = DEBUG
+
 try:
     from local_config import *
 except ImportError:
@@ -37,6 +41,9 @@ except ImportError:
 
 # CONSTRAINS to ensure we are not running with a bad Config
 if not DEBUG:
+    if not MAIL_SERVER:
+        raise ValueError("You need to set the environment variable 'MAIL_SERVER'!")
+
     if SECRET_KEY == "__DEV":
         raise ValueError("You need to set the environment variable 'SECRET_KEY'!")
 
