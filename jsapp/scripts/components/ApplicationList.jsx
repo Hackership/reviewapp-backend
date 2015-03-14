@@ -7,10 +7,12 @@
 var React = require('react/addons'),
   _ = require('underscore'),
 	rtbs  = require('react-bootstrap'),
+  Modal = rtbs.Modal,
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
   Accordion = rtbs.Accordion,
   PanelGroup = rtbs.PanelGroup,
+  OverlayMixin = rtbs.OverlayMixin,
   Button = rtbs.Button,
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
@@ -49,7 +51,7 @@ var Application = React.createClass({
 
   render_email_send: function(){
     var app = this.props.app;
-    var  content  = app.get('anon_content');
+    var content = app.get('anon_content');
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
     var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
@@ -90,6 +92,7 @@ var Application = React.createClass({
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
         </div>
+        <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>
       </Panel>
       
       );
@@ -149,7 +152,6 @@ var CommentBox = React.createClass({
   },
 
   render: function() {
-    console.log('COMMENTS', comments);
       var comments = this.props.comments ? this.props.comments : "";
 
       return (
@@ -184,22 +186,66 @@ var CommentBox = React.createClass({
 });
 
 
-
 var EmailCreate = React.createClass({
- render: function() {
-    var questions = this.props.questions;
-    var questionString;
-    for (q in questions){
-      questionString = questionString + ' ' + q;
-    }
-
-    return (
-        <div>
-        <textarea> {questionString} </textarea>
-        </div>
+  mixins: [OverlayMixin],
+ 
+  getInitialState: function() {
+    var comments = this.props.questions.concat(this.props.comments),
+    
+    comment_str = _.map(comments, function(comment){
+            return (comment['content'])  
+          });
+     console.log('STRING',comment_str);
       
-      );
-  }
+    var com_str = '';
+    var i;
+    for(i = 0; i < comment_str.length; i++){
+      com_str = com_str + comment_str[i] + ' \n' ;
+    }
+      return {'isModalOpen': false, 'comments': com_str};
+    },
+
+  commentChanged: function(evt){
+      this.setState({
+        comments: evt.target.value
+      });
+    },
+
+  handleToggle: function(evt) {
+  
+      this.setState({
+        isModalOpen: !this.state.isModalOpen
+      });
+    },
+
+    sendEmail: function(evt) {
+      Action.sendEmail({email: this.state.comments, appId: this.props.app_id});
+    },
+
+   render: function() {
+      return (
+          <Button className="btn btn-primary btn-form" onClick={this.handleToggle}>Email Applicant</Button>
+        );
+    },
+
+    renderOverlay: function() {
+      if (!this.state.isModalOpen) {
+        return <span/>;
+         console.log('Hello overlay: NO')
+      }else{
+         console.log('Hello overlay: YES')
+        return (
+            <Modal title="Edit Questions to Send" onRequestHide={this.handleToggle}>
+              <div>
+                <textarea className="form-text" onChange={this.commentChanged} value={this.state.comments} labelClassName="col-xs-2" 
+                        wrapperClassName="col-xs-10"/>
+                <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
+                <br />
+              </div>
+            </Modal>
+          );
+      }
+    }
 });
 
 var ApplicationsList = React.createClass({

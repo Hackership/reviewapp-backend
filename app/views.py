@@ -90,7 +90,7 @@ def get_state():
 @roles_accepted('admin')
 @with_application_at_stage("incoming")
 def switch_to_review(application):
-    anon_content = request.form.get("anon_content") or request.args.get("anon_content")
+    anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
     if anon_content:
         application.anon_content = anon_content
     application.anonymizer = current_user._get_current_object().id
@@ -108,12 +108,12 @@ def switch_to_review(application):
     return _render_application(application)
 
 
-@app.route('/application/<id>/move_to_stage/email_send', methods=['GET'])
+@app.route('/application/<id>/move_to_stage/email_send', methods=['POST'])
 @login_required
 @roles_accepted('moderator', 'admin')
 @with_application_at_stage("in_review")
 def switch_to_email_send(application):
-    email = request.args.get("email", None)
+    email = (request.form.get("email") or request.args.get("email")) or None
     if not email:
         abort(400, "Missing email")
 
