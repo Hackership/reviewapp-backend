@@ -12,6 +12,24 @@
 var $=require('jquery');
 
  var Application = Backbone.Model.extend({
+
+ 	getQuestions: function(){
+ 		var comments = this.get("comments") || null;
+ 		if (comments){
+ 			return _.filter(comments, 
+    		function(x){return x['question'] === true});
+ 		}
+ 		return [];
+ 	},
+
+ 	getComments: function(){
+ 		var comments = this.get("comments") || null;
+ 		if (comments){
+ 			return _.filter(comments, 
+    		function(x){return x['question'] === false});
+ 		}
+ 		return [];
+ 	}
     
 });
 
@@ -47,7 +65,40 @@ function getApps() {
    });
 }
 
+function postComment(payload) {
+	var comment = payload['comment'];
+	var app_id = payload['appId'];
+	var content = payload['question'] ? {comment: comment, question: payload['question']} : {comment: comment};
 
+    $.ajax({
+          type: 'POST',
+          url: '/application/' + app_id + '/comment',
+          data: content,
+          }).done(function(resp) {
+          	console.log(resp);
+          	applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToReview(payload) {
+	var content = payload['anon_content'];
+	var app_id = payload['appId'];
+	console.log('appId', app_id);
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' + app_id + '/move_to_stage/in_review',
+          data: {anon_content: content},
+          }).done(function(resp) {
+          	console.log(resp);
+          	applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
 
 // Register dispatcher 
 Dispatcher.register(function(payload) {
@@ -55,6 +106,15 @@ Dispatcher.register(function(payload) {
   switch(payload.actionType) {
     case 'getApplications':
 		getApps()
+		break;
+	case 'postComment':
+		postComment(payload.payload)
+		break;
+	case 'postQuestion':
+		postComment(payload.payload)
+		break;
+	case 'moveToReview':
+		moveToReview(payload.payload)
 		break;
 
     default:

@@ -19,6 +19,21 @@ header {
   padding-top: 5px;
 }
 
+.commentBox {
+  background-color: white;
+  color: black;
+  width: 70vw;
+  margin-bottom: 5%;
+  margin-top: 5px;
+  margin-left:2%;
+}
+
+.comment {
+  padding: 5px;
+  background-color: #F0F0F0;
+  margin-bottom: 5px;
+}
+
 .content-app {
   padding-bottom: 10px;
 }

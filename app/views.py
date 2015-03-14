@@ -83,12 +83,12 @@ def get_state():
                                 "applications": query.all()}).data)
 
 
-@app.route('/application/<id>/move_to_stage/in_review', methods=['GET'])
+@app.route('/application/<id>/move_to_stage/in_review', methods=['POST'])
 @login_required
 @roles_accepted('admin')
 @with_application_at_stage("incoming")
 def switch_to_review(application):
-    anon_content = request.args.get("anon_content", None)
+    anon_content = request.form.get("anon_content") or request.args.get("anon_content")
     if anon_content:
         application.anon_content = anon_content
     application.anonymizer = current_user._get_current_object().id

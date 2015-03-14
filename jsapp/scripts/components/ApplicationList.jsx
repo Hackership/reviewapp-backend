@@ -14,11 +14,33 @@ var React = require('react/addons'),
   Button = rtbs.Button,
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
+  Action = require('../actions/actions'),
   moment = require('moment');
 
-
+var $=require('jquery');
 
 var Application = React.createClass({
+
+  componentDidMount: function(){
+    var self = this;
+    this.props.app.on("all", function(){
+      self.forceUpdate();
+    });
+
+  },
+
+  moveToReview: function(){
+    console.log('to review:', this.props.app.get('id'))
+     Action.moveToReview({appId: this.props.app.get('id'), anon_content: this.state.anon_content});
+  },
+
+  getInitialState: function(){
+    return {'anon_content': this.props.app.get('anon_content')};
+  },
+
+  contentChanged: function(event) {
+    this.setState({anon_content: event.target.value});
+  },
   
   render: function() {
     var stage = this.props.app.get("stage");
@@ -26,7 +48,6 @@ var Application = React.createClass({
   },
 
   render_email_send: function(){
-    var  content  = this.props.app.get('anon_content');
     var app = this.props.app;
     var  content  = app.get('anon_content');
     var active = this.props.index === this.props.activeKey;
@@ -48,20 +69,26 @@ var Application = React.createClass({
   render_in_review: function(){
     var app = this.props.app;
     var content  = app.get('anon_content');
+    var fizzbuzz = app.get('fizzbuzz');
     var active = this.props.index === this.props.activeKey;
     var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar();
     var style = (deadline > moment())? 'danger' : 'success';
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'DEADLINE: ';
     var hdr = (<h3>{hdr_str}<strong>{deadline}</strong></h3>);
-    
+        
     return (
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <h4><strong>Please Review</strong></h4>
           <div className="content-app">
           {content}
+          <br />
+          <br />
+          {fizzbuzz}
           </div>
-          <Questions />
+
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
         </div>
       </Panel>
       
@@ -74,7 +101,6 @@ var Application = React.createClass({
 
   render_incoming:function() {
     var app = this.props.app;
-    var  content  = app.get('anon_content');
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Created: ';
     var active = this.props.index === this.props.activeKey;
     var date = moment(app.attributes.createdAt).calendar();
@@ -87,10 +113,10 @@ var Application = React.createClass({
           <div className="content-app">
           </div>
           <form>
-            <textarea className="form-text" value={content} label="Anonymized" labelClassName="col-xs-2" 
+            <textarea className="form-text" value={this.state.anon_content} onChange={this.contentChanged} label="Anonymized" labelClassName="col-xs-2" 
                     wrapperClassName="col-xs-10" ref="anon"/>
           </form>
-          <Button>Submit and move to next stage</Button>
+          <Button onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
       </Panel>
       
@@ -98,33 +124,66 @@ var Application = React.createClass({
   }
 });
 
-var Questions = React.createClass({
-  render: function() {
-    return (
-        <form>
-         <Input type='textarea' label="Questions:" labelClassName="col-xs-2" 
-                      wrapperClassName="col-xs-10" 
-                      placeholder="Enter Follow Up Questions" ref="questions" /> 
-          
-          <button className="btn btn-primary btn-form" type="submit">Save</button>
-      </form>
-      
-      );
-  }
-});
 
 var CommentBox = React.createClass({
 
-render: function() {
-    comments = this.props.comments;
+  postComment: function() {
+    console.log(this.props.appId);
 
-    return (
-        <div className="comment_box">
+    if (this.props.question) {
+      Action.postComment({appId: this.props.appId, comment: this.state.comment, question: '1'});
+      this.setState({comment: ''});
+    }
+    else{
+      Action.postComment({appId: this.props.appId, comment: this.state.comment});
+      this.setState({comment: ''});
+    }
+  },
 
-        </div>
-      );
-  }
+  getInitialState: function(){
+    return {'comment': ''};
+  },
+
+  commentChanged: function(event) {
+    this.setState({comment: event.target.value});
+  },
+
+  render: function() {
+    console.log('COMMENTS', comments);
+      var comments = this.props.comments ? this.props.comments : "";
+
+      return (
+          <div className="commentBox">
+           <h3>{this.props.hdr}:</h3>
+         
+          {_.map(comments, function(comment){
+            var content = comment['content'],
+                author = comment['author']['name'] ? comment['author']['name'] : 'unknown',
+                date = ' '+ comment['createdAt'];
+                
+                return(
+                  <div className="comment">
+                    <p>
+                    <strong>{content}</strong> <br />
+                    by: {author}, 
+                    {date}
+                    </p>
+                  </div>
+                  )
+              })}
+              <form>
+            <Input type='textarea' 
+                        wrapperClassName="col-xs-9" 
+                        placeholder={this.props.place} onChange={this.commentChanged} ref="comment" /> 
+            
+            <button className="btn btn-primary btn-form" type="submit" onClick={this.postComment}>Add</button>
+        </form>
+          </div>
+        );
+    }
 });
+
+
 
 var EmailCreate = React.createClass({
  render: function() {
