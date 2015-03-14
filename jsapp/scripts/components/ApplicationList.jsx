@@ -26,7 +26,7 @@ var Application = React.createClass({
   componentDidMount: function(){
     var self = this;
     this.props.app.on("all", function(){
-      self.forceUpdate();
+      self.isMounted() && self.forceUpdate();
     });
 
   },
@@ -37,13 +37,13 @@ var Application = React.createClass({
   },
 
   getInitialState: function(){
-    return {'anon_content': this.props.app.get('anon_content')};
+    return {};
   },
 
   contentChanged: function(event) {
     this.setState({anon_content: event.target.value});
   },
-  
+
   render: function() {
     var stage = this.props.app.get("stage");
     return this["render_" + stage]();
@@ -107,6 +107,7 @@ var Application = React.createClass({
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Created: ';
     var active = this.props.index === this.props.activeKey;
     var date = moment(app.attributes.createdAt).calendar();
+    var content = this.state.anon_content || this.props.app.attributes.anon_content;
     var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
     
     return (
@@ -116,13 +117,18 @@ var Application = React.createClass({
           <div className="content-app">
           </div>
           <form>
-            <textarea className="form-text" value={this.state.anon_content} onChange={this.contentChanged} label="Anonymized" labelClassName="col-xs-2" 
-                    wrapperClassName="col-xs-10" ref="anon"/>
+            <textarea className="form-text"
+                      value={content}
+                      onChange={this.contentChanged}
+                      label="Anonymized"
+                      labelClassName="col-xs-2"
+                      wrapperClassName="col-xs-10"
+                      ref="anon"/>
           </form>
           <Button onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
       </Panel>
-      
+
       );
   }
 });
