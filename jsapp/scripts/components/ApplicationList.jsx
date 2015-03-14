@@ -18,6 +18,7 @@ var React = require('react/addons'),
   {user} = require('../stores/UserStore'),
   Action = require('../actions/actions'),
   markdown = require( "markdown" ).markdown,
+  Highlight = require('react-highlight'),
   moment = require('moment');
 
 var $=require('jquery');
@@ -83,10 +84,11 @@ var Application = React.createClass({
         <div>
           <h4><strong>Please Review</strong></h4>
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
-          <div>
+
           <h4><strong>Coding Challenge</strong></h4>
+          <Highlight>
             {fizzbuzz}
-          </div>
+          </Highlight>
 
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
