@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from flask.ext.security import login_required, roles_accepted, current_user
+from flask.ext.security.utils import encrypt_password
 
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema)
 from app.models import User, Application, Email, Comment, REVIEW_STAGES
 from app.utils import generate_password, send_email
+
 from datetime import datetime
 
 from flask import (Flask, session, redirect, url_for, escape,
@@ -288,11 +290,10 @@ def add_reviewer():
     req = request.get_json()
 
     password = generate_password()
-
     user = user_datastore.create_user(name=req['name'],
                                       email=req['email'],
                                       status="active",
-                                      password=password)
+                                      password=encrypt_password(password))
     if 'role' in req:
         user_datastore.add_role_to_user(user, req['role'])
 
