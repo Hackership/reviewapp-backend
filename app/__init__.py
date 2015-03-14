@@ -62,6 +62,15 @@ if app.debug:
 
     email_dispatched.connect(log_message)
 
+else:
+
+    # log to stderr
+    import logging
+    from logging import StreamHandler
+    file_handler = StreamHandler()
+    app.logger.setLevel(logging.INFO)  # set the desired logging level here
+    app.logger.addHandler(file_handler)
+
 # this defines all the views
 # they rely on things everywhere, do this last!
 from app import views

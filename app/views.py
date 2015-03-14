@@ -173,9 +173,10 @@ def update_application():
 
 @app.route('/applications/new', methods=['POST'])
 def new_application():
-    form = request.form
-    if not form['_token'] == app.config.get("SCHEMA_TOKEN"):
+    if not request.form['_token'] == app.config.get("SCHEMA_TOKEN"):
         return jsonify(success=False)
+
+    form = json.loads(request.form['payload'])
 
     grant = 'Applying for a Programme Fee Grant' in form
 
@@ -187,10 +188,13 @@ def new_application():
 
     anon = render_template("forms/content_anon.md", app=form)
 
-    application = Application(name=form['Name'], email=form['Email'],
-                              content=content, anon_content=anon,
+    application = Application(name=form['Name'],
+                              email=form['Email'],
+                              content=content,
+                              anon_content=anon,
                               fizzbuzz=form['Hacking task'],
-                              stage="incoming", batch=form['batch'],
+                              stage="incoming",
+                              batch=form['batch'],
                               grant=grant,
                               changedStageAt=datetime.now(),
                               grant_content=grant_content,
@@ -200,9 +204,10 @@ def new_application():
     db.session.commit()
 
     # E-mail Applicant
-    application.send_email('Application Received',
-                           render_template("emails/applicant/received.md",
-                                           app=application))
+    if not request.form.get('_skip_email', False):
+        application.send_email('Application Received',
+                               render_template("emails/applicant/received.md",
+                                               app=application).encode("utf-8"))
 
     return jsonify(success=True)
 
