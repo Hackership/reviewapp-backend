@@ -36,7 +36,8 @@ header {
 
 .incoming {
   padding: 5px;
-  background-color: green;
+  background-color: white;
+  color:#20a260;
   margin-bottom: 5px;
 }
 

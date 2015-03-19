@@ -79,7 +79,7 @@ var Application = React.createClass({
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-         <h4><strong>Waiting for Replies</strong></h4>
+         <h4><strong>Review Replies</strong></h4>
           <div className="content-app">
           {content}
            <EmailBox emails={app.get('emails')} />
@@ -232,7 +232,7 @@ var EmailBox = React.createClass({
                 return(
                   <div className={incoming}>
                     <p>
-                    <strong>{content}</strong> <br />
+                    {content} <br /><br />
                     by: {author},
                     {date}
                     </p>
