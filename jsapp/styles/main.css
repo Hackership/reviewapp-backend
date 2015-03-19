@@ -34,6 +34,12 @@ header {
   margin-bottom: 5px;
 }
 
+.incoming {
+  padding: 5px;
+  background-color: green;
+  margin-bottom: 5px;
+}
+
 .content-app {
   padding-bottom: 10px;
 }

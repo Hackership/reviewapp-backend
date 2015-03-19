@@ -82,6 +82,7 @@ var Application = React.createClass({
          <h4><strong>Waiting for Replies</strong></h4>
           <div className="content-app">
           {content}
+           <EmailBox emails={app.get('emails')} />
           </div>
         </div>
       </Panel>
@@ -169,7 +170,7 @@ var CommentBox = React.createClass({
   },
 
   getInitialState: function(){
-    return {'comment': ''};
+    return {};
   },
 
   commentChanged: function(event) {
@@ -213,6 +214,35 @@ var CommentBox = React.createClass({
     }
 });
 
+var EmailBox = React.createClass({
+  
+  render: function() {
+      var emails = this.props.emails;
+
+      return (
+          <div className="commentBox">
+           <h3>Emails:</h3>
+
+          {_.map(emails, function(email){
+            var content = email['content'],
+                author = email['author']['name'] ? email['author']['name'] : 'unknown',
+                date = ' '+ email['createdAt'],
+                incoming = email['incoming'] ? 'incoming' : 'comment';
+
+                return(
+                  <div className={incoming}>
+                    <p>
+                    <strong>{content}</strong> <br />
+                    by: {author},
+                    {date}
+                    </p>
+                  </div>
+                  )
+              })}
+          </div>
+        );
+    }
+});
 
 var EmailCreate = React.createClass({
   mixins: [OverlayMixin],
