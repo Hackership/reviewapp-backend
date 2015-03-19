@@ -86,8 +86,7 @@ var Application = React.createClass({
         </div>
       </Panel>
       );
-
-  }
+  },
 
   render_in_review: function(){
     var app = this.props.app;

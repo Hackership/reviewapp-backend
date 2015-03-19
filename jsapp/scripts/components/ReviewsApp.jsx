@@ -33,8 +33,8 @@ var ReviewsApp = React.createClass({
   },
 
   render: function() {
-    var apps = [applications.byStage('in_review'), applications.byStage('email_send'), applications.byStage('reply_received'), applications.byStage('skyped')],
-        titles = ['To Review','Emailed', 'Reply Received', 'Skyped'];
+    var apps = [applications.byStage('in_review'), applications.byStage('email_send'), applications.byStage('reply_received')],
+        titles = ['To Review','Emailed', 'Reply Received'];
 
     if (user.attributes.can_admin) {
         apps.splice(0, 0, applications.byStage('incoming'));
