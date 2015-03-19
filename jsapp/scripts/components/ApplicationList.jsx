@@ -69,6 +69,26 @@ var Application = React.createClass({
       );
   },
 
+  render_reply_received: function(){
+    var app = this.props.app;
+    var content = app.get('anon_content');
+    var active = this.props.index === this.props.activeKey;
+    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
+    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+ 
+    return (
+      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        <div>
+         <h4><strong>Waiting for Replies</strong></h4>
+          <div className="content-app">
+          {content}
+          </div>
+        </div>
+      </Panel>
+      );
+
+  }
+
   render_in_review: function(){
     var app = this.props.app;
     var content  = markdown.toHTML(app.get('anon_content'));
