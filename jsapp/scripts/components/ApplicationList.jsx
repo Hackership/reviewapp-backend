@@ -283,6 +283,9 @@ var EmailCreate = React.createClass({
 
     sendEmail: function(evt) {
       Action.sendEmail({email: this.state.comments, appId: this.props.app_id});
+      this.setState({
+        isModalOpen: !this.state.isModalOpen
+      });
     },
 
    render: function() {
