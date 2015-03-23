@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 from flask.ext.security import login_required, roles_accepted, current_user
 from flask.ext.security.utils import get_hmac, encrypt_password, verify_password
-
+from sqlalchemy.sql import or_, and_
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema,
                          ExternalApplicationSchema)
-from app.models import User, Application, Email, Comment, REVIEW_STAGES
+from app.models import (User, Application, Email, Comment,
+                        Timeslot, ScheduledCall,
+                        REVIEW_STAGES)
 from app.utils import generate_password, send_email
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from flask import (Flask, session, redirect, url_for, escape,
-                   request, jsonify, render_template, abort)
+from flask import (request, jsonify,
+                   render_template, abort)
 
 from functools import wraps
 
-import logging
 import base64
 import random
 import json
 import re
+
 
 def _select_reviewers():
     # Find review only status
@@ -31,6 +33,77 @@ def _select_reviewers():
     random.shuffle(reviewers)
 
     return reviewers[:2]   # fetches a random two reviewers
+
+
+def _clean_time(dt):
+    return dt.strftime("%Y-%m-%d %H:{}").format((dt.minute / 30 and "30:00" or "00:00"))
+
+
+def _find_available_slots():
+    tomorrow = datetime.utcnow() + timedelta(hours=25)
+
+    slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
+                  and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
+
+    scheduled_query = ScheduledCall.query.filter(ScheduledCall.scheduledAt >= tomorrow).join()
+
+    blocked = {}
+    for call in scheduled_query:
+        for user in call.callers:
+            blocked.setdefault(user.id, []).append(_clean_time(call.scheduledAt))
+
+    users_per_slot = {}
+
+    FUTURE = 3
+    WEEK = timedelta(days=7)
+
+    for slot in slots_query:
+        dt = slot.datetime
+        if slot.once:
+            if not _clean_time(dt) in blocked.get(slot.user, []):
+                users_per_slot.setdefault(_clean_time(dt),
+                                          []).append(slot.user)
+            continue
+
+        while(dt < tomorrow):
+            dt += WEEK
+
+        for x in xrange(FUTURE):
+            try:
+                if _clean_time(dt) in blocked[slot.user]:
+                    continue
+            except KeyError:
+                pass
+
+            users_per_slot.setdefault(_clean_time(dt),
+                                      []).append(slot.user)
+
+            dt += WEEK
+
+    users_map = dict([(x.id, x) for x in User.query.all()])
+
+    actually_available = []
+
+    for key, uids in users_per_slot.iteritems():
+        # ensure we skip double bookings
+        uids = set(uids)
+        if len(uids) < 2:
+            continue
+
+        has_admin = False
+        users = []
+        for uid in uids:
+            user = users_map[uid]
+            users.append(user)
+            if user.can_admin():
+                has_admin = True
+
+        if not has_admin:
+            continue
+
+        actually_available.append((key, users))
+
+    return sorted(actually_available)
 
 
 def with_application_at_stage(stages):
@@ -87,6 +160,11 @@ def index():
     return app.send_static_file('index.html')
 
 
+@app.route('/api/available_slots')
+def available_slots():
+    slots = _find_available_slots()
+    return jsonify({"slots": [x[0] for x in slots]})
+
 @app.route('/api/app_state')
 @login_required
 def get_state():
@@ -111,7 +189,36 @@ def external_info(application):
 @with_application
 @verify_key
 def schedule(application):
-    pass
+    slot = request.form.get("slot")
+    skype = request.form.get("skype")
+    slots = dict(_find_available_slots())
+
+    if not slot or not skype:
+        abort(400, "Please provide slot and skype contact")
+    if slot not in slots:
+        abort(401, "Slot already taken. Please pick another");
+
+    users = slots[slot]
+    if len(users) > 2:
+        admins = []
+        normal = []
+        for user in users:
+            admins.append(user) if user.can_admin() else normal.append(user)
+        random.shuffle(admins)
+        random.shuffle(normal)
+
+        if normal:
+            users = [admins[0], normal[0]]
+        else:
+            users = admins[:2]
+
+    call = ScheduledCall(application=application.id,
+                         scheduledAt=datetime.strptime(slot + "+UTC", "%Y-%m-%d %H:%M:%S+%Z"),
+                         skype_name=skype,
+                         callers=users)
+    db.session.add(call)
+    db.session.commit()
+    return jsonify(success=True)
 
 
 @app.route('/application/<id>/move_to_stage/to_skype', methods=['POST'])
