@@ -31,14 +31,21 @@ var Scheduler = React.createClass({
         $.getJSON("/application/" + params.app_id + "/external/" + params.key
             ).then(function(data){
                 this.setState({'info': data, loading: false})
+                this._refresh_slots();
             }.bind(this)
             ).fail(function(){
                 this.setState({'failed': true,
                                'loading': false})
             }.bind(this))
+
+    },
+    _refresh_slots: function(){
+        $.getJSON("/api/available_slots").then(function(data){
+            this.setState({loadingSlots: false, slots: _.map(data.slots, function(x){return moment.tz(x, "UTC")})})
+        }.bind(this))
     },
     getInitialState: function(){
-        return {loading: true, failed: false}
+        return {loading: true, failed: false, loadingSlots: true}
     },
     setTimezone: function(tz){
         this.setState({timezone: moment.tz.zone(tz)});
@@ -64,13 +71,25 @@ var Scheduler = React.createClass({
                 </div>
             );
         }
+        var slots = <p>Loading available Time Slots</p>;
+        if (!this.state.loadingSlots){
+            if (!this.state.slots){
+                slots = <p>No Slots open available at the moment. Please come back later</p>
+            } else {
+                var zone = this.state.timezone.name;
+                slots = (<ul>
+                    {_.map(this.state.slots, function(slot){
+                        return <li>{slot.tz(zone).format('LLLL')}</li>
+                    })}
+                </ul>)
+            }
+        }
         return (
             <div>
                 {head}
-                <div>
-                    <p>Your timezone is {this.state.timezone.name} <a onClick={this.resetTimezone}>change</a></p>
-                </div>
                 <h2>Please select a timeslot</h2>
+                <p>Times are shown for local time in {this.state.timezone.name} <a onClick={this.resetTimezone}>change</a></p>
+                {slots}
             </div>
         );
     }
