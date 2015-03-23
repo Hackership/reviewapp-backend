@@ -182,6 +182,7 @@ var CommentBox = React.createClass({
 
   render: function() {
       var comments = this.props.comments ? this.props.comments : "";
+      var new_comment = this.state.comment ? this.state.comment : "";
 
       return (
           <div className="commentBox">
@@ -207,6 +208,7 @@ var CommentBox = React.createClass({
                   wrapperClassName="col-xs-9"
                   placeholder={this.props.place}
                   onChange={this.commentChanged}
+                  value={new_comment}
                   ref="comment" />
             <button className="btn btn-primary btn-form"
                     type="submit"
