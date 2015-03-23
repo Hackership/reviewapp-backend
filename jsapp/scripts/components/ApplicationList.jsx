@@ -52,7 +52,7 @@ var Application = React.createClass({
 
   render_email_send: function(){
     var app = this.props.app;
-    var content = app.get('anon_content');
+    var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
     var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
@@ -61,8 +61,7 @@ var Application = React.createClass({
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
          <h4><strong>Waiting for Replies</strong></h4>
-          <div className="content-app">
-          {content}
+          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
         </div>
       </Panel>
@@ -71,7 +70,7 @@ var Application = React.createClass({
 
   render_reply_received: function(){
     var app = this.props.app;
-    var content = app.get('anon_content');
+    var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
     var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
@@ -80,10 +79,9 @@ var Application = React.createClass({
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
          <h4><strong>Review Replies</strong></h4>
-          <div className="content-app">
-          {content}
-           <EmailBox emails={app.get('emails')} />
+          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
+          <EmailBox emails={app.get('emails')} />
         </div>
       </Panel>
       );
@@ -98,6 +96,11 @@ var Application = React.createClass({
     var style = (deadline > moment())? 'danger' : 'success';
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'DEADLINE: ';
     var hdr = (<h3>{hdr_str}<strong>{deadline}</strong></h3>);
+    var email_button ="";
+    
+    if (user.attributes.can_moderate || user.attributes.can_admin){
+      email_button = <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>;
+    }
 
     return (
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
@@ -113,7 +116,7 @@ var Application = React.createClass({
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
         </div>
-        <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>
+        {email_button}
       </Panel>
 
       );
@@ -224,15 +227,16 @@ var EmailBox = React.createClass({
            <h3>Emails:</h3>
 
           {_.map(emails, function(email){
-            var content = email['content'],
+            var content = markdown.toHTML(email['content']),
                 author = email['author']['name'] ? email['author']['name'] : 'unknown',
                 date = ' '+ email['createdAt'],
                 incoming = email['incoming'] ? 'incoming' : 'comment';
 
                 return(
                   <div className={incoming}>
+                    <div  dangerouslySetInnerHTML={{__html: content}}>
+                    </div>
                     <p>
-                    {content} <br /><br />
                     by: {author},
                     {date}
                     </p>
@@ -288,9 +292,7 @@ var EmailCreate = React.createClass({
     renderOverlay: function() {
       if (!this.state.isModalOpen) {
         return <span/>;
-         console.log('Hello overlay: NO')
       }else{
-         console.log('Hello overlay: YES')
         return (
             <Modal title="Edit Questions to Send" onRequestHide={this.handleToggle}>
               <div>
