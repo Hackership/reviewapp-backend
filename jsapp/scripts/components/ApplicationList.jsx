@@ -105,7 +105,7 @@ var Application = React.createClass({
     return (
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-          <h4><strong>Please Review</strong></h4>
+          <h4><strong>Please Review Application</strong></h4>
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
 
           <h4><strong>Coding Challenge</strong></h4>
