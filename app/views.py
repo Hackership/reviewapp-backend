@@ -81,8 +81,13 @@ def get_state():
         schema = admin_app_state
         query = Application.query
 
+    if not current_user.has_role('admin') and not current_user.has_role('moderator'):
+        query = filter(lambda app: app.stage in REVIEW_STAGES, current_user.applications)
+    else:
+        query = query.all()
+
     return jsonify(schema.dump({"user": current_user._get_current_object(),
-                                "applications": query.all()}).data)
+                                "applications": query}).data)
 
 
 @app.route('/application/<id>/move_to_stage/in_review', methods=['POST'])
