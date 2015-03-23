@@ -15,7 +15,9 @@ import sqlalchemy as sa
 
 
 def upgrade():
-   ALTER TYPE stage ADD value 'review_reply' after 'reply_received'; 
+   op.execute("""
+ALTER TYPE stage ADD value 'review_reply' after 'reply_received';
+""")
 
 
 def downgrade():

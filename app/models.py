@@ -8,7 +8,7 @@ import datetime
 
 
 stages = ('incoming', 'in_review',
-          'email_send', 'reply_received', 'skyped',
+          'email_send', 'reply_received', 'review_reply', 'skyped',
           'accepted', 'rejected', 'grant_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
