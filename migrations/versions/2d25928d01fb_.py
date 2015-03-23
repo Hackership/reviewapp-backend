@@ -17,7 +17,7 @@ import sqlalchemy as sa
 def upgrade():
     op.execute('COMMIT')  # See https://bitbucket.org/zzzeek/alembic/issue/123
     op.execute("""
-ALTER TYPE stage ADD value 'review_reply' after 'reply_received';
+ALTER TYPE STAGES ADD value 'review_reply' after 'reply_received';
 """)
 
 
