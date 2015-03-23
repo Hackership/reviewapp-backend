@@ -16,9 +16,11 @@ import sqlalchemy as sa
 
 def upgrade():
     op.execute('COMMIT')  # See https://bitbucket.org/zzzeek/alembic/issue/123
+    # Appareantly the name as done by SQLAlchemy/Alembic has _quotes in the name_.
     op.execute("""
 ALTER TYPE "STAGES" ADD value 'review_reply' after 'reply_received';
 """)
+
 
 
 def downgrade():
