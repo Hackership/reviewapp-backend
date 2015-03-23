@@ -10,7 +10,7 @@ var webpack = require('webpack');
 module.exports = {
 
   output: {
-    filename: 'main.js',
+    filename: '[name].js',
     path: 'assets',
     publicPath: '/assets/'
   },
@@ -18,7 +18,12 @@ module.exports = {
   cache: true,
   debug: true,
   devtool: false,
-  entry: ['./jsapp/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
+  entry: {
+      'main':
+        ['./jsapp/scripts/components/main.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
+      'scheduler':
+        ['./jsapp/scripts/components/scheduler.jsx', '!bootstrap-webpack!./bootstrap.config.js'],
+    },
 
   stats: {
     colors: true,

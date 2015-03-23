@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask.ext.security import login_required, roles_accepted, current_user
-from flask.ext.security.utils import encrypt_password
+from flask.ext.security.utils import get_hmac, encrypt_password, verify_password
 
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
-                         AnonymousApplicationSchema, ApplicationSchema)
+                         AnonymousApplicationSchema, ApplicationSchema,
+                         ExternalApplicationSchema)
 from app.models import User, Application, Email, Comment, REVIEW_STAGES
 from app.utils import generate_password, send_email
 
@@ -16,10 +17,10 @@ from flask import (Flask, session, redirect, url_for, escape,
 from functools import wraps
 
 import logging
+import base64
 import random
 import json
 import re
-
 
 def _select_reviewers():
     # Find review only status
@@ -59,12 +60,26 @@ def with_application(func):
     return wrapper
 
 
+def verify_key(func):
+    @wraps(func)
+    def wrapper(application, key, *args, **kwargs):
+        print(base64.b64decode(key), get_hmac(application.email), base64.b64encode(get_hmac(application.email)))
+        if get_hmac(application.email) != base64.b64decode(key):
+            abort(404, "Application not Found")
+        return func(application, *args, **kwargs)
+    return wrapper
+
+
 def _render_application(application):
     schema = AnonymousApplicationSchema()
     if current_user.has_role("admin"):
         schema = ApplicationSchema()
     return jsonify({"application": schema.dump(application).data})
 
+
+@app.route('/scheduler/')
+def scheduler_index():
+    return app.send_static_file('scheduler.html')
 
 @app.route('/')
 @login_required
@@ -83,6 +98,52 @@ def get_state():
 
     return jsonify(schema.dump({"user": current_user._get_current_object(),
                                 "applications": query.all()}).data)
+
+
+@app.route('/application/<id>/external/<key>', methods=['GET'])
+@with_application
+@verify_key
+def external_info(application):
+    return jsonify(ExternalApplicationSchema().dump(application).data)
+
+
+@app.route('/application/<id>/schedule/<key>', methods=['POST'])
+@with_application
+@verify_key
+def schedule(application):
+    pass
+
+
+@app.route('/application/<id>/move_to_stage/to_skype', methods=['POST'])
+@login_required
+@roles_accepted('admin')
+@with_application_at_stage("review_reply")
+def switch_to_skype(application):
+    pass
+
+
+@app.route('/application/<id>/move_to_stage/review_reply', methods=['POST'])
+@login_required
+@roles_accepted('admin')
+@with_application_at_stage("reply_received")
+def switch_to_review_reply(application):
+    anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
+    if anon_content:
+        application.anon_content = anon_content
+    application.anonymizer = current_user._get_current_object().id
+    application.members = _select_reviewers()
+    application.stage = "in_review"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    # Email Reviewers
+    application.send_email('New Application to review',
+                           render_template("emails/reviewer/new_application.md", app=application),
+                           map(lambda x: x.email, application.members))
+
+    return _render_application(application)
+
 
 
 @app.route('/application/<id>/move_to_stage/in_review', methods=['POST'])
