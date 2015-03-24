@@ -321,7 +321,7 @@ var SingleEmail = React.createClass({
 },
   render: function() {
       var email = this.props.email,
-      content = email['content'];
+      content = email['incoming'] ? email['content'] : email['anon_content'];
 
 
       return (  
