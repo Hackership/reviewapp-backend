@@ -32,13 +32,15 @@ var MainAppWrap = React.createClass({
 	render: function(){
 
 		var content = user.attributes.can_admin ? <Link className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link> : "";
+		var login = user.attributes.id ? <a className="btn btn-primary" target="_blank" href="/logout">Logout </a> : <a className="btn btn-primary" target="_blank" href="/login">Login </a> 
 		return (
 			<div>
 				<header>
 				<Link className="btn btn-primary btn-white" to="main">Main</Link> 
 				{content}
+				{login}
 				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
-				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a> 
+				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a>
 				</header>
 				<RouteHandler />
 			</div>
