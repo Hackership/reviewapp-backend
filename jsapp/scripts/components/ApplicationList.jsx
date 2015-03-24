@@ -45,9 +45,50 @@ var Application = React.createClass({
     this.setState({anon_content: event.target.value});
   },
 
+  emailChanged: function(event) {
+     this.setState({email_content: event.target.value});
+  },
+
   render: function() {
     var stage = this.props.app.get("stage");
     return this["render_" + stage]();
+  },
+
+
+  render_review_reply:function() {
+    var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+    var active = this.props.index === this.props.activeKey;
+    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
+    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+ 
+    return (
+      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        <div>
+         <h4><strong>Anonymize Replies</strong></h4>
+         <div dangerouslySetInnerHTML={{__html: content}} />
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+        </div>
+      </Panel>
+      );
+  },
+
+  render_reply_received: function(){
+    var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+    var active = this.props.index === this.props.activeKey;
+    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
+    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+ 
+    return (
+      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        <div>
+         <h4><strong>Anonymize Replies</strong></h4>
+         
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
+        </div>
+      </Panel>
+      );
   },
 
   render_email_send: function(){
@@ -68,24 +109,6 @@ var Application = React.createClass({
       );
   },
 
-  render_reply_received: function(){
-    var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
-    var active = this.props.index === this.props.activeKey;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
- 
-    return (
-      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
-        <div>
-         <h4><strong>Review Replies</strong></h4>
-          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
-          </div>
-          <EmailBox emails={app.get('emails')} />
-        </div>
-      </Panel>
-      );
-  },
 
   render_in_review: function(){
     var app = this.props.app;
@@ -221,31 +244,87 @@ var CommentBox = React.createClass({
 
 var EmailBox = React.createClass({
   
+  submitEmails: function() {
+    var index;
+    var emails = {};
+    var email;
+    for (index=0; index < this.props.emails.length; index++){
+      content = this.refs["email"+index].getContent();
+      email = this.props.emails[index];
+      emails[email['id']] = content;
+      console.log(emails);
+    }
+    Action.moveToEmailReview({appId: this.props.app_id, content: emails});
+  },
+
   render: function() {
       var emails = this.props.emails;
+      var edit = this.props.canEdit;
+      var submit = edit ? <Button onClick={this.submitEmails}>Submit</Button> : ""; 
 
       return (
           <div className="commentBox">
            <h3>Emails:</h3>
 
-          {_.map(emails, function(email){
-            var content = markdown.toHTML(email['content']),
-                author = email['author']['name'] ? email['author']['name'] : 'unknown',
-                date = ' '+ email['createdAt'],
-                incoming = email['incoming'] ? 'incoming' : 'comment';
+          {_.map(emails, function(email, index){
+              var ref = 'email' + index;
+                
+                if (edit) {
+                return(<SingleEmail email={email} ref={ref}/>)
+                }
 
-                return(
-                  <div className={incoming}>
-                    <div  dangerouslySetInnerHTML={{__html: content}}>
-                    </div>
-                    <p>
-                    by: {author},
-                    {date}
-                    </p>
-                  </div>
-                  )
+                else {
+                  return (<DisplayEmail email={email} />)
+                }
+                  
               })}
+          {submit}
           </div>
+        );
+    }
+});
+
+var DisplayEmail = React.createClass({
+  
+  render: function() {
+
+    var email = this.props.email,
+        content = markdown.toHTML(email['anon_content']),
+        author = email['author']['name'] ? email['author']['name'] : 'unknown',
+        date = ' '+ email['createdAt'],
+        incoming = email['incoming'] ? 'incoming' : 'comment';
+
+    return (
+        <div className={incoming}>
+            <div  dangerouslySetInnerHTML={{__html: content}}>
+            </div>
+            <p>
+            by: {author},
+            {date}
+            </p>
+          </div>
+        );
+  }
+});
+
+var SingleEmail = React.createClass({
+
+  getContent: function() {
+    return this.refs.anon.getValue();
+
+},
+  render: function() {
+      var email = this.props.email,
+      content = email['content'];
+
+
+      return (  
+            <Input type='textarea' className="form-text"
+                      defaultValue={content}
+                      label="Anonymized Email"
+                      labelClassName="col-xs-2"
+                      wrapperClassName="col-xs-10"
+                      ref="anon"/>
         );
     }
 });

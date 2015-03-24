@@ -100,6 +100,24 @@ function moveToReview(payload) {
           });
 }
 
+function moveToEmailReview(payload) {
+  var content = payload['content'];
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' + app_id + '/move_to_stage/review_reply',
+          data: content,
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 function sendEmail(payload) {
 	var email = payload['email'];
 	var app_id = payload['appId'];
@@ -134,8 +152,12 @@ Dispatcher.register(function(payload) {
 	case 'moveToReview':
 		moveToReview(payload.payload)
 		break;
+  case 'moveToEmailReview':
+    moveToEmailReview(payload.payload)
+    break;
 	case 'sendEmail':
 		sendEmail(payload.payload)
+    break;
 
     default:
       return true;

@@ -33,8 +33,8 @@ var ReviewsApp = React.createClass({
   },
 
   render: function() {
-    var apps = [applications.byStage('in_review'), applications.byStage('email_send'), applications.byStage('reply_received')],
-        titles = ['To Review','Emailed', 'Reply Received'];
+    var apps = [applications.byStage('in_review'), applications.byStage('email_send'), applications.byStage('review_reply')],
+        titles = ['To Review','Emailed', 'Review Reply'];
 
     if (user.attributes.can_admin) {
         apps.splice(0, 0, applications.byStage('incoming'));
@@ -42,8 +42,8 @@ var ReviewsApp = React.createClass({
     }
 
     if (user.attributes.can_moderate) {
-        apps.splice(2, 0, applications.toEmail());
-        titles.splice(2 ,0, 'To Email');
+        apps.splice(3,0, applications.byStage('reply_received'));
+        titles.splice(3,0, 'Reply Incoming');
     }
 
     return (
