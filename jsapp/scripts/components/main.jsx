@@ -37,6 +37,8 @@ var MainAppWrap = React.createClass({
 				<header>
 				<Link className="btn btn-primary btn-white" to="main">Main</Link> 
 				{content}
+				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
+				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a> 
 				</header>
 				<RouteHandler />
 			</div>
@@ -48,7 +50,7 @@ var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
 	    <Route name="main" path="/" handler={ReviewsApp} />
-	  </Route>
+	</Route>
 );
 
 Router.run(Routes, function (Handler) {

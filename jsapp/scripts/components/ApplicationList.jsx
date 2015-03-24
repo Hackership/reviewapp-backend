@@ -10,6 +10,7 @@ var React = require('react/addons'),
   Modal = rtbs.Modal,
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
+  Well = rtbs.Well,
   Accordion = rtbs.Accordion,
   PanelGroup = rtbs.PanelGroup,
   OverlayMixin = rtbs.OverlayMixin,
@@ -60,14 +61,17 @@ var Application = React.createClass({
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+    var date = moment(app.attributes.changedStageAt).calendar();
+    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-         <h4><strong>Anonymize Replies</strong></h4>
+          <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
          <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
       </Panel>
       );
@@ -78,13 +82,13 @@ var Application = React.createClass({
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+    var date = moment(app.attributes.changedStageAt).calendar();
+    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-         <h4><strong>Anonymize Replies</strong></h4>
-         
+          <Instruction instruction="Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers." />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
         </div>
       </Panel>
@@ -96,14 +100,16 @@ var Application = React.createClass({
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var hdr = (<h3>{hdr_str}<strong>{app.attributes.changedStageAt}</strong></h3>);
+    var date = moment(app.attributes.changedStageAt).calendar();
+    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
       <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-         <h4><strong>Waiting for Replies</strong></h4>
+        <Instruction instruction="Email Send. No Action Required." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
+            <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={false} />
         </div>
       </Panel>
       );
@@ -128,7 +134,7 @@ var Application = React.createClass({
     return (
       <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-          <h4><strong>Please Review Application</strong></h4>
+          <Instruction instruction="Review Stage. Please read through this application and add questions for the applicant in the box below." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
 
           <h4><strong>Coding Challenge</strong></h4>
@@ -160,7 +166,7 @@ var Application = React.createClass({
     return (
        <Panel header={hdr} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
-          <h4><strong>Edit the Anonymized Output:</strong></h4>
+         <Instruction instruction="Anonymization Stage. Please Anonymize this application by removing names and other identifiers" />
           <div className="content-app">
           </div>
           <form>
@@ -319,13 +325,24 @@ var SingleEmail = React.createClass({
 
 
       return (  
-            <Input type='textarea' className="form-text"
+            <Input type='textarea' className="email"
                       defaultValue={content}
-                      label="Anonymized Email"
-                      labelClassName="col-xs-2"
-                      wrapperClassName="col-xs-10"
+                      wrapperClassName="col-xs-12"
                       ref="anon"/>
         );
+    }
+});
+
+var Instruction = React.createClass({
+
+  render: function() {
+        var text = this.props.instruction;
+
+      return ( 
+        <Well className="instruction">
+          <h4>What to do with this application:</h4>
+          <p>{text}</p>
+        </Well>);
     }
 });
 
@@ -334,8 +351,14 @@ var EmailCreate = React.createClass({
 
   getInitialState: function() {
     var comments = this.props.questions.concat(this.props.comments),
+        com_str = this.getComments(comments);
 
-    comment_str = _.map(comments, function(comment){
+      return {'isModalOpen': false, 'comments': com_str};
+    },
+
+  getComments: function(comments){
+    
+    var comment_str = _.map(comments, function(comment){
             return (comment['content']);
           });
 
@@ -344,9 +367,16 @@ var EmailCreate = React.createClass({
     for(i = 0; i < comment_str.length; i++){
       com_str = com_str + comment_str[i] + ' \n' ;
     }
-      return {'isModalOpen': false, 'comments': com_str};
-    },
 
+    return (com_str);
+  },
+
+  componentWillReceiveProps: function(props) {
+    var com_str = this.getComments(props.questions);
+    this.setState({
+      comments: com_str
+    });
+  },
   commentChanged: function(evt){
       this.setState({
         comments: evt.target.value
@@ -354,7 +384,6 @@ var EmailCreate = React.createClass({
     },
 
   handleToggle: function(evt) {
-
       this.setState({
         isModalOpen: !this.state.isModalOpen
       });
@@ -376,11 +405,12 @@ var EmailCreate = React.createClass({
     renderOverlay: function() {
       if (!this.state.isModalOpen) {
         return <span/>;
-      }else{
+      }else
+      {
         return (
             <Modal title="Edit Questions to Send" onRequestHide={this.handleToggle}>
               <div>
-                <textarea className="form-text" onChange={this.commentChanged} value={this.state.comments} labelClassName="col-xs-2" 
+                <textarea className="popup" onChange={this.commentChanged} value={this.state.comments} labelClassName="col-xs-2" 
                         wrapperClassName="col-xs-10"/>
                 <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
                 <br />
