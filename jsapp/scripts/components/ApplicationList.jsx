@@ -115,7 +115,7 @@ var Application = React.createClass({
     var content  = markdown.toHTML(app.get('anon_content'));
     var fizzbuzz = app.get('fizzbuzz');
     var active = this.props.index === this.props.activeKey;
-    var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar();
+    var deadline = user.attributes.can_moderate ? moment(app.attributes.changedStageAt).add(14, 'days').calendar() : moment(app.attributes.changedStageAt).add(7, 'days').calendar();
     var style = (deadline > moment())? 'danger' : 'success';
     var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'DEADLINE: ';
     var hdr = (<h3>{hdr_str}<strong>{deadline}</strong></h3>);
