@@ -90,6 +90,34 @@ def get_state():
                                 "applications": query}).data)
 
 
+@app.route('/application/<id>/move_to_stage/review_reply', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application_at_stage("reply_received")
+def switch_to_review_reply(application):
+    anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
+    if anon_content:
+        application.anon_content = anon_content
+    application.stage = "review_reply"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    for email in application.emails:
+        new_content = (request.form.get("{}".format(email.id)) or request.args.get("{}".format(email.id))) or None
+        if not new_content:
+            continue
+        email.anon_content = new_content
+        db.session.add(email)
+
+    db.session.commit()
+
+    # Email Reviewers
+    application.send_email('Applicant replied',
+                           render_template("emails/reviewer/applicant_replied.md", app=application),
+                           map(lambda x: x.email, application.members))
+
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/in_review', methods=['POST'])
 @login_required
 @roles_accepted('admin')
