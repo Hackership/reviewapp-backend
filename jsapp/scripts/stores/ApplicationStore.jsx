@@ -7,6 +7,7 @@
  	 Actions = require('../actions/actions'),
  	 moment = require('moment'),
  	 _ =require('underscore'),
+   {user} = require('./UserStore'),
  	 Dispatcher = require('../dispatchers/dispatcher');
 
 var $=require('jquery');
@@ -43,11 +44,36 @@ var Applications = Backbone.Collection.extend({
     		function(x){return moment(x.changedStageAt) < weekAgo});
     },
 
- 	byStage: function(stage) {
- 		return this.where({"stage": stage});
- },
+   	byStage: function(stage) {
+   		return this.where({"stage": stage});
+   },
 
-});
+    byUrgency: function(role) {
+      var review_apps,
+          reply_apps;
+
+      if (role === 'reviewer') {
+         review_apps = _.sortBy(_.filter(this.where({'stage': 'in_review'}), function(app){
+             return !(_.find(app.get('comments'), function(comment){
+                console.log(comment['author']);
+                return ((comment['author']['id'] === 0) && comment['question']);
+             }));
+          }), 'changedStageAt');
+
+          reply_apps = _.sortBy(this.where({'stage': 'review_reply'}), 'changedStageAt');
+
+          return _.flatten([review_apps, reply_apps]);
+      }
+
+      else if (role === 'moderator'){
+        return _.sortBy(_.flatten([this.toEmail(), this.byStage('reply_received')]), 'changedStageAt');
+      }
+
+      else if (role === 'admin'){
+        return _.sortBy(_.flatten([this.byStage('incoming'), this.byStage('reply_received')]), 'changedStageAt');
+      }
+
+}});
 
 var applications = new Applications();
 

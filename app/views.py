@@ -5,7 +5,7 @@ from flask.ext.security.utils import encrypt_password
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema)
-from app.models import User, Application, Email, Comment, REVIEW_STAGES
+from app.models import User, Application, Email, Comment, REVIEW_STAGES, MOD_STAGES
 from app.utils import generate_password, send_email
 
 from datetime import datetime
@@ -77,10 +77,11 @@ def index():
 def get_state():
     schema = app_state
     query = Application.query.filter(Application.stage in REVIEW_STAGES)
-    if current_user.has_role('admin'):
+    
+    if current_user.has_role('admin') or current_user.has_role('moderator'):
         schema = admin_app_state
         query = Application.query
-
+    
     if not current_user.has_role('admin') and not current_user.has_role('moderator'):
         query = filter(lambda app: app.stage in REVIEW_STAGES, current_user.applications)
     else:
@@ -181,10 +182,11 @@ def add_comment(application):
     content = request.form.get("comment") or request.args.get("comment")
     if not content:
         abort(400, "Please pass a comment")
+
     # FIXME verification would be great...
     comment = Comment(content=content,
                       question=request.form.get("question", False),
-                      author=current_user.id,
+                      author=current_user._get_current_object().id,
                       application=application.id,
                       stage=application.stage)
 

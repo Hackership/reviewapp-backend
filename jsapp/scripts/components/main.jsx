@@ -4,9 +4,10 @@
 
 'use strict';
 
-var ReviewsApp = require('./ReviewsApp'),
+var {ReviewsApp} = require('./ReviewsApp'),
+	{FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
-	ApplicationList = require('./ApplicationList'),
+	{ApplicationList} = require('./ApplicationList'),
 	React = require('react'),
 	Router = require('react-router'),
 	Route = Router.Route,
@@ -36,7 +37,8 @@ var MainAppWrap = React.createClass({
 		return (
 			<div>
 				<header>
-				<Link className="btn btn-primary btn-white" to="main">Main</Link> 
+				<Link className="btn btn-primary" to="main">Main</Link> 
+				<Link className="btn btn-primary" to="focus">Focus Mode</Link> 
 				{content}
 				{login}
 				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
@@ -52,6 +54,7 @@ var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
 	    <Route name="main" path="/" handler={ReviewsApp} />
+	    <Route name="focus" path="/focus" handler={FocusReview} />
 	</Route>
 );
 

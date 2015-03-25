@@ -13,9 +13,11 @@ stages = ('incoming', 'in_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
 
-REVIEW_STAGES = ('in_review', 'email_send', 'reply_received',
+REVIEW_STAGES = ('in_review', 'email_send', 'review_reply',
                  'skyped', 'accepted', 'rejected')
 
+MOD_STAGES = ('in_review', 'email_send', 'review_reply', 'reply_received',
+              'skyped', 'accepted', 'rejected')
 
 roles_users = db.Table('roles_users',
                        db.Column('user_id', db.Integer(),
@@ -31,6 +33,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(120))
     status = db.Column(db.String)
     active = db.Column(db.Boolean())
+    comments = db.relationship('Comment', backref='user')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 

@@ -451,4 +451,4 @@ var ApplicationsList = React.createClass({
 });
 
 
-module.exports = ApplicationsList;
+module.exports = {ApplicationList: ApplicationsList, Application: Application};

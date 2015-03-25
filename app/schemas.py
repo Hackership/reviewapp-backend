@@ -2,9 +2,9 @@ from marshmallow import Schema, fields
 
 
 class UserSchema(Schema):
-    id = fields.Integer()
-    name = fields.String()
-
+    class Meta:
+        fields = ('id', 'name')
+        
 
 class MeUserSchema(Schema):
     class Meta:

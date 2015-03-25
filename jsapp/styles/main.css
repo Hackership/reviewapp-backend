@@ -27,6 +27,11 @@ textarea.form-control.email{
   padding-top: 5px;
 }
 
+.counter {
+  font-weight: 800%;
+  color: white;
+}
+
 /* main */
 .form-text {
   margin: 1%;

@@ -10,8 +10,9 @@ var React = require('react/addons'),
   TabbedArea = rtbs.TabbedArea,
   TabPane = rtbs.TabPane,
   {Link, Route} = require('react-router'),
-  ApplicationList = require('./ApplicationList'),
+  {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
+  FocusList = require('./FocusMode'),
   {user} = require('../stores/UserStore');
 
 // CSS
@@ -64,4 +65,45 @@ var ReviewsApp = React.createClass({
   }
 });
 
-module.exports = ReviewsApp;
+var FocusReview = React.createClass({
+
+  componentDidMount: function(){
+    var self = this;
+    applications.on("all", function(){
+      self.forceUpdate();
+    });
+
+    user.on("all", function(){
+        self.forceUpdate();
+      });
+  },
+
+  render: function() {
+    var apps;
+
+    if (user.attributes.can_admin) {
+      console.log('ADMIN');
+      apps = applications.byUrgency('admin');
+    }
+
+    else if (user.attributes.can_moderate) {
+      console.log('MOD');
+       apps = applications.byUrgency('moderator');
+    }
+
+    else{
+      console.log('REV');
+       apps = applications.byUrgency('reviewer');
+    }
+
+    return (
+      <div className="main">
+        <div className="container">
+         <FocusList apps={apps} />
+        </div>
+      </div>
+    );
+  }
+});
+
+module.exports = {ReviewsApp: ReviewsApp, FocusReview: FocusReview};
