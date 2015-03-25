@@ -99,12 +99,13 @@ members_table = db.Table('members',
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime, default=datetime.datetime.now)
-    author = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     content = db.Column(db.Text)
     stage = db.Column(db.Enum(*stages))
     question = db.Column(db.Boolean, default=False)
     application = db.Column(db.Integer, db.ForeignKey('application.id'))
-
+    author = db.relationship('User')
+    
     def __repr__(self):
         return '<Comment: {}, {}>'.format(self.createdAt, self.id)
 

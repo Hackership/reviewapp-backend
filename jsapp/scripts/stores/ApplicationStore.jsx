@@ -56,7 +56,7 @@ var Applications = Backbone.Collection.extend({
          review_apps = _.sortBy(_.filter(this.where({'stage': 'in_review'}), function(app){
              return !(_.find(app.get('comments'), function(comment){
                 console.log(comment['author']);
-                return ((comment['author']['id'] === 0) && comment['question']);
+                return ((comment['author']['id'] === user.get('id')) && comment['question']);
              }));
           }), 'changedStageAt');
 
