@@ -33,4 +33,3 @@ ALTER TABLE comment RENAME COLUMN author_id TO author
 """)
     ### end Alembic commands ###
 
- 

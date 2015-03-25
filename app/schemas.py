@@ -66,6 +66,11 @@ class ApplicationSchema(Schema):
     emails = fields.Nested(EmailSchema, many=True)
 
 
+class ExternalApplicationSchema(Schema):
+    class Meta:
+        fields = ('id', 'createdAt', 'changedStageAt', 'name', 'stage')
+
+
 class AppStateSchema(Schema):
     user = fields.Nested(MeUserSchema)
     applications = fields.Nested(ApplicationSchema, many=True)

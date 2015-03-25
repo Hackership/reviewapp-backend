@@ -37,6 +37,10 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    timeslots = db.relationship('Timeslot')
+
+    calls = db.relationship('ScheduledCall',  secondary=lambda: user_calls_table)
+
     def can_admin(self):
         return self.has_role("admin")
 
@@ -71,6 +75,8 @@ class Application(db.Model):
     # backref from comments and emails come automatically
     members = db.relationship('User', secondary=lambda: members_table,
                               backref='applications')
+
+    calls = db.relationship('ScheduledCall')
 
     comments = db.relationship('Comment')
     emails = db.relationship('Email')
@@ -122,3 +128,32 @@ class Email(db.Model):
 
     def __repr__(self):
         return '<Email: {}, {}>'.format(self.createdAt, self.id)
+
+
+## conference call management
+
+class Timeslot(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    once = db.Column(db.Boolean, default=False)
+    # we extract date and hour from that.
+    datetime = db.Column(db.DateTime)
+    user = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+
+class ScheduledCall(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    application = db.Column(db.Integer, db.ForeignKey('application.id'))
+    scheduledAt = db.Column(db.DateTime)
+    failed = db.Column(db.Boolean, default=False)
+    skype_name = db.Column(db.String(255))
+
+    callers = db.relationship('User',  secondary=lambda: user_calls_table)
+
+
+user_calls_table = db.Table('user_calls',
+    db.Column('user_id', db.Integer, db.ForeignKey("user.id"),
+           primary_key=True),
+    db.Column('scheduled_call_id', db.Integer, db.ForeignKey("scheduled_call.id"),
+           primary_key=True)
+)
+
