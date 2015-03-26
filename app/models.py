@@ -41,6 +41,9 @@ class User(db.Model, UserMixin):
 
     calls = db.relationship('ScheduledCall',  secondary=lambda: user_calls_table)
 
+    def is_skypelead(self):
+        return self.has_role("skypelead")
+
     def can_admin(self):
         return self.has_role("admin")
 
@@ -111,7 +114,7 @@ class Comment(db.Model):
     question = db.Column(db.Boolean, default=False)
     application = db.Column(db.Integer, db.ForeignKey('application.id'))
     author = db.relationship('User')
-    
+
     def __repr__(self):
         return '<Comment: {}, {}>'.format(self.createdAt, self.id)
 

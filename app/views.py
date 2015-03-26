@@ -94,7 +94,7 @@ def _find_available_slots():
         for uid in uids:
             user = users_map[uid]
             users.append(user)
-            if user.can_admin():
+            if user.is_skypelead():
                 has_admin = True
 
         if not has_admin:
@@ -237,7 +237,7 @@ def schedule(application):
         admins = []
         normal = []
         for user in users:
-            admins.append(user) if user.can_admin() else normal.append(user)
+            admins.append(user) if user.is_skypelead() else normal.append(user)
         random.shuffle(admins)
         random.shuffle(normal)
 
