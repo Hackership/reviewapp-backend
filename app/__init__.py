@@ -86,6 +86,8 @@ if app.debug:
                     password='password'),
                 user_datastore.find_role("skypelead"))
 
+        user_datastore.commit()
+
     def log_message(message, app):
         app.logger.debug(u"Email {} from {} to {}:\n{}\n".format(
                         message.subject, message.sender,
