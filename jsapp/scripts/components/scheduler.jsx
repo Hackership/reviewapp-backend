@@ -5,11 +5,8 @@
 'use strict';
 
 var React = require('react'),
-    Router = require('react-router'),
+    {Route, Link, RouteHandler, NotFoundRoute, run} = require('react-router'),
     _ = require("underscore"),
-    Route = Router.Route,
-    Link = require('react-router').Link,
-    RouteHandler = Router.RouteHandler,
     moment = require('moment'),
     moment_tz = require('moment-timezone/moment-timezone'),
     zones = require("../data/timezones"),
@@ -24,6 +21,18 @@ var availableZones = _.map(zones.zones, function(x){
     var name = x.split('|')[0];
     return {value: name, label: name.replace("_", " ")};
 });
+
+var NotFound = React.createClass({
+    render: function(){
+        return (
+            <div>
+                <h2>404 - Resource not found</h2>
+                <p>If you arrived here after clicking a link in an email, try copy pasting it instead. If this keeps happning, please inform the administrators!</p>
+
+            </div>
+            );
+    }
+})
 
 var Scheduler = React.createClass({
     componentWillMount: function(){
@@ -112,10 +121,11 @@ var MainAppWrap = React.createClass({
 var Routes = (
     <Route path="/" handler={MainAppWrap}>
         <Route name="scheduler" path="schedule/:app_id/:key" handler={Scheduler} />
+        <NotFoundRoute handler={NotFound} />
     </Route>
 );
 
-Router.run(Routes, function (Handler, state) {
+run(Routes, function (Handler, state) {
   var params = state.params;
   React.render(<Handler params={params}/>, document.getElementById('content'));
 });
