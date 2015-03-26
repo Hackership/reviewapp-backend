@@ -32,7 +32,7 @@ security = Security(app, user_datastore)
 
 @app.before_first_request
 def ensure_roles():
-    for rolename in ["admin", "moderator"]:
+    for rolename in ["admin", "moderator", "skypelead", "skypee"]:
         user_datastore.find_or_create_role(rolename)
 
 if app.debug:
@@ -40,20 +40,53 @@ if app.debug:
     # Create a user to test with
     @app.before_first_request
     def create_user():
-        if user_datastore.get_user('reviewer@example.org'):
-            return
-        user_datastore.create_user(
-            email='reviewer@example.org', password='password')
-        user_datastore.add_role_to_user(
+        if not user_datastore.get_user('reviewer@example.org'):
             user_datastore.create_user(
-                email='moderator@example.org',
-                password='password'),
-            user_datastore.find_role("moderator"))
-        user_datastore.add_role_to_user(
-            user_datastore.create_user(
-                email='admin@example.org',
-                password='password'),
-            user_datastore.find_role("admin"))
+                email='reviewer@example.org', password='password')
+
+        if not user_datastore.get_user('moderator@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='moderator@example.org',
+                    password='password'),
+                user_datastore.find_role("moderator"))
+
+        if not user_datastore.get_user('admin@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='admin@example.org',
+                    password='password'),
+                user_datastore.find_role("admin"))
+
+        if not user_datastore.get_user('skypee1@example.org'):
+
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='skypee1@example.org',
+                    password='password'),
+                user_datastore.find_role("skypee"))
+
+        if not user_datastore.get_user('skypee2@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='skypee2@example.org',
+                    password='password'),
+                user_datastore.find_role("skypee"))
+
+        if not user_datastore.get_user('skypee3@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='skypee3@example.org',
+                    password='password'),
+                user_datastore.find_role("skypee"))
+        if not user_datastore.get_user('skypelead@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='skypelead@example.org',
+                    password='password'),
+                user_datastore.find_role("skypelead"))
+
+        user_datastore.commit()
 
     def log_message(message, app):
         app.logger.debug(u"Email {} from {} to {}:\n{}\n".format(
