@@ -8,7 +8,9 @@ import datetime
 
 
 stages = ('incoming', 'in_review',
-          'email_send', 'reply_received', 'review_reply', 'skyped',
+          'email_send', 'reply_received', 'review_reply',
+          'schedule_skype',
+          'skype_scheduled', 'skyped',
           'accepted', 'rejected', 'grant_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
@@ -149,6 +151,7 @@ class ScheduledCall(db.Model):
     scheduledAt = db.Column(db.DateTime)
     failed = db.Column(db.Boolean, default=False)
     skype_name = db.Column(db.String(255))
+    calendar_id = db.Column(db.String(255))
 
     callers = db.relationship('User',  secondary=lambda: user_calls_table)
 

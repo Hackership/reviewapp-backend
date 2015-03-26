@@ -9,6 +9,7 @@ from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
 from app.utils import generate_password, send_email
+from calendar import add_call_to_calendar
 
 from datetime import datetime, timedelta
 
@@ -135,7 +136,6 @@ def with_application(func):
 def verify_key(func):
     @wraps(func)
     def wrapper(application, key, *args, **kwargs):
-        print(base64.b64decode(key), get_hmac(application.email), base64.b64encode(get_hmac(application.email)))
         if get_hmac(application.email) != base64.b64decode(key):
             abort(404, "Application not Found")
         return func(application, *args, **kwargs)
@@ -182,6 +182,25 @@ def get_state():
 
     return jsonify(schema.dump({"user": current_user._get_current_object(),
                                 "applications": query}).data)
+
+
+
+@app.route('/application/<id>/move_to_stage/schedule_skype', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application_at_stage("review_reply")
+def switch_to_schedule_skype(application):
+    application.stage = "schedule_skype"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    # Email Reviewers
+    application.send_email("Let's schedule a call to talk about your Hackership Application",
+                           render_template("emails/applicant/schedule_skype.md",
+                              app=application, key=base64.b64encode(get_hmac(application.email))))
+
+    return _render_application(application)
 
 
 @app.route('/application/<id>/move_to_stage/review_reply', methods=['POST'])
@@ -250,7 +269,11 @@ def schedule(application):
                          scheduledAt=datetime.strptime(slot + "+UTC", "%Y-%m-%d %H:%M:%S+%Z"),
                          skype_name=skype,
                          callers=users)
+
+    call.calendar_id = add_call_to_calendar(call, application)
+    application.stage = 'skype_scheduled'
     db.session.add(call)
+    db.session.add(application)
     db.session.commit()
     return jsonify(success=True)
 
