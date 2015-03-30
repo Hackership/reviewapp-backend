@@ -1,4 +1,5 @@
 import os
+import base64
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -33,6 +34,10 @@ MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
 MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
 MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", SECURITY_EMAIL_SENDER)
 MAIL_SUPPRESS_SEND = DEBUG
+
+GDATA_PRIVATE_EMAIL = os.environ.get("GDATA_PRIVATE_EMAIL", "")
+GDATA_PRIVATE_KEY = base64.b64decode(os.environ.get("GDATA_PRIVATE_KEY", ""))
+GDATA_CALENDAR_ID = os.environ.get("GDATA_CALENDAR_ID", "")
 
 try:
     from local_config import *
