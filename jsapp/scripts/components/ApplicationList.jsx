@@ -55,8 +55,28 @@ var Application = React.createClass({
     return this["render_" + stage]();
   },
 
+  render_schedule_skype: function() {
+     var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+    var active = this.props.index === this.props.activeKey;
+    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
+    var date = moment(app.attributes.changedStageAt).calendar();
+    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
+ 
+    return (
+      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        <div>
+          <Instruction instruction="Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!" />
+          <div dangerouslySetInnerHTML={{__html: content}} />
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        </div>
+      </Panel>
+      );
+    },
 
-  render_review_reply:function() {
+  render_review_reply: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
@@ -73,6 +93,7 @@ var Application = React.createClass({
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
+        <SkypeScheduleButton app={app} user={user} />
       </Panel>
       );
   },
@@ -419,6 +440,28 @@ var EmailCreate = React.createClass({
           );
       }
     }
+});
+
+var SkypeScheduleButton = React.createClass({
+
+  render: function() {
+    var inactive = (this.props.app.attributes.stage === 'review_reply') ? false : true,
+        visible = (this.props.user.attributes.can_admin || this.props.user.attributes.can_moderate) ? true : false,
+        app_id = this.props.app.attributes.id;
+
+    if (visible){
+      return (
+        <Button disabled={inactive} onClick={this.scheduleSkype} className="btn-primary btn-form">Schedule Skype</Button>
+        );
+    }
+
+    return (<div></div>);
+
+  },
+
+  scheduleSkype: function() {
+     Action.moveToScheduleSkype({appId: this.props.app.attributes.id});
+  }
 });
 
 var ApplicationsList = React.createClass({
