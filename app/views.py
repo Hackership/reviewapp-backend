@@ -9,7 +9,7 @@ from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
 from app.utils import generate_password, send_email
-from calendar import add_call_to_calendar
+from calendar import add_call_to_calendar, remove_call_from_calendar
 
 from datetime import datetime, timedelta
 
@@ -264,6 +264,13 @@ def schedule(application):
             users = [admins[0], normal[0]]
         else:
             users = admins[:2]
+
+    for call in application.calls:
+        if not call.failed:
+            call.failed = True
+            if call.calendar_id:
+              remove_call_from_calendar(call.calendar_id)
+            db.session.add(call)
 
     call = ScheduledCall(application=application.id,
                          scheduledAt=datetime.strptime(slot + "+UTC", "%Y-%m-%d %H:%M:%S+%Z"),

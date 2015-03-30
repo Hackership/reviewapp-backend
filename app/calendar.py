@@ -13,6 +13,21 @@ def _get_service():
     http_auth = credentials.authorize(Http())
     return build('calendar', 'v3', http=http_auth)
 
+
+def remove_call_from_calendar(eventId):
+    if not app.config.get("GDATA_CALENDAR_ID"):
+        print ("Google Calendar Disabled. Please add GDATA_CALENDAR_ID to config")
+
+    service = _get_service()
+
+    try:
+        return service.events().delete(calendarId=app.config.get("GDATA_CALENDAR_ID"),
+                                       sendNotifications=True,
+                                       eventId=eventId).execute()
+    except Exception, exc:
+        print("Well, consider this failed: %r" % exc)
+
+
 def add_call_to_calendar(call, application):
     if not app.config.get("GDATA_CALENDAR_ID"):
         print ("Google Calendar Disabled. Please add GDATA_CALENDAR_ID to config")
