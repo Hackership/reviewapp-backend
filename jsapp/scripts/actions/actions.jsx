@@ -5,7 +5,7 @@ var AppDispatcher = require('../dispatchers/dispatcher'),
 
 _.each([
     //applications
-    "getApplications", "updateApplication", "moveToReview", "moveToEmailReview",
+    "getApplications", "updateApplication", "moveToReview", "moveToEmailReview", "moveToScheduleSkype",
 
     // Comments & questions
     "postComment", "postQuestion",
