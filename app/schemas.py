@@ -66,9 +66,19 @@ class ApplicationSchema(Schema):
     emails = fields.Nested(EmailSchema, many=True)
 
 
+class ScheduledCallSchema(Schema):
+    class Meta:
+        fields = ('id', 'scheduledAt', 'failed', 'calendar_id', 'callers')
+
+    callers = fields.Nested(UserSchema, many=True)
+
+
 class ExternalApplicationSchema(Schema):
     class Meta:
-        fields = ('id', 'createdAt', 'changedStageAt', 'name', 'stage')
+        fields = ('id', 'createdAt', 'changedStageAt', 'name',
+                  'stage', 'calls')
+
+    calls = fields.Nested(ScheduledCallSchema, many=True)
 
 
 class AppStateSchema(Schema):

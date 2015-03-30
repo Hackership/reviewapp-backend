@@ -54,13 +54,16 @@ var Scheduler = React.createClass({
         }.bind(this))
     },
     getInitialState: function(){
-        return {loading: true, failed: false, loadingSlots: true}
+        return {loading: true, failed: false, loadingSlots: true, reselect: false}
     },
     setTimezone: function(tz){
         this.setState({timezone: moment.tz.zone(tz)});
     },
     resetTimezone: function () {
         this.setState({timezone: null});
+    },
+    clickReselect: function(){
+        this.setState({reselect: true});
     },
     render: function(){
         if (this.state.loading){
@@ -75,11 +78,32 @@ var Scheduler = React.createClass({
             return (
                 <div>
                     {head}
-                    <h2>Please select a timezone</h2>
+                    <h2>Please select your timezone</h2>
                     <Select options={availableZones} onChange={this.setTimezone}/>
                 </div>
             );
         }
+
+        console.log(this.state.info);
+
+        if (this.state.info.stage === "skype_scheduled" && !this.state.reselect){
+            var call = _.find(this.state.info.calls, function(call){
+                                return !call.failed;
+                                });
+            console.log(call);
+            if (call){
+                var zone = this.state.timezone.name,
+                    dt = moment(call.scheduledAt);
+                return (<div>
+                            {head}
+                            <h2>Scheduled Call:</h2>
+                            <p>You call is scheduled for <strong>{dt.tz(zone).format('LLLL')}</strong></p>
+                            <p>You can't make it? <button className="btn" onClick={this.clickReselect}>Schedule another call here</button></p>
+                        </div>)
+            }
+
+        }
+
         var slots = <p>Loading available Time Slots</p>;
         if (!this.state.loadingSlots){
             if (!this.state.slots){
@@ -96,7 +120,7 @@ var Scheduler = React.createClass({
         return (
             <div>
                 {head}
-                <h2>Please select a timeslot</h2>
+                <h2>Please select the timeslot, you'd like to have the call at</h2>
                 <p>Times are shown for local time in {this.state.timezone.name} <a onClick={this.resetTimezone}>change</a></p>
                 {slots}
             </div>
