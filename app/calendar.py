@@ -17,6 +17,7 @@ def _get_service():
 def remove_call_from_calendar(eventId):
     if not app.config.get("GDATA_CALENDAR_ID"):
         print ("Google Calendar Disabled. Please add GDATA_CALENDAR_ID to config")
+        return
 
     service = _get_service()
 
@@ -31,6 +32,7 @@ def remove_call_from_calendar(eventId):
 def add_call_to_calendar(call, application):
     if not app.config.get("GDATA_CALENDAR_ID"):
         print ("Google Calendar Disabled. Please add GDATA_CALENDAR_ID to config")
+        return
 
     build = _get_service()
 
