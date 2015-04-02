@@ -9,19 +9,11 @@ var React = require('react'),
     {Panel, Button, Input} = require('react-bootstrap'),
     _ = require("underscore"),
     moment = require('moment'),
-    moment_tz = require('moment-timezone/moment-timezone'),
-    zones = require("../data/timezones"),
+    availableZones = require("../stores/TimezonesStore"),
     Select = require('react-select'),
     $ = require('jquery');
 
-moment.tz.load(zones);
-
 require("react-select/dist/default.css");
-
-var availableZones = _.map(zones.zones, function(x){
-    var name = x.split('|')[0];
-    return {value: name, label: name.replace("_", " ")};
-});
 
 var NotFound = React.createClass({
     render: function(){

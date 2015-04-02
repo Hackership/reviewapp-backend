@@ -25,11 +25,11 @@ var ReviewsApp = React.createClass({
   componentDidMount: function(){
     var self = this;
     applications.on("all", function(){
-      self.forceUpdate();
+      self.isMounted() && self.forceUpdate();
     });
 
     user.on("all", function(){
-        self.forceUpdate();
+        self.isMounted() && self.forceUpdate();
       });
   },
 
@@ -70,11 +70,11 @@ var FocusReview = React.createClass({
   componentDidMount: function(){
     var self = this;
     applications.on("all", function(){
-      self.forceUpdate();
+      self.isMounted() && self.forceUpdate();
     });
 
     user.on("all", function(){
-        self.forceUpdate();
+        self.isMounted() && self.forceUpdate();
       });
   },
 
@@ -82,17 +82,10 @@ var FocusReview = React.createClass({
     var apps;
 
     if (user.attributes.can_admin) {
-      console.log('ADMIN');
       apps = applications.byUrgency('admin');
-    }
-
-    else if (user.attributes.can_moderate) {
-      console.log('MOD');
+    } else if (user.attributes.can_moderate) {
        apps = applications.byUrgency('moderator');
-    }
-
-    else{
-      console.log('REV');
+    } else {
        apps = applications.byUrgency('reviewer');
     }
 

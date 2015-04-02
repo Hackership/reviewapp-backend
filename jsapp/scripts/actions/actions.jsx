@@ -14,7 +14,10 @@ _.each([
     "sendEmail", "receiveEmail",
 
     //User
-    "setUser"
+    "setUser", "setTimezone",
+
+    // Skype Schedule
+    "refreshSkypeSlots", "addSkypeSlot", "removeSkypeSlot"
 
     ],
     function(name){
@@ -24,6 +27,6 @@ _.each([
             payload: payload
         });
     }
-}); 
+});
 
 module.exports = actions;

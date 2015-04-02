@@ -7,6 +7,7 @@
 var {ReviewsApp} = require('./ReviewsApp'),
 	{FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
+	SkypeSlots = require('./SkypeSlots'),
 	{ApplicationList} = require('./ApplicationList'),
 	React = require('react'),
 	Router = require('react-router'),
@@ -17,7 +18,8 @@ var {ReviewsApp} = require('./ReviewsApp'),
 	Actions = require('../actions/actions'),
 	RouteHandler = Router.RouteHandler,
   	{applications} = require('../stores/ApplicationStore'),
-	{user} = require('../stores/UserStore');
+	{user} = require('../stores/UserStore'),
+	_ = require("underscore");
 
 var content = document.getElementById('content');
 
@@ -59,7 +61,7 @@ var MainAppWrap = React.createClass({
 			menu.push(<Link key='admin' className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link>)
 		}
 		if (user.get("can_skype")){
-			menu.push(<Link key='skype' className="btn btn-primary btn-white" to="skypeSchedule"> Skype Schedule</Link>)
+			menu.push(<Link key='skype' className="btn btn-primary btn-white" to="skypeSlots"> Skype Schedule</Link>)
 		}
 		menu.push(<a key='logout' className="btn btn-primary" target="_blank" href="/logout">Logout </a>)
 
@@ -82,6 +84,7 @@ var MainAppWrap = React.createClass({
 var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
+	    <Route name="skypeSlots" path="/skype/schedule" handler={SkypeSlots} />
 	    <Route name="main" path="/" handler={ReviewsApp} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />
 	</Route>
