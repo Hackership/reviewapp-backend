@@ -5,11 +5,17 @@
 'use strict';
  var Backbone = require('backbone'),
  	 Dispatcher = require('../dispatchers/dispatcher'),
+     moment = require('moment'),
+     availableZones = require("../stores/TimezonesStore"),
      $ = require('jquery');
 
-var Slot = Backbone.Model.extend({});
+var Slot = Backbone.Model.extend({
+    initialize: function(attributes){
+        this.ts = moment(attributes.datetime);
+    }
+});
 
-var Slots = Backbone.Collection({
+var Slots = Backbone.Collection.extend({
     model: Slot
 })
 
@@ -19,10 +25,10 @@ var collection = new Slots();
 Dispatcher.register(function(payload) {
 
   switch(payload.actionType) {
-    case 'fetchSkypeSchedule':
-		collection.fetch();
-		break;
 
+    case 'setUser':
+        collection.reset(payload.payload.timeslots);
+        break;
     default:
       return true;
   }

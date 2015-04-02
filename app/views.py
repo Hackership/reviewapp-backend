@@ -184,6 +184,12 @@ def get_state():
                                 "applications": query}).data)
 
 
+@app.route('/api/skype_calendar')
+@login_required
+@roles_accepted('skypee', 'skypelead', 'admin')
+def skype_calendar():
+    pass
+
 
 @app.route('/application/<id>/move_to_stage/schedule_skype', methods=['POST'])
 @login_required

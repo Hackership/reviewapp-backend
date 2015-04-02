@@ -7,7 +7,7 @@
 var {ReviewsApp} = require('./ReviewsApp'),
 	{FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
-	SkypeSlots = require('./SkypeSlots'),
+	CallSlots = require('./CallSlots'),
 	{ApplicationList} = require('./ApplicationList'),
 	React = require('react'),
 	Router = require('react-router'),
@@ -61,7 +61,7 @@ var MainAppWrap = React.createClass({
 			menu.push(<Link key='admin' className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link>)
 		}
 		if (user.get("can_skype")){
-			menu.push(<Link key='skype' className="btn btn-primary btn-white" to="skypeSlots"> Skype Schedule</Link>)
+			menu.push(<Link key='callslots' className="btn btn-primary btn-white" to="callslots"> Manage Call Slots</Link>)
 		}
 		menu.push(<a key='logout' className="btn btn-primary" target="_blank" href="/logout">Logout </a>)
 
@@ -84,7 +84,7 @@ var MainAppWrap = React.createClass({
 var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
-	    <Route name="skypeSlots" path="/skype/schedule" handler={SkypeSlots} />
+	    <Route name="callslots" path="/calls/slots" handler={CallSlots} />
 	    <Route name="main" path="/" handler={ReviewsApp} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />
 	</Route>

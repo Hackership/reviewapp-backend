@@ -6,15 +6,28 @@ class UserSchema(Schema):
         fields = ('id', 'name')
 
 
+class Timeslot(Schema):
+    class Meta:
+        fields = ('id', 'once', 'datetime')
+
+
+class Call(Schema):
+    class Meta:
+        fields = ('id', 'scheduledAt', 'failed', 'application', 'skype_name')
+
+
 class MeUserSchema(Schema):
     class Meta:
         fields = ('id', 'name', 'email', 'can_moderate',
-                  'can_admin', 'can_skype')
+                  'can_admin', 'can_skype', 'timeslots', 'calls')
         exclude = ('password',)
 
     can_admin = fields.Method("check_admin")
     can_moderate = fields.Method("check_moderate")
     can_skype = fields.Method("check_skypee")
+
+    timeslots = fields.Nested(Timeslot, many=True)
+    calls = fields.Nested(Call, many=True)
 
     def check_skypee(self, obj):
         return obj.has_role("skypee") or obj.has_role("skypelead")
