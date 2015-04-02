@@ -5,9 +5,8 @@
 'use strict';
 
 var React = require('react/addons'),
-	rtbs  = require('react-bootstrap'),
-  _ = require('underscore'),
-  Input = rtbs.Input;
+	{Input}  = require('react-bootstrap'),
+  _ = require('underscore');
 
 var $=require('jquery');
 

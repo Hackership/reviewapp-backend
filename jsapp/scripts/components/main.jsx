@@ -10,39 +10,68 @@ var {ReviewsApp} = require('./ReviewsApp'),
 	{ApplicationList} = require('./ApplicationList'),
 	React = require('react'),
 	Router = require('react-router'),
+	{Alert, ProgressBar}  = require('react-bootstrap'),
 	Route = Router.Route,
 	Link = require('react-router').Link,
 	dispatcher = require('../dispatchers/dispatcher'),
 	Actions = require('../actions/actions'),
 	RouteHandler = Router.RouteHandler,
+  	{applications} = require('../stores/ApplicationStore'),
 	{user} = require('../stores/UserStore');
 
 var content = document.getElementById('content');
 
 var MainAppWrap = React.createClass({
-	
-	componentDidMount: function() {
-		Actions.getApplications();
+
+	getInitialState: function(){
+		return {loading: 10};
+	},
+	componentWillMount: function() {
 
 		var self = this;
     	user.on("all", function(){
-      	self.forceUpdate();
+      		self.setState({loading: self.state.loading + 45});
     	});
+	    applications.on("all", function(){
+	      self.setState({loading: self.state.loading + 45});
+	    });
+		Actions.getApplications();
 	},
 
 	render: function(){
+		if (this.state.loading < 100){
+			return (<Alert bsStyle='info'>
+          				<h4>loading app</h4>
+          				<ProgressBar active now={this.state.loading} />
+        			</Alert>);
+		}
 
-		var content = user.attributes.can_admin ? <Link className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link> : "";
-		var login = user.attributes.id ? <a className="btn btn-primary" target="_blank" href="/logout">Logout </a> : <a className="btn btn-primary" target="_blank" href="/login">Login </a> 
+		if (!user.attributes.id){
+			return (<Alert bsStyle='warning'>
+          				<h4>Not logged in</h4>
+          				<p>You need to login to use this app.</p>
+          				<p><a className="btn btn-primary" target="_blank" href="/login">Login </a></p>
+        			</Alert>);
+		}
+
+		var menu = []
+		if (user.get("can_admin")){
+			menu.push(<Link key='admin' className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link>)
+		}
+		if (user.get("can_skype")){
+			menu.push(<Link key='skype' className="btn btn-primary btn-white" to="skypeSchedule"> Skype Schedule</Link>)
+		}
+		menu.push(<a key='logout' className="btn btn-primary" target="_blank" href="/logout">Logout </a>)
+
+
 		return (
 			<div>
 				<header>
-				<Link className="btn btn-primary" to="main">Main</Link> 
-				<Link className="btn btn-primary" to="focus">Focus Mode</Link> 
-				{content}
-				{login}
-				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
-				<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a>
+					<Link className="btn btn-primary" to="main">Main</Link>
+					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
+					{menu}
+					<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
+					<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a>
 				</header>
 				<RouteHandler />
 			</div>

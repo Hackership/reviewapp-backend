@@ -4,15 +4,20 @@ from marshmallow import Schema, fields
 class UserSchema(Schema):
     class Meta:
         fields = ('id', 'name')
-        
+
 
 class MeUserSchema(Schema):
     class Meta:
-        fields = ('id', 'name', 'email', 'can_moderate', 'can_admin')
+        fields = ('id', 'name', 'email', 'can_moderate',
+                  'can_admin', 'can_skype')
         exclude = ('password',)
 
     can_admin = fields.Method("check_admin")
     can_moderate = fields.Method("check_moderate")
+    can_skype = fields.Method("check_skypee")
+
+    def check_skypee(self, obj):
+        return obj.has_role("skypee") or obj.has_role("skypelead")
 
     def check_moderate(self, obj):
         return obj.can_moderate()
