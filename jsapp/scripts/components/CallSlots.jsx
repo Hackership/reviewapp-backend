@@ -35,6 +35,10 @@ function _slotformat (x, offset) {
   return offset? x + ":" + offset : x + ":00";
 }
 
+function _displayCall(call, zone){
+  return moment(call.scheduledAt).tz(zone).format('dddd, MMMM Do YYYY HH:mm ')
+}
+
 function _displaySlot(slot, zone, days){
   if (slot.attributes.once) {
     return slot.ts.tz(zone).format('dddd, MMMM Do YYYY HH:mm ')
@@ -48,7 +52,7 @@ function _displaySlot(slot, zone, days){
 var AddSlot = React.createClass({
 
   getInitialState: function(){
-    return {oneTime: false, date: moment(), slot: [0, 0]};
+    return {oneTime: false, date: moment(), slot: "00:00"};
   },
 
   setOnce: function(evt){
@@ -154,7 +158,7 @@ var SkypeSlots = React.createClass({
           slotGroups = _.groupBy(regularSlots, function(slot){
                             return slot.ts.tz(zone).day();
                           }),
-          days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays"],
+          days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"],
           regularSlotsElems = _.map(_.sortBy(_.keys(slotGroups),
                                                 function(x) {return x}),
                                 function(day){
@@ -178,8 +182,14 @@ var SkypeSlots = React.createClass({
                                       {_displaySlot(slot, zone)}
                                     </Button>
                                   </li>);
-
                           }) : <li><em>No upcoming one time slots</em></li>),
+          callSlots = (user.get("calls").length ?
+                            _.filter(user.get("calls"), function(call){
+                                      return !call.failed && moment(call.scheduledAt) > moment();
+                                    }) : []),
+          callSlotElems = (callSlots.length ? _.map(callSlots, function(call){
+                                return <li key={call.scheduledAt}><em>{_displayCall(call, zone)}</em> with {call.skype_name}</li>
+                              }) : <li><em>No upcoming calls at the moment</em></li>),
           showAdd;
 
     if (this.state.showAdd){
@@ -208,7 +218,9 @@ var SkypeSlots = React.createClass({
                   </Col>
                   <Col xs={12} md={4}>
                     <h2>Upcoming calls</h2>
-                    <p></p>
+                    <ul>
+                      {callSlotElems}
+                    </ul>
                   </Col>
                 </Row>
               </Grid>
