@@ -63,7 +63,7 @@ var MainAppWrap = React.createClass({
 		if (user.get("can_skype")){
 			menu.push(<Link key='callslots' className="btn btn-primary btn-white" to="callslots"> Manage Call Slots</Link>)
 		}
-		menu.push(<a key='logout' className="btn btn-primary" target="_blank" href="/logout">Logout </a>)
+		menu.push(<a key='logout' className="btn btn-primary" href="/logout">Logout </a>)
 
 
 		return (
