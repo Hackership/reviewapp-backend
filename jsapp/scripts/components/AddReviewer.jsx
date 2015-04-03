@@ -30,7 +30,7 @@ var AddReviewer = React.createClass({
       roles.push('skypee');
     }
 
-    if (!(this.state.name.length => 3) || !(this.state.email.length > 6)) {
+    if (!(this.state.name.length > 2) || !(this.state.email.length > 6)) {
       alert("Name or Email is empty!")
       return;
     } else {
