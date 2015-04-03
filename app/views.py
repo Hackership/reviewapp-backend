@@ -26,13 +26,11 @@ import re
 
 def _select_reviewers():
     # Find review only status
-    reviewers = User.query.outerjoin("roles"
-                         ).filter(User.roles == None).all()
-                # ).filter(User.status == 'active'
-
+    role = user_datastore.find_role('reviewer')
+    reviewers = [x for x in role.users]
     random.shuffle(reviewers)
 
-    return reviewers[:2]   # fetches a random two reviewers
+    return reviewers[:2]   # fetches two reviewers at random
 
 
 def _clean_time(dt):
