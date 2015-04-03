@@ -18,7 +18,7 @@ ONCE = [False, False, False, False, False, True]
 
 
 def _clear():
-    db.sessions.query(Timeslot).delete()
+    db.session.query(Timeslot).delete()
     db.session.commit()
 
 
