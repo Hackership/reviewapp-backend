@@ -195,6 +195,15 @@ def add_call_slot():
     return jsonify(TimeslotSchema().dump(timeslot).data)
 
 
+@app.route('/api/call_slots/purge', methods=['POST'])
+@login_required
+@roles_accepted('skypee', 'skypelead')
+def pruge_call_slots():
+    db.session.query(Timeslot).filter(Timeslot.user==current_user.id).delete()
+    db.session.commit()
+
+    return jsonify(success=True)
+
 @app.route('/api/me', methods=['PATCH'])
 @login_required
 def update_me():

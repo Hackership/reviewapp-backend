@@ -314,6 +314,12 @@ var CallSlots = React.createClass({
     this.setState({showAdd: true});
   },
 
+  clearSlots: function(){
+    if (confirm("Should we really purge all existing slots?")){
+      Actions.clearCallSlots();
+    }
+  },
+
   render: function() {
     if (!user.get("timezone")){
       return <TimezoneSelector setTimezone={this.setTimezone} />;
@@ -388,7 +394,10 @@ var CallSlots = React.createClass({
     } else if (this.state.showAdd){
       showAdd = <AddSlot onClose={this.onCloseAdd} />;
     } else {
-      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button> <Button onClick={this.showAddMany}>+ Add Regulars </Button></div>;
+      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button>
+                     <Button onClick={this.showAddMany}>+ Add Regulars </Button>
+                     <Button bsSize="xsmall" onClick={this.clearSlots}> clear all</Button>
+                </div>;
     }
 
     return (<div>

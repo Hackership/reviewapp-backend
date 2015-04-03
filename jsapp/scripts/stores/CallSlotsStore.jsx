@@ -40,6 +40,17 @@ Dispatcher.register(function(payload) {
         }
         break;
 
+
+    case 'clearCallSlots':
+        $.ajax({
+          type: 'POST',
+          url: '/api/call_slots/purge',
+          contentType: 'application/json',
+        }).done(function( msg ) {
+            collection.reset();
+        });
+        break;
+
     case 'removeCallSlot':
         collection.remove(payload.payload).destroy();
         break;

@@ -17,7 +17,7 @@ _.each([
     "setUser", "setTimezone",
 
     // Call Schedule
-    "addCallSlot", "removeCallSlot"
+    "addCallSlot", "removeCallSlot", "clearCallSlots"
 
     ],
     function(name){
