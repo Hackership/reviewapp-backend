@@ -300,7 +300,7 @@ var CallSlots = React.createClass({
   },
 
   removeSlot: function(slot){
-    var slotText = _displaySlot(slot, user.get("timezone").name, true);
+    var slotText = _displaySlot(slot, user.get("timezone"), true);
     if (confirm("Really remove "+ slotText + "?")){
       Actions.removeCallSlot(slot);
     }
