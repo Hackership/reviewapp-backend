@@ -118,6 +118,164 @@ var AddSlot = React.createClass({
     }
 });
 
+var TimeRange = React.createClass({
+  selectFrom: function (value) {
+    this.props.selectFrom(this.props.index, value);
+  },
+  selectUntil: function (value) {
+    this.props.selectUntil(this.props.index, value);
+  },
+  remove: function(){
+    this.props.remove(this.props.index);
+  },
+  render: function () {
+    var slots = _.flatten(_(24).times(function(x) {
+            return [{value: x + ":00", label: _slotformat(x)},
+                    {value: x + ":30", label: _slotformat(x, "30")}];
+                  })
+            );
+    return (<Row>
+                <div className="col-xs-1 col-xs-offset-1">
+                  From
+                </div>
+                <div className="col-xs-2">
+                  <Select onChange={this.selectFrom} value={this.props.from} options={slots} />
+                </div>
+                <div className="col-xs-1  col-xs-offset-1">
+                  Until
+                </div>
+                <div className="col-xs-2">
+                  <Select onChange={this.selectUntil} value={this.props.until} options={slots} />
+                </div>
+                <Button
+                      bsSize='xsmall'
+                      onClick={this.remove}>x</Button>
+            </Row>)
+  }
+
+});
+
+function splitMap(val){
+  var val = val.split(":")
+  return [parseInt(val[0], 10), parseInt(val[1], 10)];
+}
+
+function _unfold(from, until){
+  var from = splitMap(from),
+      until = splitMap(until);
+  var results = [];
+  while (from < until){
+    results.push(from)
+    if (from[1] === 0){
+      from = [from[0], 30]
+    } else {
+      from = [from[0] + 1, 0]
+    }
+  }
+  return results;
+}
+
+var AddMany = React.createClass({
+  getInitialState: function(){
+    return {slots: [{"from": "10:00", "until": "13:00"}]};
+  },
+  addSlot: function (argument) {
+    this.state.slots.push({"from": "10:00", "until": "13:00"});
+    this.forceUpdate()
+  },
+  selectFrom: function (idx, from) {
+    this.state.slots[idx]['from'] = from;
+    this.forceUpdate()
+  },
+  selectUntil: function (idx, until) {
+    this.state.slots[idx]['until'] = until;
+    this.forceUpdate()
+  },
+  remove: function(idx){
+    this.state.slots.splice(idx, 1);
+    this.forceUpdate();
+  },
+  submit: function(){
+
+    var self = this,
+        days = _.filter(['sun', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat'], function(day){
+      return self.refs[day].getChecked();
+    });
+
+    if (!days.length || !this.state.slots.length){
+      return alert("You need to select at least one day and time slot!");
+    }
+
+    var zone = this.props.zone,
+        slotTimes = _.uniq(_.flatten(_.map(this.state.slots, function(slot){
+            return _unfold(slot.from, slot.until);
+        }), true)),
+        slots = _.flatten(_.map(days, function(day){
+            return _.map(slotTimes, function(slot){
+              return {datetime: moment.tz(day + " " + slot.join(":"), 'ddd hh:mm', zone),
+                once: false};
+            })
+        }));
+
+    // console.log(slotTimes, slots);
+
+    Actions.addCallSlot(slots);
+    this.props.onClose && this.props.onClose ();
+  },
+  render: function(){
+    var self = this;
+    return (<Well>
+              <p>Please specify your regular availability</p>
+              <Row>
+                <h4>Weekdays</h4>
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='mon' defaultChecked={true} label="Mon" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='tue' defaultChecked={true} label="Tue" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='wed' defaultChecked={true} label="Wed" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='thur' defaultChecked={true} label="Thur" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='fri' defaultChecked={true} label="Fri" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='sat' defaultChecked={false} label="Sat" />
+                <Input type="checkbox"
+                      wrapperClassName="col-xs-1"
+                      ref='sun' defaultChecked={false} label="Sun" />
+              </Row>
+              <Row>
+                <h4>Time Ranges</h4>
+                <div>
+                {_.map(this.state.slots, function(slot, idx){
+                    return <TimeRange key={idx}
+                                      from={slot.from} until={slot.until} index={idx}
+                                      selectUntil={self.selectUntil} selectFrom={self.selectFrom}
+                                      remove={self.remove} />
+
+                  })}
+                </div>
+              </Row>
+              <Row>
+                <div className="col-xs-offset-1">
+                  <Button
+                      bsSize='small'
+                      onClick={this.addSlot}>+ More slots</Button>
+                </div>
+              </Row>
+              <Row>
+                <Button onClick={this.submit} bsSize="large" bsStyle="primary">Submit</Button>
+              </Row>
+            </Well>);
+  }
+})
+
 
 var CallSlots = React.createClass({
   componentDidMount: function(){
@@ -127,7 +285,7 @@ var CallSlots = React.createClass({
     });
   },
   getInitialState: function(){
-    return {showAdd: false};
+    return {showAdd: false, first: true};
   },
   setTimezone: function(tz){
     Actions.setTimezone(moment.tz.zone(tz));
@@ -137,11 +295,19 @@ var CallSlots = React.createClass({
     this.setState({showAdd: false});
   },
 
+  onCloseFirst: function(){
+    this.setState({first: false});
+  },
+
   removeSlot: function(slot){
     var slotText = _displaySlot(slot, user.get("timezone").name, true);
     if (confirm("Really remove "+ slotText + "?")){
       Actions.removeCallSlot(slot);
     }
+  },
+
+  showAddMany: function (argument) {
+    this.setState({showAdd: 'many'});
   },
 
   showAdd: function(){
@@ -153,60 +319,76 @@ var CallSlots = React.createClass({
       return <TimezoneSelector setTimezone={this.setTimezone} />;
     }
 
-      var zone = user.get("timezone"),
-          self = this,
-          regularSlots = _.filter(slots.models, function(slot){
-                            return !slot.attributes.once;
-                          }),
-          oneTimeSlots = _.filter(slots.models, function(slot){
-                              return slot.attributes.once && (slot.ts > moment())
-                          }),
-          slotGroups = _.groupBy(regularSlots, function(slot){
-                            return slot.ts.tz(zone).day();
-                          }),
-          days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"],
-          regularSlotsElems = _.map(_.sortBy(_.keys(slotGroups),
-                                                function(x) {return x}),
-                                function(day){
-                                  var dt = <h3>{days[day]}</h3>,
-                                      slotData = slotGroups[day];
-                                  return (
-                                          <Panel key={day} header={dt}>
-                                              {_.map(slotData, function(slot){
-                                                  return <Button btSize='large'
-                                                              onClick={function(x){self.removeSlot(slot)}}
-                                                              key={slot.ts.format('LLLL')}>{_displaySlot(slot, zone)}</Button>
-                                                  })
-                                              }
-                                          </Panel>)
-                        }),
-          onceSlotElems = (oneTimeSlots.length ? _.map(oneTimeSlots, function(slot){
-                          return (<li key={slot.ts}>
-                                    <Button btSize='large'
-                                            onClick={function(x){self.removeSlot(slot)}}
-                                            key={slot.ts.format('LLLL')}>
-                                      {_displaySlot(slot, zone)}
-                                    </Button>
-                                  </li>);
-                          }) : <li><em>No upcoming one time slots</em></li>),
-          callSlots = (user.get("calls").length ?
-                            _.filter(user.get("calls"), function(call){
-                                      return !call.failed && moment(call.scheduledAt) > moment();
-                                    }) : []),
-          callSlotElems = (callSlots.length ? _.map(callSlots, function(call){
-                                var callers = _.pluck(call.callers, 'name').join(", ");
-                                return <li key={call.scheduledAt}>
-                                        <em>{_displayCall(call, zone)}</em>
-                                        <br/> Application #{call.application}
-                                        <br/> skype: @{call.skype_name}
-                                        <br/> {callers}</li>
-                              }) : <li><em>No upcoming calls at the moment</em></li>),
-          showAdd;
+    if (!slots.models.length && this.state.first){
+      var zone = user.get("timezone");
+      return (<Grid>
+                <Row>
+                  <h2>Welcome</h2>
+                  <p>Please let us know about your call availability</p>
+                </Row>
+                <Row>
+                  <AddMany onClose={this.onCloseFirst} zone={zone} />
+                </Row>
+                <p>All information rendered with 24h format for local time at <em>{zone}</em></p>
+              </Grid>);
+    }
 
-    if (this.state.showAdd){
-      showAdd = <AddSlot onClose={this.onCloseAdd} zone={zone}/>;
+    var zone = user.get("timezone"),
+        self = this,
+        regularSlots = _.filter(slots.models, function(slot){
+                          return !slot.attributes.once;
+                        }),
+        oneTimeSlots = _.filter(slots.models, function(slot){
+                            return slot.attributes.once && (slot.ts > moment())
+                        }),
+        slotGroups = _.groupBy(regularSlots, function(slot){
+                          return slot.ts.tz(zone).day();
+                        }),
+        days = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"],
+        regularSlotsElems = _.map(_.sortBy(_.keys(slotGroups),
+                                              function(x) {return x}),
+                              function(day){
+                                var dt = <h3>{days[day]}</h3>,
+                                    slotData = slotGroups[day];
+                                return (
+                                        <Panel key={day} header={dt}>
+                                            {_.map(slotData, function(slot){
+                                                return <Button btSize='large'
+                                                            onClick={function(x){self.removeSlot(slot)}}
+                                                            key={slot.ts.format('LLLL')}>{_displaySlot(slot, zone)}</Button>
+                                                })
+                                            }
+                                        </Panel>)
+                      }),
+        onceSlotElems = (oneTimeSlots.length ? _.map(oneTimeSlots, function(slot){
+                        return (<li key={slot.ts}>
+                                  <Button btSize='large'
+                                          onClick={function(x){self.removeSlot(slot)}}
+                                          key={slot.ts.format('LLLL')}>
+                                    {_displaySlot(slot, zone)}
+                                  </Button>
+                                </li>);
+                        }) : <li><em>No upcoming one time slots</em></li>),
+        callSlots = (user.get("calls").length ?
+                          _.filter(user.get("calls"), function(call){
+                                    return !call.failed && moment(call.scheduledAt) > moment();
+                                  }) : []),
+        callSlotElems = (callSlots.length ? _.map(callSlots, function(call){
+                              var callers = _.pluck(call.callers, 'name').join(", ");
+                              return <li key={call.scheduledAt}>
+                                      <em>{_displayCall(call, zone)}</em>
+                                      <br/> Application #{call.application}
+                                      <br/> skype: @{call.skype_name}
+                                      <br/> {callers}</li>
+                            }) : <li><em>No upcoming calls at the moment</em></li>),
+        showAdd;
+
+    if (this.state.showAdd == 'many'){
+      showAdd = <AddMany onClose={this.onCloseAdd} zone={zone} />;
+    } else if (this.state.showAdd){
+      showAdd = <AddSlot onClose={this.onCloseAdd} />;
     } else {
-      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button></div>;
+      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button> <Button onClick={this.showAddMany}>+ Add Regulars </Button></div>;
     }
 
     return (<div>

@@ -32,7 +32,12 @@ Dispatcher.register(function(payload) {
         break;
 
     case 'addCallSlot':
-        collection.add(payload.payload).save();
+        var model = collection.add(payload.payload);
+        if (!model.save){
+            _.invoke(model, 'save');
+        } else {
+            model.save();
+        }
         break;
 
     case 'removeCallSlot':
