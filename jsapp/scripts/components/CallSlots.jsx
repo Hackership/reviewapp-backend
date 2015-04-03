@@ -194,7 +194,12 @@ var CallSlots = React.createClass({
                                       return !call.failed && moment(call.scheduledAt) > moment();
                                     }) : []),
           callSlotElems = (callSlots.length ? _.map(callSlots, function(call){
-                                return <li key={call.scheduledAt}><em>{_displayCall(call, zone)}</em> with {call.skype_name}</li>
+                                var callers = _.pluck(call.callers, 'name').join(", ");
+                                return <li key={call.scheduledAt}>
+                                        <em>{_displayCall(call, zone)}</em>
+                                        <br/> Application #{call.application}
+                                        <br/> skype: @{call.skype_name}
+                                        <br/> {callers}</li>
                               }) : <li><em>No upcoming calls at the moment</em></li>),
           showAdd;
 

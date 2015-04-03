@@ -13,7 +13,9 @@ class TimeslotSchema(Schema):
 
 class Call(Schema):
     class Meta:
-        fields = ('id', 'scheduledAt', 'failed', 'application', 'skype_name')
+        fields = ('id', 'scheduledAt', 'failed', 'application', 'skype_name', 'callers')
+
+    callers = fields.Nested(UserSchema, many=True)
 
 
 class MeUserSchema(Schema):
