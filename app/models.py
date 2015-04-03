@@ -35,6 +35,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(120))
     status = db.Column(db.String)
     active = db.Column(db.Boolean())
+    timezone = db.Column(db.String)
     comments = db.relationship('Comment', backref='user')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))

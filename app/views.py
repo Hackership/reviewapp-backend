@@ -197,6 +197,24 @@ def add_call_slot():
     return jsonify(TimeslotSchema().dump(timeslot).data)
 
 
+@app.route('/api/me', methods=['PATCH'])
+@login_required
+def update_me():
+    payload = request.get_json()
+    user = current_user._get_current_object()
+    dirty = False
+    for key in ['name', 'timezone']:
+        if key in payload:
+            setattr(user, key, payload[key])
+            dirty = True
+
+    if dirty:
+        db.session.add(user)
+        db.session.commit()
+
+    return jsonify(me_schema.dump(user).data)
+
+
 @app.route('/api/call_slots/<int:slotId>', methods=['DELETE'])
 @login_required
 @roles_accepted('skypee', 'skypelead')

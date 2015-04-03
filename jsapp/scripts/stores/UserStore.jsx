@@ -7,7 +7,9 @@
  	 Dispatcher = require('../dispatchers/dispatcher');
 
 
-var User = Backbone.Model.extend({});
+var User = Backbone.Model.extend({
+    url: '/api/me'
+});
 var user = new User();
 
 // Register dispatcher
@@ -19,7 +21,7 @@ Dispatcher.register(function(payload) {
 		break;
 
     case 'setTimezone':
-        user.set("timezone", payload.payload);
+        user.save({"timezone": payload.payload.name}, {patch: true});
 
     default:
       return true;

@@ -13,14 +13,15 @@ class TimeslotSchema(Schema):
 
 class Call(Schema):
     class Meta:
-        fields = ('id', 'scheduledAt', 'failed', 'application', 'skype_name', 'callers')
+        fields = ('id', 'scheduledAt', 'failed', 'application',
+                  'skype_name', 'callers')
 
     callers = fields.Nested(UserSchema, many=True)
 
 
 class MeUserSchema(Schema):
     class Meta:
-        fields = ('id', 'name', 'email', 'can_moderate',
+        fields = ('id', 'name', 'email', 'can_moderate', 'timezone',
                   'can_admin', 'can_skype', 'timeslots', 'calls')
         exclude = ('password',)
 

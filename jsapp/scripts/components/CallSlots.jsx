@@ -153,7 +153,7 @@ var CallSlots = React.createClass({
       return <TimezoneSelector setTimezone={this.setTimezone} />;
     }
 
-      var zone = user.get("timezone").name,
+      var zone = user.get("timezone"),
           self = this,
           regularSlots = _.filter(slots.models, function(slot){
                             return !slot.attributes.once;
@@ -206,7 +206,7 @@ var CallSlots = React.createClass({
     if (this.state.showAdd){
       showAdd = <AddSlot onClose={this.onCloseAdd} zone={zone}/>;
     } else {
-      showAdd = <div><Button onClick={this.showAdd}>Add + </Button></div>;
+      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button></div>;
     }
 
     return (<div>
@@ -233,6 +233,9 @@ var CallSlots = React.createClass({
                       {callSlotElems}
                     </ul>
                   </Col>
+                </Row>
+                <Row>
+                  <p>All information rendered with 24h format for local time at <em>{zone}</em></p>
                 </Row>
               </Grid>
             </div>)
