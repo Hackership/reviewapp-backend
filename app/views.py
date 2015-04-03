@@ -535,8 +535,8 @@ def add_reviewer():
                                       email=req['email'],
                                       status="active",
                                       password=encrypt_password(password))
-    if 'role' in req:
-        user_datastore.add_role_to_user(user, req['role'])
+    for role in req['roles']:
+        user_datastore.add_role_to_user(user, role)
 
     #Email Reviewer
     send_email("Welcome to the Hackership Review Panel",

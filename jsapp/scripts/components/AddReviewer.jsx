@@ -5,7 +5,7 @@
 'use strict';
 
 var React = require('react/addons'),
-	{Input} = require('react-bootstrap'),
+	{Input, Grid, Row, Col, Button} = require('react-bootstrap'),
   _ = require('underscore'),
   $ = require('jquery');
 
@@ -14,36 +14,43 @@ var AddReviewer = React.createClass({
   submitForm: function(e){
     e.preventDefault();
 
-    var   admin = this.refs.admin.getValue().trim(),
-          mod = this.refs.mod.getValue().trim(),
-          role;
+    var roles = [];
 
-      if (admin){
-        role = 'admin';
-      } else if (mod){
-        role = 'mod';
-      }
+    if (this.refs.admin.getChecked()){
+      roles.push('admin');
+    } else if (this.refs.moderator.getChecked()){
+      roles.push('moderator');
+    } else if (this.refs.reviewer.getChecked()) {
+      roles.push('reviewer');
+    }
 
-      if (!(this.state.name.length > 3) || !(this.state.email.length > 6)) {
-        console.log('ERROR SENDING')
-        alert("Name or Email is empty!")
-        return;
-      } else {
-        var rev_object = {"name": this.state.name, "email": this.state.email, "role": role};
-        var url = "/reviewer/new";
+    if (this.refs.skypelead.getChecked()){
+      roles.push('skypelead');
+    } else if (this.refs.skypee.getChecked()){
+      roles.push('skypee');
+    }
 
-         $.ajax({
-            type: 'POST',
-            url: url,
-            contentType: 'application/json',
-            data: JSON.stringify(rev_object),
-          }).done(function( msg ) {
-            alert( "Reviewer Added: " + msg );
-          });
-      }
-
-      this.setState({name:'', email:''});
+    if (!(this.state.name.length => 3) || !(this.state.email.length > 6)) {
+      alert("Name or Email is empty!")
       return;
+    } else {
+      var rev_object = {"name": this.state.name,
+                        "email": this.state.email,
+                        "roles": roles};
+      var url = "/reviewer/new";
+
+       $.ajax({
+          type: 'POST',
+          url: url,
+          contentType: 'application/json',
+          data: JSON.stringify(rev_object),
+        }).done(function( msg ) {
+          alert( "Reviewer Added: " + msg );
+        });
+    }
+
+    this.setState({name:'', email:''});
+    return;
   },
   getInitialState: function() {
     return {name: '', email: ''};
@@ -65,20 +72,28 @@ var AddReviewer = React.createClass({
         <h3> Add A Reviewer </h3>
         <p>Reviewers will receive an email with username and login details</p>
         <form onSubmit={this.submitForm} className='form-horizontal'>
-         <Input type="checkbox"
-                   ref="mod"
-                   wrapperClassName="col-xs-offset-1 col-xs-10"
-                   label="Is Moderator"/>
-         <Input type="checkbox"
-                   ref="admin"
-                   wrapperClassName="col-xs-offset-1 col-xs-10"
-                   label="Is Admin"/>
-         <Input type='text' label="Name:" labelClassName="col-xs-2"
-                      wrapperClassName="col-xs-8"
-                      placeholder="Reviewer's Name" value={name} onChange={this.changeName} ref="name" />
-         <Input type='text' label="Email:" labelClassName="col-xs-2"
+
+          <Row>
+           <Input type='text' label="Name:" labelClassName="col-xs-2"
+                        wrapperClassName="col-xs-8"
+                        placeholder="Reviewer's Name" value={name} onChange={this.changeName} ref="name" />
+           <Input type='text' label="Email:" labelClassName="col-xs-2"
                       wrapperClassName="col-xs-8"
                       placeholder="Reviewer's Email" value={email} onChange={this.changeEmail} ref="email" />
+          </Row>
+
+          <Row>
+            <Col xs={4} xsOffset={2}>
+             <Input type='checkbox' ref='reviewer' label="is Reviewer" defaultChecked={true} />
+             <Input type='checkbox' ref='moderator' label="is Moderator" />
+             <Input type='checkbox' ref='admin' label="is Admin" />
+            </Col>
+            <Col xs={4}>
+             <Input type='radio' wrapperClassName='' ref='noSkype' label="doesn't do skype" defaultChecked={true}  name='skype' />
+             <Input type='radio' wrapperClassName='' ref='skypee' label="is skypee" name='skype' />
+             <Input type='radio' wrapperClassName='' ref='skypelead' label="is skype lead" name='skype' />
+            </Col>
+          </Row>
           <button bsStyle="success" className="btn" type="Post">Submit</button>
         </form>
         </div>
