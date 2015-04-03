@@ -71,7 +71,7 @@ var AddSlot = React.createClass({
     evt.preventDefault();
     var slot = this.state.slot,
         date = moment.tz(this.state.date + " " + slot, 'YYYY-MM-DD H:mm', this.props.zone);
-    Actions.addSkypeSlot({date: date, once: this.state.oneTime});
+    Actions.addCallSlot({datetime: date, once: this.state.oneTime});
     this.props.onClose();
   },
 
@@ -119,7 +119,13 @@ var AddSlot = React.createClass({
 });
 
 
-var SkypeSlots = React.createClass({
+var CallSlots = React.createClass({
+  componentDidMount: function(){
+    var self = this;
+    slots.on("all", function(){
+      self.isMounted() && self.forceUpdate();
+    });
+  },
   getInitialState: function(){
     return {showAdd: false};
   },
@@ -134,7 +140,7 @@ var SkypeSlots = React.createClass({
   removeSlot: function(slot){
     var slotText = _displaySlot(slot, user.get("timezone").name, true);
     if (confirm("Really remove "+ slotText + "?")){
-      Actions.removeSlot(slot);
+      Actions.removeCallSlot(slot);
     }
   },
 
@@ -193,7 +199,7 @@ var SkypeSlots = React.createClass({
           showAdd;
 
     if (this.state.showAdd){
-      showAdd = <AddSlot onClose={this.onCloseAdd} zone={zone.name}/>;
+      showAdd = <AddSlot onClose={this.onCloseAdd} zone={zone}/>;
     } else {
       showAdd = <div><Button onClick={this.showAdd}>Add + </Button></div>;
     }
@@ -229,4 +235,4 @@ var SkypeSlots = React.createClass({
   }
 });
 
-module.exports = SkypeSlots;
+module.exports = CallSlots;

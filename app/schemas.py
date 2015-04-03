@@ -6,7 +6,7 @@ class UserSchema(Schema):
         fields = ('id', 'name')
 
 
-class Timeslot(Schema):
+class TimeslotSchema(Schema):
     class Meta:
         fields = ('id', 'once', 'datetime')
 
@@ -26,7 +26,7 @@ class MeUserSchema(Schema):
     can_moderate = fields.Method("check_moderate")
     can_skype = fields.Method("check_skypee")
 
-    timeslots = fields.Nested(Timeslot, many=True)
+    timeslots = fields.Nested(TimeslotSchema, many=True)
     calls = fields.Nested(Call, many=True)
 
     def check_skypee(self, obj):

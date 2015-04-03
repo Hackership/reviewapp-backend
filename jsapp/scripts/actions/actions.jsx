@@ -16,8 +16,8 @@ _.each([
     //User
     "setUser", "setTimezone",
 
-    // Skype Schedule
-    "refreshSkypeSlots", "addSkypeSlot", "removeSkypeSlot"
+    // Call Schedule
+    "addCallSlot", "removeCallSlot"
 
     ],
     function(name){

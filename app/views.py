@@ -5,7 +5,7 @@ from sqlalchemy.sql import or_, and_
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema,
-                         ExternalApplicationSchema)
+                         ExternalApplicationSchema, TimeslotSchema)
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
 from app.utils import generate_password, send_email
@@ -184,11 +184,29 @@ def get_state():
                                 "applications": query}).data)
 
 
-@app.route('/api/skype_calendar')
+@app.route('/api/call_slots', methods=['POST'])
 @login_required
-@roles_accepted('skypee', 'skypelead', 'admin')
-def skype_calendar():
-    pass
+@roles_accepted('skypee', 'skypelead')
+def add_call_slot():
+    timeslot = Timeslot(**request.get_json())
+    timeslot.user = current_user.id
+
+    db.session.add(timeslot)
+    db.session.commit()
+
+    return jsonify(TimeslotSchema().dump(timeslot).data)
+
+
+@app.route('/api/call_slots/<int:slotId>', methods=['DELETE'])
+@login_required
+@roles_accepted('skypee', 'skypelead')
+def delete_call_slot(slotId):
+    timeslot = db.session.query(Timeslot).get(slotId)
+    if timeslot and timeslot.user == current_user.id:
+        db.session.delete(timeslot)
+        db.session.commit()
+
+    return jsonify(success=True)
 
 
 @app.route('/application/<id>/move_to_stage/schedule_skype', methods=['POST'])

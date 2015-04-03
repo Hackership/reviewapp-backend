@@ -10,6 +10,7 @@
      $ = require('jquery');
 
 var Slot = Backbone.Model.extend({
+    urlRoot : "/api/call_slots",
     initialize: function(attributes){
         this.ts = moment(attributes.datetime);
     }
@@ -29,6 +30,15 @@ Dispatcher.register(function(payload) {
     case 'setUser':
         collection.reset(payload.payload.timeslots);
         break;
+
+    case 'addCallSlot':
+        collection.add(payload.payload).save();
+        break;
+
+    case 'removeCallSlot':
+        collection.remove(payload.payload).destroy();
+        break;
+
     default:
       return true;
   }
