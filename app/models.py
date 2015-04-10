@@ -73,6 +73,14 @@ class User(db.Model, UserMixin):
         return self.has_role("moderator") or self.has_role("admin")
 
     @property
+    def admin(self):
+        return self.can_admin()
+
+    @property
+    def moderator(self):
+        return self.can_moderate()
+
+    @property
     def gravatar(self):
         return hasher(self)
 
