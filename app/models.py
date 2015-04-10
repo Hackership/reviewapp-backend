@@ -5,6 +5,13 @@ from sqlalchemy.sql.expression import text
 from app.utils import send_email
 
 import datetime
+import hashlib
+
+def hasher(self):
+    return hashlib.md5(self.email).hexdigest()
+
+
+
 
 
 stages = ('incoming', 'in_review',
@@ -53,6 +60,10 @@ class User(db.Model, UserMixin):
     def can_moderate(self):
         return self.has_role("moderator") or self.has_role("admin")
 
+    @property
+    def gravatar(self):
+        return hasher(self)
+
     def __repr__(self):
         return '<User: {}>'.format(self.email)
 
@@ -95,6 +106,10 @@ class Application(db.Model):
     @property
     def from_email(self):
         return 'appl-15{}@review.hackership.org'.format(self.id)
+
+    @property
+    def gravatar(self):
+        return hasher(self)
 
     def __repr__(self):
         return '<Application: {}, {}>'.format(self.createdAt, self.id)

@@ -7,6 +7,7 @@
 var React = require('react/addons'),
   _ = require('underscore'),
 	rtbs  = require('react-bootstrap'),
+  {Gravatar} = require("./User"),
   Modal = rtbs.Modal,
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
@@ -55,16 +56,20 @@ var Application = React.createClass({
     return this["render_" + stage]();
   },
 
+  renderHeader: function(app){
+    var app = this.props.app,
+        hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ',
+        date = moment(app.attributes.changedStageAt).calendar();
+    return (<h3><Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} /> {hdr_str}<strong>{date}</strong></h3>);
+  },
+
   render_schedule_skype: function() {
-     var app = this.props.app;
+    var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var date = moment(app.attributes.changedStageAt).calendar();
-    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
- 
+
     return (
-      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!" />
           <div dangerouslySetInnerHTML={{__html: content}} />
@@ -80,12 +85,9 @@ var Application = React.createClass({
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var date = moment(app.attributes.changedStageAt).calendar();
-    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
-      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
          <div dangerouslySetInnerHTML={{__html: content}} />
@@ -102,12 +104,9 @@ var Application = React.createClass({
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var date = moment(app.attributes.changedStageAt).calendar();
-    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
-      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers." />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
@@ -120,12 +119,9 @@ var Application = React.createClass({
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
     var active = this.props.index === this.props.activeKey;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ';
-    var date = moment(app.attributes.changedStageAt).calendar();
-    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
  
     return (
-      <Panel header={hdr} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
         <Instruction instruction="Email Send. No Action Required." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
@@ -153,7 +149,7 @@ var Application = React.createClass({
     }
 
     return (
-      <Panel header={hdr} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+      <Panel header={this.renderHeader()} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Review Stage. Please read through this application and add questions for the applicant in the box below." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
@@ -185,7 +181,7 @@ var Application = React.createClass({
     var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
 
     return (
-       <Panel header={hdr} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+       <Panel header={this.renderHeader()} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
          <Instruction instruction="Anonymization Stage. Please Anonymize this application by removing names and other identifiers" />
           <div className="content-app">

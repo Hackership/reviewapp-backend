@@ -4,14 +4,14 @@
 
 'use strict';
 
-var {ReviewsApp} = require('./ReviewsApp'),
-	{FocusReview} = require('./ReviewsApp'),
+var {ReviewsApp, FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
 	CallSlots = require('./CallSlots'),
 	{ApplicationList} = require('./ApplicationList'),
+	{Gravatar} = require("./User"),
 	React = require('react'),
 	Router = require('react-router'),
-	{Alert, ProgressBar}  = require('react-bootstrap'),
+	{Alert, ProgressBar, DropdownButton, MenuItem}  = require('react-bootstrap'),
 	Route = Router.Route,
 	Link = require('react-router').Link,
 	dispatcher = require('../dispatchers/dispatcher'),
@@ -56,14 +56,18 @@ var MainAppWrap = React.createClass({
         			</Alert>);
 		}
 
-		var menu = []
+		var menu = [];
+
 		if (user.get("can_admin")){
-			menu.push(<Link key='admin' className="btn btn-primary btn-white" to="reviewer"> Add Reviewer</Link>)
+			menu.push(<MenuItem key='add-reviewer'><Link to="reviewer"> Add Reviewer</Link></MenuItem>)
 		}
 		if (user.get("can_skype")){
-			menu.push(<Link key='callslots' className="btn btn-primary btn-white" to="callslots"> Manage Call Slots</Link>)
+			menu.push(<MenuItem key='callslots'><Link to="callslots"> Manage Call Slots</Link></MenuItem>)
 		}
-		menu.push(<a key='logout' className="btn btn-primary" href="/logout">Logout </a>)
+		menu.push(<MenuItem key='logout'><a href="/logout">Logout </a></MenuItem>)
+
+
+		var me = <Gravatar hash={user.get("gravatar")} size={25} />
 
 
 		return (
@@ -71,9 +75,16 @@ var MainAppWrap = React.createClass({
 				<header>
 					<Link className="btn btn-primary" to="main">Main</Link>
 					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
-					{menu}
-					<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
-					<a className="btn btn-white" target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a>
+					<DropdownButton title={me}>
+						{menu}
+						<MenuItem divider />
+						<MenuItem>
+							<a target="_blank" href="http://community.hackership.org/c/reviewers">Help </a> 
+						</MenuItem>
+						<MenuItem>
+							<a target="_blank" href="http://community.hackership.org/c/reviewers">Bug Report</a>
+						</MenuItem>
+					</DropdownButton>
 				</header>
 				<RouteHandler />
 			</div>

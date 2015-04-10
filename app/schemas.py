@@ -3,7 +3,7 @@ from marshmallow import Schema, fields
 
 class UserSchema(Schema):
     class Meta:
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'gravatar')
 
 
 class TimeslotSchema(Schema):
@@ -22,7 +22,7 @@ class Call(Schema):
 class MeUserSchema(Schema):
     class Meta:
         fields = ('id', 'name', 'email', 'can_moderate', 'timezone',
-                  'can_admin', 'can_skype', 'timeslots', 'calls')
+                  'can_admin', 'can_skype', 'timeslots', 'calls', 'gravatar')
         exclude = ('password',)
 
     can_admin = fields.Method("check_admin")
@@ -68,7 +68,7 @@ class AnonymousApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'anon_content',
                   'members', 'fizzbuzz', 'stage', 'batch', 'comments',
-                  'emails')
+                  'emails', 'gravatar')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
@@ -80,7 +80,8 @@ class ApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'content',
                   'name', 'email', 'anon_content', 'members',
-                  'fizzbuzz', 'stage', 'batch', 'comments', 'emails')
+                  'fizzbuzz', 'stage', 'batch', 'comments', 'emails',
+                  'gravatar')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
