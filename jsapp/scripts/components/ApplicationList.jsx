@@ -7,7 +7,7 @@
 var React = require('react/addons'),
   _ = require('underscore'),
 	rtbs  = require('react-bootstrap'),
-  {Gravatar} = require("./User"),
+  {User, Gravatar} = require("./User"),
   Modal = rtbs.Modal,
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
@@ -236,7 +236,7 @@ var CommentBox = React.createClass({
 
           {_.map(comments, function(comment){
             var content = comment['content'],
-                author = comment['author']['name'] ? comment['author']['name'] : 'unknown',
+                author = <User user={comment.user} />,
                 date = ' '+ comment['createdAt'];
 
                 return(
@@ -313,7 +313,7 @@ var DisplayEmail = React.createClass({
 
     var email = this.props.email,
         content = markdown.toHTML(email['anon_content']),
-        author = email['author']['name'] ? email['author']['name'] : 'unknown',
+        author = <User user={email.author} />,
         date = ' '+ email['createdAt'],
         incoming = email['incoming'] ? 'incoming' : 'comment';
 
