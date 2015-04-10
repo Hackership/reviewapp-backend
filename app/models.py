@@ -36,19 +36,31 @@ roles_users = db.Table('roles_users',
 
 
 class User(db.Model, UserMixin):
+    # miniamal basics
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True)
     email = db.Column(db.String(120), unique=True)
+
+    # security features
     password = db.Column(db.String(120))
     status = db.Column(db.String)
     active = db.Column(db.Boolean())
-    timezone = db.Column(db.String)
-    comments = db.relationship('Comment', backref='user')
+
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    # Security: Tracking
+    last_login_at = db.Column(db.DateTime)
+    current_login_at = db.Column(db.DateTime)
+    last_login_ip = db.Column(db.String)
+    current_login_ip = db.Column(db.String)
+    login_count = db.Column(db.Integer)
+
+    # Tool features
+    timezone = db.Column(db.String)
     timeslots = db.relationship('Timeslot')
 
+    comments = db.relationship('Comment', backref='user')
     calls = db.relationship('ScheduledCall',  secondary=lambda: user_calls_table)
 
     def is_skypelead(self):
