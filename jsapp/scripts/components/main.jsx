@@ -57,12 +57,15 @@ var MainAppWrap = React.createClass({
 		}
 
 		var menu = [];
-
-		if (user.get("can_admin")){
-			menu.push(<MenuItem key='add-reviewer'><Link to="reviewer"> Add Reviewer</Link></MenuItem>)
-		}
 		if (user.get("can_skype")){
 			menu.push(<MenuItem key='callslots'><Link to="callslots"> Manage Call Slots</Link></MenuItem>)
+		}
+
+		if (user.get("can_admin")){
+			menu.push(<MenuItem key="admin-in" divider />)
+			menu.push(<MenuItem key='add-admin'><a href="/admin"> Admin Area</a></MenuItem>)
+			menu.push(<MenuItem key='add-reviewer'><Link to="reviewer"> Add Reviewer</Link></MenuItem>)
+			menu.push(<MenuItem key="admin-out" divider />)
 		}
 		menu.push(<MenuItem key='logout'><a href="/logout">Logout </a></MenuItem>)
 

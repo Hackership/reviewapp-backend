@@ -126,5 +126,6 @@ else:
 # they rely on things everywhere, do this last!
 from app import tasks
 from app import views
+from app import admin
 
 
