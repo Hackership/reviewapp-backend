@@ -39,6 +39,14 @@ GDATA_PRIVATE_EMAIL = os.environ.get("GDATA_PRIVATE_EMAIL", "")
 GDATA_PRIVATE_KEY = base64.b64decode(os.environ.get("GDATA_PRIVATE_KEY", ""))
 GDATA_CALENDAR_ID = os.environ.get("GDATA_CALENDAR_ID", "")
 
+# CELERY Queue Manager
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = "db+{}".format(SQLALCHEMY_DATABASE_URI)
+CELERY_BROKER_URL = os.environ.get("REDIS_URL", 'sqla+sqlite:///{}'.format(os.path.join(basedir, 'broker.db')))
+
+
 try:
     from local_config import *
 except ImportError:

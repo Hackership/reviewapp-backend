@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request
 from flask.ext.security import Security, SQLAlchemyUserDatastore
 from flask.ext.migrate import Migrate, MigrateCommand
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
+from flask import Flask
+from celery import Celery
 
 from flask_mail import Mail, email_dispatched
 
@@ -21,6 +22,21 @@ manager.add_command('db', MigrateCommand)
 
 # setup mail
 mail = Mail(app)
+
+
+celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+TaskBase = celery.Task
+
+
+class ContextTask(TaskBase):
+    abstract = True
+
+    def __call__(self, *args, **kwargs):
+        with app.app_context():
+            return TaskBase.__call__(self, *args, **kwargs)
+
+celery.Task = ContextTask
 
 # import models (only after the DB and everything has happened!)
 from app import models
@@ -108,5 +124,7 @@ else:
 
 # this defines all the views
 # they rely on things everywhere, do this last!
+from app import tasks
 from app import views
+
 
