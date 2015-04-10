@@ -117,7 +117,7 @@ var Application = React.createClass({
 
   render_email_send: function(){
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
+    var content = markdown.toHTML(app.get('anon_content') || '');
     var active = this.props.index === this.props.activeKey;
  
     return (
@@ -312,7 +312,7 @@ var DisplayEmail = React.createClass({
   render: function() {
 
     var email = this.props.email,
-        content = markdown.toHTML(email['anon_content']),
+        content = markdown.toHTML(email['anon_content'] || ''),
         author = <User user={email.author} />,
         date = ' '+ email['createdAt'],
         incoming = email['incoming'] ? 'incoming' : 'comment';
