@@ -36,8 +36,12 @@ var Gravatar = React.createClass({
 
 var User = React.createClass({
     render: function(){
-        var user = this.props.user,
-            name = user.name || 'unknown',
+        var user = this.props.user;
+
+        if (!user){
+            return <em>unknown</em>;
+        }
+        var name = user.name || 'unknown',
             gravatar = user.gravatar;
         return (<span className="user">
                 <Gravatar forceDefault={false} hash={gravatar} size={20} /> {name}
