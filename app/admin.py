@@ -20,6 +20,7 @@ class BaseAdminView(BaseView):
 
 class UserView(BaseAdminView, ModelView):
     can_create = False
+    can_delete = False
     column_list = ('admin', 'moderator', 'email', 'name', 'current_login_at', 'login_count')
 
     form_widget_args = {
@@ -31,10 +32,13 @@ class UserView(BaseAdminView, ModelView):
 
     }
 
-    form_edit_rules = [
-        rules.FieldSet( ('active', 'name', 'email', 'timezone'), 'Basics'),
-        rules.FieldSet( ('login_count', 'current_login_at', 'current_login_ip','last_login_at', 'last_login_ip'), 'Login Stats' ),
-    ]
+    form_excluded_columns = ('password', 'roles', 'timeslots', 'status',
+                             'comments', 'calls', 'applications')
+
+    # form_edit_rules = [
+    #     rules.FieldSet( ('active', 'name', 'email', 'timezone'), 'Basics'),
+    #     rules.FieldSet( ('login_count', 'current_login_at', 'current_login_ip','last_login_at', 'last_login_ip'), 'Login Stats' ),
+    # ]
 
     def __init__(self, session, **kwargs):
         # You can pass name and other parameters if you want to
