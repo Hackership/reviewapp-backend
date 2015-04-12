@@ -187,7 +187,7 @@ def get_state():
 @roles_accepted('skypee', 'skypelead')
 def add_call_slot():
     timeslot = Timeslot(**request.get_json())
-    timeslot.user = current_user.id
+    timeslot.user_id = current_user.id
 
     db.session.add(timeslot)
     db.session.commit()
@@ -199,7 +199,7 @@ def add_call_slot():
 @login_required
 @roles_accepted('skypee', 'skypelead')
 def pruge_call_slots():
-    db.session.query(Timeslot).filter(Timeslot.user==current_user.id).delete()
+    db.session.query(Timeslot).filter(Timeslot.user_id==current_user.id).delete()
     db.session.commit()
 
     return jsonify(success=True)
@@ -227,7 +227,7 @@ def update_me():
 @roles_accepted('skypee', 'skypelead')
 def delete_call_slot(slotId):
     timeslot = db.session.query(Timeslot).get(slotId)
-    if timeslot and timeslot.user == current_user.id:
+    if timeslot and timeslot.user_id == current_user.id:
         db.session.delete(timeslot)
         db.session.commit()
 
@@ -318,10 +318,10 @@ def schedule(application):
         if not call.failed:
             call.failed = True
             if call.calendar_id:
-              remove_call_from_calendar(call.calendar_id)
+                remove_call_from_calendar(call.calendar_id)
             db.session.add(call)
 
-    call = ScheduledCall(application=application.id,
+    call = ScheduledCall(application_id=application.id,
                          scheduledAt=datetime.strptime(slot + "+UTC", "%Y-%m-%d %H:%M:%S+%Z"),
                          skype_name=skype,
                          callers=users)
@@ -342,7 +342,7 @@ def switch_to_review(application):
     anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
     if anon_content:
         application.anon_content = anon_content
-    application.anonymizer = current_user._get_current_object().id
+    application.anonymizer_id = current_user._get_current_object().id
     application.members = _select_reviewers()
     application.stage = "in_review"
     application.changedStageAt = datetime.now()
@@ -370,11 +370,11 @@ def switch_to_email_send(application):
                               app=application,
                               content=email)
 
-    email = Email(author=current_user._get_current_object().id,
+    email = Email(author_id=current_user._get_current_object().id,
                   content=content,
                   incoming=False,
                   stage=application.stage,
-                  application=application.id,
+                  application_id=application.id,
                   anon_content=email)
 
     application.stage = "email_send"
@@ -401,8 +401,8 @@ def add_comment(application):
     # FIXME verification would be great...
     comment = Comment(content=content,
                       question=request.form.get("question", False),
-                      author=current_user,
-                      application=application.id,
+                      author_id=current_user,
+                      application_id=application.id,
                       stage=application.stage)
 
     db.session.add(comment)
@@ -411,16 +411,6 @@ def add_comment(application):
     # email to other reviewers or moderator?
 
     return _render_application(application)
-
-
-@app.route('/application/update', methods=['POST'])
-@login_required
-def update_application():
-    req = request.get_json()
-    app = req['application']
-
-    application = Application.query.find_by(id=app['id'])
-    #Renew application
 
 
 @app.route('/applications/new', methods=['POST'])
@@ -488,7 +478,7 @@ def _handle_email(email):
     if application.email.lower() == sender:
         db_mail = Email(incoming=True,
                         stage=application.stage,
-                        application=application.id,
+                        application_id=application.id,
                         content=email["text"])
 
         if application.stage == 'email_send':
@@ -504,8 +494,8 @@ def _handle_email(email):
     if not user:
         raise BounceError("User unknown")
 
-    comment = Comment(author=user.id,
-                      application=application.id,
+    comment = Comment(author_id=user.id,
+                      application_id=application.id,
                       stage=application.stage,
                       content=email["text"])
     db.session.add(comment)
