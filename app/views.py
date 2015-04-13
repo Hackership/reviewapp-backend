@@ -2,13 +2,14 @@
 from flask.ext.security import login_required, roles_accepted, current_user
 from flask.ext.security.utils import get_hmac, encrypt_password, verify_password
 from sqlalchemy.sql import or_, and_
+from sqlalchemy.exc import IntegrityError
 from app import app, db, mail, user_datastore
 from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema,
                          ExternalApplicationSchema, TimeslotSchema)
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
-from app.utils import generate_password, send_email
+from app.utils import generate_password, send_email, generate_fancy_name
 from calendar import add_call_to_calendar, remove_call_from_calendar
 
 from datetime import datetime, timedelta
@@ -442,8 +443,14 @@ def new_application():
                               grant_content=grant_content,
                               createdAt=datetime.now())
 
-    db.session.add(application)
-    db.session.commit()
+    while True:
+        db.session.add(application)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            application.anon_name = generate_fancy_name()
+        else:
+            break
 
     # E-mail Applicant
     if not request.form.get('_skip_email', False):
