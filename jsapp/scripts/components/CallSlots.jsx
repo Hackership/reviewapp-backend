@@ -156,8 +156,8 @@ var TimeRange = React.createClass({
 });
 
 function splitMap(val){
-  var val = val.split(":")
-  return [parseInt(val[0], 10), parseInt(val[1], 10)];
+  var val = val.split(":");
+  return parseInt(val[0], 10) + (parseInt(val[1], 10) === 30 ? 0.5 : 0);
 }
 
 function _unfold(from, until){
@@ -165,12 +165,9 @@ function _unfold(from, until){
       until = splitMap(until);
   var results = [];
   while (from < until){
-    results.push(from)
-    if (from[1] === 0){
-      from = [from[0], 30]
-    } else {
-      from = [from[0] + 1, 0]
-    }
+    var hour = parseInt(from, 10);
+    results.push([hour, from % hour ? 30 : 0])
+    from += 0.5;
   }
   return results;
 }
