@@ -111,6 +111,7 @@ var AddSlot = React.createClass({
                 <Row>
                   <Col xsOffset={1} mdOffset={1}>
                     <Button bsStyle="primary" type="submit">+ Add</Button>
+                    <a onClick={this.props.onClose}>cancel</a>
                   </Col>
                 </Row>
               </form>
@@ -156,8 +157,8 @@ var TimeRange = React.createClass({
 });
 
 function splitMap(val){
-  var val = val.split(":")
-  return [parseInt(val[0], 10), parseInt(val[1], 10)];
+  var val = val.split(":");
+  return parseInt(val[0], 10) + (parseInt(val[1], 10) === 30 ? 0.5 : 0);
 }
 
 function _unfold(from, until){
@@ -165,12 +166,9 @@ function _unfold(from, until){
       until = splitMap(until);
   var results = [];
   while (from < until){
-    results.push(from)
-    if (from[1] === 0){
-      from = [from[0], 30]
-    } else {
-      from = [from[0] + 1, 0]
-    }
+    var hour = parseInt(from, 10);
+    results.push([hour, from % hour ? 30 : 0])
+    from += 0.5;
   }
   return results;
 }
@@ -217,10 +215,8 @@ var AddMany = React.createClass({
             })
         }));
 
-    // console.log(slotTimes, slots);
-
     Actions.addCallSlot(slots);
-    this.props.onClose && this.props.onClose ();
+    this.props.onClose && this.props.onClose();
   },
   render: function(){
     var self = this;
@@ -271,6 +267,7 @@ var AddMany = React.createClass({
               </Row>
               <Row>
                 <Button onClick={this.submit} bsSize="large" bsStyle="primary">Submit</Button>
+                <a onClick={this.props.onClose}>cancel</a>
               </Row>
             </Well>);
   }

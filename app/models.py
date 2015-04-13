@@ -2,7 +2,7 @@ from app import db
 from flask.ext.security import UserMixin, RoleMixin
 from sqlalchemy.sql.expression import text
 
-from app.utils import send_email
+from app.utils import send_email, generate_fancy_name
 
 import datetime
 import hashlib
@@ -100,6 +100,7 @@ class Application(db.Model):
     changedStageAt = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True)
     name = db.Column(db.String(120))
+    anon_name = db.Column(db.String(20), unique=True, default=generate_fancy_name)
     content = db.Column(db.Text)
     anon_content = db.Column(db.Text)
     fizzbuzz = db.Column(db.Text)
@@ -107,7 +108,8 @@ class Application(db.Model):
     batch = db.Column(db.String(64))
     grant = db.Column(db.Boolean)
     grant_content = db.Column(db.Text)
-    anonymizer = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    anonymizer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    anonymizer = db.relationship('User')
 
     # backref from comments and emails come automatically
     members = db.relationship('User', secondary=lambda: members_table,
@@ -150,7 +152,8 @@ class Comment(db.Model):
     content = db.Column(db.Text)
     stage = db.Column(db.Enum(*stages))
     question = db.Column(db.Boolean, default=False)
-    application = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application = db.relationship('Application')
     author = db.relationship('User')
 
     def __repr__(self):
@@ -160,10 +163,12 @@ class Comment(db.Model):
 class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     createdAt = db.Column(db.DateTime, default=datetime.datetime.now)
-    author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    author = db.relationship('User')
     stage = db.Column(db.Enum(*stages))
     incoming = db.Column(db.Boolean, default=False)
-    application = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application = db.relationship('Application')
     content = db.Column(db.Text)
     anon_content = db.Column(db.Text)
 
@@ -178,12 +183,14 @@ class Timeslot(db.Model):
     once = db.Column(db.Boolean, default=False)
     # we extract date and hour from that.
     datetime = db.Column(db.DateTime)
-    user = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user = db.relationship('User')
 
 
 class ScheduledCall(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    application = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id'))
+    application = db.relationship('Application')
     scheduledAt = db.Column(db.DateTime)
     failed = db.Column(db.Boolean, default=False)
     skype_name = db.Column(db.String(255))

@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
+
+from flask import (request, jsonify, render_template, abort)
 from flask.ext.security import login_required, roles_accepted, current_user
-from flask.ext.security.utils import get_hmac, encrypt_password, verify_password
+from flask.ext.security.utils import get_hmac, encrypt_password
+
 from sqlalchemy.sql import or_, and_
-from app import app, db, mail, user_datastore
-from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
-                         AnonymousApplicationSchema, ApplicationSchema,
-                         ExternalApplicationSchema, TimeslotSchema)
+from sqlalchemy.exc import IntegrityError
+
+from app.utils import generate_password, send_email, generate_fancy_name
+from app.calendar import add_call_to_calendar, remove_call_from_calendar
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
-from app.utils import generate_password, send_email
-from calendar import add_call_to_calendar, remove_call_from_calendar
+from app.schemas import (me_schema, admin_app_state, app_state,
+                         AnonymousApplicationSchema, ApplicationSchema,
+                         ExternalApplicationSchema, TimeslotSchema)
+
+from app import app, db, user_datastore
 
 from datetime import datetime, timedelta
-
-from flask import (request, jsonify,
-                   render_template, abort)
-
 from functools import wraps
 
 import base64
@@ -41,7 +43,7 @@ def _find_available_slots():
     tomorrow = datetime.utcnow() + timedelta(hours=25)
 
     slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
-                  and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
+            and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
 
     scheduled_query = ScheduledCall.query.filter(ScheduledCall.scheduledAt >= tomorrow).join()
 
@@ -151,6 +153,7 @@ def _render_application(application):
 def scheduler_index():
     return app.send_static_file('scheduler.html')
 
+
 @app.route('/')
 @login_required
 def index():
@@ -187,7 +190,7 @@ def get_state():
 @roles_accepted('skypee', 'skypelead')
 def add_call_slot():
     timeslot = Timeslot(**request.get_json())
-    timeslot.user = current_user.id
+    timeslot.user_id = current_user.id
 
     db.session.add(timeslot)
     db.session.commit()
@@ -199,10 +202,11 @@ def add_call_slot():
 @login_required
 @roles_accepted('skypee', 'skypelead')
 def pruge_call_slots():
-    db.session.query(Timeslot).filter(Timeslot.user==current_user.id).delete()
+    db.session.query(Timeslot).filter(Timeslot.user_id==current_user.id).delete()
     db.session.commit()
 
     return jsonify(success=True)
+
 
 @app.route('/api/me', methods=['PATCH'])
 @login_required
@@ -227,7 +231,7 @@ def update_me():
 @roles_accepted('skypee', 'skypelead')
 def delete_call_slot(slotId):
     timeslot = db.session.query(Timeslot).get(slotId)
-    if timeslot and timeslot.user == current_user.id:
+    if timeslot and timeslot.user_id == current_user.id:
         db.session.delete(timeslot)
         db.session.commit()
 
@@ -247,7 +251,8 @@ def switch_to_schedule_skype(application):
     # Email Reviewers
     application.send_email("Let's schedule a call to talk about your Hackership Application",
                            render_template("emails/applicant/schedule_skype.md",
-                              app=application, key=base64.b64encode(get_hmac(application.email))))
+                                           app=application,
+                                           key=base64.b64encode(get_hmac(application.email))))
 
     return _render_application(application)
 
@@ -311,7 +316,7 @@ def schedule(application):
     if not slot or not skype:
         abort(400, "Please provide slot and skype contact")
     if slot not in slots:
-        abort(401, "Slot already taken. Please pick another");
+        abort(401, "Slot already taken. Please pick another")
 
     users = slots[slot]
     if len(users) > 2:
@@ -331,10 +336,10 @@ def schedule(application):
         if not call.failed:
             call.failed = True
             if call.calendar_id:
-              remove_call_from_calendar(call.calendar_id)
+                remove_call_from_calendar(call.calendar_id)
             db.session.add(call)
 
-    call = ScheduledCall(application=application.id,
+    call = ScheduledCall(application_id=application.id,
                          scheduledAt=datetime.strptime(slot + "+UTC", "%Y-%m-%d %H:%M:%S+%Z"),
                          skype_name=skype,
                          callers=users)
@@ -355,7 +360,7 @@ def switch_to_review(application):
     anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
     if anon_content:
         application.anon_content = anon_content
-    application.anonymizer = current_user._get_current_object().id
+    application.anonymizer_id = current_user._get_current_object().id
     application.members = _select_reviewers()
     application.stage = "in_review"
     application.changedStageAt = datetime.now()
@@ -383,11 +388,11 @@ def switch_to_email_send(application):
                               app=application,
                               content=email)
 
-    email = Email(author=current_user._get_current_object().id,
+    email = Email(author_id=current_user._get_current_object().id,
                   content=content,
                   incoming=False,
                   stage=application.stage,
-                  application=application.id,
+                  application_id=application.id,
                   anon_content=email)
 
     application.stage = "email_send"
@@ -414,8 +419,8 @@ def add_comment(application):
     # FIXME verification would be great...
     comment = Comment(content=content,
                       question=request.form.get("question", False),
-                      author=current_user,
-                      application=application.id,
+                      author_id=current_user,
+                      application_id=application.id,
                       stage=application.stage)
 
     db.session.add(comment)
@@ -424,16 +429,6 @@ def add_comment(application):
     # email to other reviewers or moderator?
 
     return _render_application(application)
-
-
-@app.route('/application/update', methods=['POST'])
-@login_required
-def update_application():
-    req = request.get_json()
-    app = req['application']
-
-    application = Application.query.find_by(id=app['id'])
-    #Renew application
 
 
 @app.route('/applications/new', methods=['POST'])
@@ -465,8 +460,14 @@ def new_application():
                               grant_content=grant_content,
                               createdAt=datetime.now())
 
-    db.session.add(application)
-    db.session.commit()
+    while True:
+        db.session.add(application)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            application.anon_name = generate_fancy_name()
+        else:
+            break
 
     # E-mail Applicant
     if not request.form.get('_skip_email', False):
@@ -501,7 +502,7 @@ def _handle_email(email):
     if application.email.lower() == sender:
         db_mail = Email(incoming=True,
                         stage=application.stage,
-                        application=application.id,
+                        application_id=application.id,
                         content=email["text"])
 
         if application.stage == 'email_send':
@@ -517,8 +518,8 @@ def _handle_email(email):
     if not user:
         raise BounceError("User unknown")
 
-    comment = Comment(author=user.id,
-                      application=application.id,
+    comment = Comment(author_id=user.id,
+                      application_id=application.id,
                       stage=application.stage,
                       content=email["text"])
     db.session.add(comment)
@@ -568,21 +569,6 @@ def add_reviewer():
                                name=user.name),
                [user.email])
 
-
     user_datastore.commit()
 
     return jsonify(success=True)
-
-
-##  Generic API
-
-@app.route('/api/user/me', methods=['GET'])
-@login_required
-def me():
-    return jsonify(me_schema.dump(current_user._get_current_object()).data)
-
-
-@app.route('/api/users', methods=['GET'])
-@login_required
-def userlist():
-    return jsonify({"users": users_schema.dump(User.query.all()).data})

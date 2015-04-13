@@ -17,6 +17,7 @@ class Call(Schema):
                   'skype_name', 'callers')
 
     callers = fields.Nested(UserSchema, many=True)
+    application = fields.Nested('AnonymousApplicationSchema', only='id')
 
 
 class MeUserSchema(Schema):
@@ -68,7 +69,7 @@ class AnonymousApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'anon_content',
                   'members', 'fizzbuzz', 'stage', 'batch', 'comments',
-                  'emails', 'gravatar')
+                  'emails', 'gravatar', 'anon_name')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
@@ -81,7 +82,7 @@ class ApplicationSchema(Schema):
         fields = ('id', 'createdAt', 'changedStageAt', 'content',
                   'name', 'email', 'anon_content', 'members',
                   'fizzbuzz', 'stage', 'batch', 'comments', 'emails',
-                  'gravatar')
+                  'gravatar', 'anon_name')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
