@@ -252,6 +252,19 @@ def switch_to_schedule_skype(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/move_to_stage/inactive', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_inactive(application):
+    application.stage = "inactive"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/review_reply', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'moderator')
