@@ -39,8 +39,74 @@ def _clean_time(dt):
     return dt.strftime("%Y-%m-%d %H:{}").format((dt.minute / 30 and "30:00" or "00:00"))
 
 
-def _find_available_slots():
-    tomorrow = datetime.utcnow() + timedelta(hours=25)
+def _filter_for_open_slots(users_per_slot):
+    users_map = dict([(x.id, x) for x in User.query.all()])
+
+    for key, uids in users_per_slot.iteritems():
+        print key, uids
+        uids = set(uids)
+        users = map(lambda x: users_map[x], uids)
+        leads = filter(lambda x: x.is_skypelead(), users)
+        if len(uids) % 2 == 0 and leads and (float(len(uids)) / len(leads) == 2):
+            # we have an evently distributed slot, ignore
+            continue
+
+        yield (key, uids, leads)
+
+
+def _find_open_slots(user, **kwargs):
+    def misses_lead(count, lead_count):
+        return (not lead_count) or float(count) / lead_count > 2
+
+    def misses_skypee(count, lead_count):
+        return lead_count and float(count) / lead_count < 2
+
+    matches = misses_skypee
+    if user.is_skypelead():
+        matches = misses_lead
+    my_id = user.id
+
+    for date, uids, leads in _filter_for_open_slots(_find_slots(**kwargs)):
+        if my_id in uids:
+            continue
+
+        if matches(len(uids), len(leads)):
+            yield date
+
+
+def _filter_actually_available(users_per_slot):
+    users_map = dict([(x.id, x) for x in User.query.all()])
+
+    actually_available = []
+
+    for key, uids in users_per_slot.iteritems():
+        # ensure we skip double bookings
+        uids = set(uids)
+        if len(uids) < 2:
+            continue
+
+        has_lead = False
+        users = []
+        for uid in uids:
+            user = users_map[uid]
+            users.append(user)
+            if user.is_skypelead():
+                has_lead = True
+
+        if not has_lead:
+            continue
+
+        actually_available.append((key, users))
+
+    return sorted(actually_available)
+
+
+def _find_available_slots(**kwargs):
+    return _filter_actually_available(_find_slots(**kwargs))
+
+
+def _find_slots(futureWeeks=3, minimum=25):
+    tomorrow = datetime.utcnow() + timedelta(hours=minimum)
 
     slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
             and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
@@ -52,58 +118,34 @@ def _find_available_slots():
         for user in call.callers:
             blocked.setdefault(user.id, []).append(_clean_time(call.scheduledAt))
 
-    users_per_slot = {}
+    uids_per_slot = {}
 
-    FUTURE = 3
     WEEK = timedelta(days=7)
 
     for slot in slots_query:
         dt = slot.datetime
         if slot.once:
-            if not _clean_time(dt) in blocked.get(slot.user, []):
-                users_per_slot.setdefault(_clean_time(dt),
-                                          []).append(slot.user)
+            if not _clean_time(dt) in blocked.get(slot.user_id, []):
+                uids_per_slot.setdefault(_clean_time(dt),
+                                          []).append(slot.user_id)
             continue
 
         while(dt < tomorrow):
             dt += WEEK
 
-        for x in xrange(FUTURE):
+        for x in xrange(futureWeeks):
             try:
-                if _clean_time(dt) in blocked[slot.user]:
+                if _clean_time(dt) in blocked[slot.user_id]:
                     continue
             except KeyError:
                 pass
 
-            users_per_slot.setdefault(_clean_time(dt),
-                                      []).append(slot.user)
+            uids_per_slot.setdefault(_clean_time(dt),
+                                      []).append(slot.user_id)
 
             dt += WEEK
 
-    users_map = dict([(x.id, x) for x in User.query.all()])
-
-    actually_available = []
-
-    for key, uids in users_per_slot.iteritems():
-        # ensure we skip double bookings
-        uids = set(uids)
-        if len(uids) < 2:
-            continue
-
-        has_admin = False
-        users = []
-        for uid in uids:
-            user = users_map[uid]
-            users.append(user)
-            if user.is_skypelead():
-                has_admin = True
-
-        if not has_admin:
-            continue
-
-        actually_available.append((key, users))
-
-    return sorted(actually_available)
+    return uids_per_slot
 
 
 def with_application_at_stage(stages):
@@ -164,6 +206,13 @@ def index():
 def available_slots():
     slots = _find_available_slots()
     return jsonify({"slots": [x[0] for x in slots]})
+
+
+@app.route('/api/suggested_slots')
+@login_required
+@roles_accepted('skypee', 'skypelead')
+def suggested_slots():
+    return jsonify({"slots": [x for x in _find_open_slots(current_user)][:10]})
 
 
 @app.route('/api/app_state')

@@ -5,7 +5,7 @@
 'use strict';
 
 var React = require('react/addons'),
-	{Input, Well, Grid, Row, Col, Button, Panel} = require('react-bootstrap'),
+	{Input, Well, Grid, Row, Col, Button, Panel, Modal} = require('react-bootstrap'),
   _ = require('underscore'),
   moment = require('moment'),
   availableZones = require("../stores/TimezonesStore"),
@@ -271,6 +271,68 @@ var AddMany = React.createClass({
               </Row>
             </Well>);
   }
+});
+
+var SuggestedSlots = React.createClass({
+  componentWillMount: function(){
+    this._refreshSuggestions();
+    slots.on("all", function(){
+      this._refreshSuggestions();
+    }.bind(this));
+  },
+  _refreshSuggestions: function(){
+    $.getJSON("/api/suggested_slots").then(function(data){
+      this.setState({"suggestedSlots": data.slots});
+    }.bind(this));
+  },
+  getInitialState: function(){
+    return {showAdd: false, suggestedSlots: false};
+  },
+
+  addSuggestedSlot: function(dt){
+    this.setState({selectedSlot: dt});
+  },
+
+  closeModal: function(){
+    this.setState({selectedSlot: false});
+  },
+  addRegular: function(){
+    Actions.addCallSlot({datetime: this.state.selectedSlot, once: false});
+    this.setState({selectedSlot: false, suggestedSlots: false});
+  },
+  addOnce: function(){
+    Actions.addCallSlot({datetime: this.state.selectedSlot, once: true});
+    this.setState({selectedSlot: false, suggestedSlots: false});
+  },
+  render: function(){
+
+    if (!this.state.suggestedSlots){
+      return <span />;
+    }
+    var zone = user.get("timezone"),
+        self = this,
+        modal = this.state.selectedSlot ? (<Modal ref="modal" bsStyle='primary' title='Add Timeslot' onRequestHide={this.closeModal} animation={true}>
+                <div className='modal-body'>
+                  <h4>Add Timeslot</h4>
+                  <p>Do you want to add this time slot once or reguarly every week?</p>
+                  <p>{_displayCall({scheduledAt: this.state.selectedSlot}, zone)}</p>
+                </div>
+                <div className='modal-footer'>
+                  <Button bsStyle="primary" onClick={this.addRegular}>Every Week</Button> <Button onClick={this.addOnce}>once only</Button> <a onClick={this.closeModal}>neither</a>
+                </div>
+              </Modal>) : <span />;
+    return (<div>
+              {modal}
+              <h2>Suggested Slots</h2>
+              <p>Are you available at any of these times in the next weeks?</p>
+              <ul>
+                {_.map(this.state.suggestedSlots, function(dt){
+                  return <li onClick={function(){self.addSuggestedSlot(dt)}}>{_displayCall({scheduledAt: dt}, zone)}</li>
+                })}
+              </ul>
+            </div>)
+  }
+
 })
 
 
@@ -284,6 +346,7 @@ var CallSlots = React.createClass({
   getInitialState: function(){
     return {showAdd: false, first: true};
   },
+
   setTimezone: function(tz){
     Actions.setTimezone(moment.tz.zone(tz));
   },
@@ -420,6 +483,7 @@ var CallSlots = React.createClass({
                     <ul>
                       {callSlotElems}
                     </ul>
+                    <SuggestedSlots />
                   </Col>
                 </Row>
                 <Row>
