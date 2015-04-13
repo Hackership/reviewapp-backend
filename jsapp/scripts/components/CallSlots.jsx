@@ -111,6 +111,7 @@ var AddSlot = React.createClass({
                 <Row>
                   <Col xsOffset={1} mdOffset={1}>
                     <Button bsStyle="primary" type="submit">+ Add</Button>
+                    <a onClick={this.props.onClose}>cancel</a>
                   </Col>
                 </Row>
               </form>
@@ -214,10 +215,8 @@ var AddMany = React.createClass({
             })
         }));
 
-    // console.log(slotTimes, slots);
-
     Actions.addCallSlot(slots);
-    this.props.onClose && this.props.onClose ();
+    this.props.onClose && this.props.onClose();
   },
   render: function(){
     var self = this;
@@ -268,6 +267,7 @@ var AddMany = React.createClass({
               </Row>
               <Row>
                 <Button onClick={this.submit} bsSize="large" bsStyle="primary">Submit</Button>
+                <a onClick={this.props.onClose}>cancel</a>
               </Row>
             </Well>);
   }
