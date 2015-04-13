@@ -12,6 +12,9 @@ var React = require('react/addons'),
 	Panel = rtbs.Panel,
   Input = rtbs.Input,
   Well = rtbs.Well,
+  Col = rtbs.Col,
+  Row = rtbs.Row,
+  Grid = rtbs.Grid,
   Accordion = rtbs.Accordion,
   PanelGroup = rtbs.PanelGroup,
   OverlayMixin = rtbs.OverlayMixin,
@@ -53,82 +56,94 @@ var Application = React.createClass({
 
   render: function() {
     var stage = this.props.app.get("stage");
-    return this["render_" + stage]();
+    var active = this.props.index === this.props.activeKey;
+    var dropOut = user.attributes.can_admin ?  <DropOutButton app={this.props.app}/> : "";
+    
+    return (<Panel header={this.render_header()} bsStyle='info' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+        {this["render_" + stage]()}
+        {dropOut}
+      </Panel>);
   },
 
-  renderHeader: function(app){
+  render_header: function(app){
     var app = this.props.app,
-        hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Send at: ',
-        date = moment(app.attributes.changedStageAt).calendar();
-    return (<h3><Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} /> {hdr_str}<strong>{date}</strong></h3>);
+        txt = user.attributes.can_moderate ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
+    return (
+      <div>
+        <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} /> 
+        <HeaderIcons app={app} />
+        {txt}
+      </div>
+      );
+  },
+
+  render_skype_scheduled: function() {
+    var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+
+    return (<div>
+          <Instruction instruction="Skype Scheduled. Please leave comments for the interviewers" />
+          <div dangerouslySetInnerHTML={{__html: content}} />
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        </div>
+      );
   },
 
   render_schedule_skype: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
-    var active = this.props.index === this.props.activeKey;
 
-    return (
-      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
-        <div>
+    return (<div>
           <Instruction instruction="Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!" />
           <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
-      </Panel>
       );
     },
 
   render_review_reply: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
-    var active = this.props.index === this.props.activeKey;
  
     return (
-      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
          <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <SkypeScheduleButton app={app} user={user} />
         </div>
-        <SkypeScheduleButton app={app} user={user} />
-      </Panel>
       );
   },
 
   render_reply_received: function(){
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
-    var active = this.props.index === this.props.activeKey;
  
     return (
-      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         <div>
           <Instruction instruction="Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers." />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
         </div>
-      </Panel>
       );
   },
 
   render_email_send: function(){
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content') || '');
-    var active = this.props.index === this.props.activeKey;
- 
+
     return (
-      <Panel header={this.renderHeader()} bsStyle='danger' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
-        <div>
+      <div>
         <Instruction instruction="Email Send. No Action Required." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
             <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={false} />
         </div>
-      </Panel>
       );
   },
 
@@ -137,11 +152,6 @@ var Application = React.createClass({
     var app = this.props.app;
     var content  = markdown.toHTML(app.get('anon_content'));
     var fizzbuzz = app.get('fizzbuzz');
-    var active = this.props.index === this.props.activeKey;
-    var deadline = user.attributes.can_moderate ? moment(app.attributes.changedStageAt).add(14, 'days').calendar() : moment(app.attributes.changedStageAt).add(7, 'days').calendar();
-    var style = (deadline > moment())? 'danger' : 'success';
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'DEADLINE: ';
-    var hdr = (<h3>{hdr_str}<strong>{deadline}</strong></h3>);
     var email_button ="";
     
     if (user.attributes.can_moderate || user.attributes.can_admin){
@@ -149,8 +159,7 @@ var Application = React.createClass({
     }
 
     return (
-      <Panel header={this.renderHeader()} bsStyle={style} collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
-        <div>
+      <div>
           <Instruction instruction="Review Stage. Please read through this application and add questions for the applicant in the box below." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
 
@@ -161,10 +170,8 @@ var Application = React.createClass({
 
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+           {email_button}
         </div>
-        {email_button}
-      </Panel>
-
       );
   },
 
@@ -174,15 +181,11 @@ var Application = React.createClass({
 
   render_incoming:function() {
     var app = this.props.app;
-    var hdr_str = app.attributes['batch'] + ' #' + app.attributes.id + ' ' + 'Created: ';
     var active = this.props.index === this.props.activeKey;
-    var date = moment(app.attributes.createdAt).calendar();
     var content = this.state.anon_content || this.props.app.attributes.anon_content;
-    var hdr = (<h3>{hdr_str}<strong>{date}</strong></h3>);
 
     return (
-       <Panel header={this.renderHeader()} bsStyle='success' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
-        <div>
+       <div>
          <Instruction instruction="Anonymization Stage. Please Anonymize this application by removing names and other identifiers" />
           <div className="content-app">
           </div>
@@ -197,8 +200,7 @@ var Application = React.createClass({
           </form>
           <Button onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
-      </Panel>
-
+     
       );
   }
 });
@@ -415,7 +417,7 @@ var EmailCreate = React.createClass({
 
    render: function() {
       return (
-          <Button className="btn btn-primary btn-form" onClick={this.handleToggle}>Email Applicant</Button>
+          <Button className="btn" bsStyle="success" onClick={this.handleToggle}>Email Applicant</Button>
         );
     },
 
@@ -447,7 +449,7 @@ var SkypeScheduleButton = React.createClass({
 
     if (visible){
       return (
-        <Button disabled={inactive} onClick={this.scheduleSkype} className="btn-primary btn-form">Schedule Skype</Button>
+        <Button disabled={inactive} onClick={this.scheduleSkype} bsStyle='info' className="btn-form">Schedule Skype</Button>
         );
     }
 
@@ -459,6 +461,65 @@ var SkypeScheduleButton = React.createClass({
      Action.moveToScheduleSkype({appId: this.props.app.attributes.id});
   }
 });
+
+var DropOutButton = React.createClass({
+    
+  dropApplication: function(){
+    if (window.confirm("Do you really want to set this application to inactive?")) { 
+      Action.dropApplication({appId: this.props.app.attributes.id});
+    }
+    
+  },
+  render: function() {
+    return (
+      <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button>  
+      );
+  }
+
+});
+
+var HeaderIcons = React.createClass({
+  render: function() {
+  return (
+      <h5>Emails: {this.props.app.numberOfEmails()} Comm: {this.props.app.numberOfComments()} Q: {this.props.app.numberOfQuestions()}</h5>
+      );
+  }
+});
+
+var HeaderTxtRev = React.createClass({
+  render: function() {
+    var app = this.props.app;
+    var in_rev = app.attributes.stage === 'in_review';
+    var text = in_rev? 'Due: ':'Stage Changed: ';
+    var deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
+    
+    return (
+      <h5>{text}{deadline}</h5>
+      );
+  }
+});
+
+var HeaderTxtMod = React.createClass({
+  render: function() {
+    var app = this.props.app;
+    var in_rev = app.attributes.stage === 'in_review';
+    var date = moment(app.attributes.changedStageAt).calendar();
+    var due = moment(app.attributes.changedStageAt).add(12, 'days').calendar();
+    var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar()
+      
+    if (in_rev){     
+      if(app.shouldSendEmail()){      
+        if(app.isReadyForEmail()){
+            return(<h4>Ready For E-mail<br />Due Date: {due}</h4>);
+        }
+        return(<h4>Urgent<br />Due Date: {due}</h4>);
+      }
+
+      return(<h4>In Review Until: {deadline}<br />Email Due: {due}</h4>)
+    }
+
+    return (<h4>Changed State At: {date}</h4>);
+}});
 
 var ApplicationsList = React.createClass({
 
@@ -480,7 +541,7 @@ var ApplicationsList = React.createClass({
         <PanelGroup activeKey={this.state.activeKey} onSelect={self.handleSelect} accordion>
         {_.map(apps, function(app, index){
               return(
-                <Application app={app} activeKey={self.state.activeKey} index={index}/>
+                <Application app={app} activeKey={self.state.activeKey} index={index} />
                 )
             })}
         </PanelGroup>

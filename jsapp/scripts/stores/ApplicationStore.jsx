@@ -14,14 +14,26 @@ var $=require('jquery');
 
  var Application = Backbone.Model.extend({
 
- 	getQuestions: function(){
- 		var comments = this.get("comments") || null;
- 		if (comments){
- 			return _.filter(comments, 
-    		function(x){return x['question'] === true});
- 		}
- 		return [];
- 	},
+  shouldSendEmail: function(){
+    var weekAgo = moment().subtract(7, 'days');
+    return moment(this.changedStageAt) < weekAgo;
+  },
+
+  isReadyForEmail: function(){
+    return (this.getQuestions().length > 0);
+  },
+
+  numberOfComments: function(){
+    return this.getComments().length;
+  },
+
+  numberOfQuestions: function(){
+    return this.getQuestions().length;
+  },
+
+  numberOfEmails: function(){
+    return this.getEmails().length;
+  },
 
  	getComments: function(){
  		var comments = this.get("comments") || null;
@@ -30,7 +42,20 @@ var $=require('jquery');
     		function(x){return x['question'] === false});
  		}
  		return [];
- 	}
+ 	},
+
+  getQuestions: function(){
+    var comments = this.get("comments") || null;
+    if (comments){
+      return _.filter(comments, 
+        function(x){return x['question'] === true});
+    }
+    return [];
+  },
+
+  getEmails: function(){
+    return this.get("emails");
+  }
     
 });
 
@@ -178,6 +203,21 @@ function moveToScheduleSkype(payload) {
           });
 }
 
+function dropApplication(payload) {
+
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/inactive',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 // Register dispatcher 
 Dispatcher.register(function(payload) {
   
@@ -202,6 +242,9 @@ Dispatcher.register(function(payload) {
     break;
   case 'moveToScheduleSkype':
     moveToScheduleSkype(payload.payload)
+    break;
+  case 'dropApplication':
+    dropApplication(payload.payload)
     break;
 
     default:
