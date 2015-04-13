@@ -17,6 +17,7 @@ class Call(Schema):
                   'skype_name', 'callers')
 
     callers = fields.Nested(UserSchema, many=True)
+    application = fields.Nested('AnonymousApplicationSchema', only='id')
 
 
 class MeUserSchema(Schema):
