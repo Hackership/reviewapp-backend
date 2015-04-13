@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
+
+from flask import (request, jsonify, render_template, abort)
 from flask.ext.security import login_required, roles_accepted, current_user
-from flask.ext.security.utils import get_hmac, encrypt_password, verify_password
+from flask.ext.security.utils import get_hmac, encrypt_password
+
 from sqlalchemy.sql import or_, and_
 from sqlalchemy.exc import IntegrityError
-from app import app, db, mail, user_datastore
-from app.schemas import (users_schema, me_schema, admin_app_state, app_state,
-                         AnonymousApplicationSchema, ApplicationSchema,
-                         ExternalApplicationSchema, TimeslotSchema)
+
+from app.utils import generate_password, send_email, generate_fancy_name
+from app.calendar import add_call_to_calendar, remove_call_from_calendar
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
-from app.utils import generate_password, send_email, generate_fancy_name
-from calendar import add_call_to_calendar, remove_call_from_calendar
+from app.schemas import (me_schema, admin_app_state, app_state,
+                         AnonymousApplicationSchema, ApplicationSchema,
+                         ExternalApplicationSchema, TimeslotSchema)
+
+from app import app, db, user_datastore
 
 from datetime import datetime, timedelta
-
-from flask import (request, jsonify,
-                   render_template, abort)
-
 from functools import wraps
 
 import base64
@@ -42,7 +43,7 @@ def _find_available_slots():
     tomorrow = datetime.utcnow() + timedelta(hours=25)
 
     slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
-                  and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
+            and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
 
     scheduled_query = ScheduledCall.query.filter(ScheduledCall.scheduledAt >= tomorrow).join()
 
@@ -152,6 +153,7 @@ def _render_application(application):
 def scheduler_index():
     return app.send_static_file('scheduler.html')
 
+
 @app.route('/')
 @login_required
 def index():
@@ -205,6 +207,7 @@ def pruge_call_slots():
 
     return jsonify(success=True)
 
+
 @app.route('/api/me', methods=['PATCH'])
 @login_required
 def update_me():
@@ -248,7 +251,8 @@ def switch_to_schedule_skype(application):
     # Email Reviewers
     application.send_email("Let's schedule a call to talk about your Hackership Application",
                            render_template("emails/applicant/schedule_skype.md",
-                              app=application, key=base64.b64encode(get_hmac(application.email))))
+                                           app=application,
+                                           key=base64.b64encode(get_hmac(application.email))))
 
     return _render_application(application)
 
@@ -299,7 +303,7 @@ def schedule(application):
     if not slot or not skype:
         abort(400, "Please provide slot and skype contact")
     if slot not in slots:
-        abort(401, "Slot already taken. Please pick another");
+        abort(401, "Slot already taken. Please pick another")
 
     users = slots[slot]
     if len(users) > 2:
@@ -552,21 +556,6 @@ def add_reviewer():
                                name=user.name),
                [user.email])
 
-
     user_datastore.commit()
 
     return jsonify(success=True)
-
-
-##  Generic API
-
-@app.route('/api/user/me', methods=['GET'])
-@login_required
-def me():
-    return jsonify(me_schema.dump(current_user._get_current_object()).data)
-
-
-@app.route('/api/users', methods=['GET'])
-@login_required
-def userlist():
-    return jsonify({"users": users_schema.dump(User.query.all()).data})
