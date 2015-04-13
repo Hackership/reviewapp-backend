@@ -2,7 +2,7 @@ from app import db
 from flask.ext.security import UserMixin, RoleMixin
 from sqlalchemy.sql.expression import text
 
-from app.utils import send_email
+from app.utils import send_email, generate_fancy_name
 
 import datetime
 import hashlib
@@ -100,6 +100,7 @@ class Application(db.Model):
     changedStageAt = db.Column(db.DateTime)
     email = db.Column(db.String(120), unique=True)
     name = db.Column(db.String(120))
+    anon_name = db.Column(db.String(20), unique=True, default=generate_fancy_name)
     content = db.Column(db.Text)
     anon_content = db.Column(db.Text)
     fizzbuzz = db.Column(db.Text)
