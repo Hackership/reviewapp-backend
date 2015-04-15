@@ -44,13 +44,10 @@ module.exports = {
     loaders: [{
       test: /\.jsx$/,
       exclude: 'node_modules',
-      loader: 'jsx-loader?harmony'
+      loader: 'babel-loader?optional=runtime'
     },{
       test: /\.less/,
       loader: 'style-loader!css-loader!less-loader'
-    },{
-      test: /\.jsx$/,
-      loader: 'jsx-loader?harmony'
     },{
       test: /\.sass/,
       loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded'
