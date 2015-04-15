@@ -468,7 +468,7 @@ def add_comment(application):
     # FIXME verification would be great...
     comment = Comment(content=content,
                       question=request.form.get("question", False),
-                      author_id=current_user,
+                      author_id=current_user.id,
                       application_id=application.id,
                       stage=application.stage)
 
