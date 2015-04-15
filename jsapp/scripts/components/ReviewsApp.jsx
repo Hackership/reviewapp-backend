@@ -6,9 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-	rtbs  = require('react-bootstrap'),
-  TabbedArea = rtbs.TabbedArea,
-  TabPane = rtbs.TabPane,
+	{TabbedArea, TabPane} = require('react-bootstrap'),
   {Link, Route} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
@@ -51,13 +49,11 @@ var ReviewsApp = React.createClass({
       <div className="main">
         <div className="main-container">
     	   <TabbedArea className="tabPanel" defaultActiveKey={0}>
-          {_.map(apps, function(app_list, index){
-              var title = titles[index] + ' ('+ app_list.length + ')';
-              return(
-                <TabPane className="tab" eventKey={index} tab={title}>
-                  <ApplicationList apps={app_list} index={index} />
-                </TabPane>)
-            })}
+          {_.map(apps, (app_list, index) =>
+            <TabPane className="tab" eventKey={index} tab={titles[index] + ' ('+ app_list.length + ')'}>
+              <ApplicationList apps={app_list} index={index} />
+            </TabPane>
+          )}
         </TabbedArea>
         </div>
       </div>

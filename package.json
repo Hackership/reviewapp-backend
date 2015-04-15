@@ -25,6 +25,8 @@
     "react-select": "^0.4.2"
   },
   "devDependencies": {
+    "babel-core": "^5.1.9",
+    "babel-loader": "^5.0.0",
     "bootstrap": "^3.3.2",
     "bootstrap-webpack": "0.0.3",
     "bootstrapp": "0.0.0",
