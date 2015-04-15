@@ -234,7 +234,7 @@ var CommentBox = React.createClass({
 
           {_.map(comments, function(comment){
             var content = comment['content'],
-                author = <User user={comment.user} />,
+                author = <User user={comment.author} />,
                 date = ' '+ comment['createdAt'];
 
                 return(

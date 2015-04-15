@@ -405,7 +405,7 @@ var CallSlots = React.createClass({
     if (!slots.models.length && this.state.first){
       var zone = user.get("timezone");
       return (<Grid>
-          <p style={{color:"#20a260"}}><em>All information rendered with 24h format for local time at {zone}</em></p>
+          <p style={{color:"purple"}}><em>All information rendered with 24h format. TIMEZONE: {zone}</em></p>
                 <Row>
                   <h2>Welcome</h2>
                   <p>Please let us know about your call availability</p>
@@ -482,7 +482,7 @@ var CallSlots = React.createClass({
     return (<div className="main-container">
               <Grid>
               <Row>
-                  <p style={{color:"#20a260"}}><em>All information rendered with 24h format for local time at {zone}</em></p>
+                  <p style={{color:"purple"}}><em>All information rendered with 24h format. TIMEZONE: {zone}</em></p>
                 </Row>
                 <Row>
                   <Col xs={12} md={8}>
