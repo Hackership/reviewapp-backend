@@ -4,31 +4,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.models import Application
 from app import db
+from test_commenting import post_comment, post_question
 from test_post import run as post
+from test_skype_scheduler import random_schedule
 from test_inbound_email import run as inbound_email
+from test_utils import get_logged_in_opener
 
 import urllib
 import urllib2
 import re
 
-from cookielib import CookieJar
-
-# let's start by logging in
-
-
-cj = CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-# input-type values from the html form
-formdata = { "email" : "admin@example.org",
-             "password": "password"}
-data_encoded = urllib.urlencode(formdata)
-response = opener.open("http://localhost:5000/login")
-content = response.read()
-formdata['csrf_token'] = re.findall('csrf_token.*?value=\"(.*?)\"', content)[0]
-
-print(opener.open("http://localhost:5000/login", urllib.urlencode(formdata)).read())
-
-
+opener = get_logged_in_opener("admin@example.org")
 
 # FIXME this should become a real unittest test suite soon
 
@@ -48,6 +34,11 @@ inbound_email(from_email='reviewer@example.org',
               email=target_email,
               text="I like this application")
 
+# let's comment around
+post_comment(application)
+post_question(application)
+post_question(application)
+
 next_stage(application, 'email_send', email="here is a question for you {}".format(email))
 
 inbound_email(from_email=email,
@@ -63,7 +54,24 @@ anon_emails = dict([(str(x.id), "anon email {}".format(x.id)) for x in applicati
 
 next_stage(application, 'review_reply', **anon_emails)
 
+post_comment(application)
+
 next_stage(application, 'schedule_skype')
+
+slot = random_schedule(application)
+
+# fetch it again, check some values
+application = Application.query.filter(Application.email == email).first()
+
+assert len(application.comments) == 5, "Comments/Email comments are broken"
+assert len(application.emails) == 3, "Comments/Email comments are broken"
+assert application.stage == "skype_scheduled", "Scheduling didn't work"
+assert len(application.calls) == 1, "Scheduling didn't work"
+application.calls[0].scheduledAt.isoformat().replace("T", " ") == slot, "Slot scheduling went wrong"
+
+print " ALL WENT WELL, WOHOOOOOOOO!"
+
+
 
 
 
