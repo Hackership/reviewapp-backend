@@ -6,19 +6,8 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-	rtbs  = require('react-bootstrap'),
+	{Modal, Panel, Input, Well, Col, Row, Grid, Glyphicon, Accordion, PanelGroup, OverlayMixin, Button}  = require('react-bootstrap'),
   {User, Gravatar} = require("./User"),
-  Modal = rtbs.Modal,
-	Panel = rtbs.Panel,
-  Input = rtbs.Input,
-  Well = rtbs.Well,
-  Col = rtbs.Col,
-  Row = rtbs.Row,
-  Grid = rtbs.Grid,
-  Accordion = rtbs.Accordion,
-  PanelGroup = rtbs.PanelGroup,
-  OverlayMixin = rtbs.OverlayMixin,
-  Button = rtbs.Button,
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
   Action = require('../actions/actions'),
@@ -69,11 +58,18 @@ var Application = React.createClass({
     var app = this.props.app,
         txt = user.attributes.can_moderate ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     return (
-      <div>
+      <Grid>
+      <Col xs={1}>
         <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} /> 
+      </Col>
+      <Col xs={3} xs-offset={1}>
+        <div className="panel-name">{app.attributes.anon_name}</div>
         <HeaderIcons app={app} />
+      </Col>
+      <Col xs={8} xs-offset={4}>
         {txt}
-      </div>
+      </Col>
+      </Grid>
       );
   },
 
@@ -481,7 +477,11 @@ var DropOutButton = React.createClass({
 var HeaderIcons = React.createClass({
   render: function() {
   return (
-      <h5>Emails: {this.props.app.numberOfEmails()} Comm: {this.props.app.numberOfComments()} Q: {this.props.app.numberOfQuestions()}</h5>
+      <ul className="panel-icons">
+        <li><Glyphicon glyph="envelope"/> {this.props.app.numberOfEmails()}</li>
+        <li><Glyphicon glyph="comment" /> {this.props.app.numberOfComments()}</li>
+        <li><Glyphicon glyph="question-sign"/> {this.props.app.numberOfQuestions()}</li>
+      </ul>
       );
   }
 });
@@ -492,9 +492,8 @@ var HeaderTxtRev = React.createClass({
     var in_rev = app.attributes.stage === 'in_review';
     var text = in_rev? 'Due: ':'Stage Changed: ';
     var deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
-    
     return (
-      <h5>{text}{deadline}</h5>
+      <h5 className="panel-header"><strong>{text}{deadline}</strong></h5>
       );
   }
 });
@@ -510,15 +509,15 @@ var HeaderTxtMod = React.createClass({
     if (in_rev){     
       if(app.shouldSendEmail()){      
         if(app.isReadyForEmail()){
-            return(<h4>Ready For E-mail<br />Due Date: {due}</h4>);
+            return(<h5 className="panel-header urgent"><strong>Ready For E-mail<br />Due Date: {due}</strong></h5>);
         }
-        return(<h4>Urgent<br />Due Date: {due}</h4>);
+        return(<h5 className="panel-header urgent"><strong>Urgent, Due Date: {due} </strong></h5>);
       }
 
-      return(<h4>In Review Until: {deadline}<br />Email Due: {due}</h4>)
+      return(<h5 className="panel-header">In Review Until: {deadline}, <strong>Email Due: {due}</strong></h5>)
     }
 
-    return (<h4>Changed State At: {date}</h4>);
+    return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
 
 var ApplicationsList = React.createClass({

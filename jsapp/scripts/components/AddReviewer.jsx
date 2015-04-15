@@ -68,7 +68,7 @@ var AddReviewer = React.createClass({
 
     return (
     <div className="main">
-      <div className="container">
+      <div className="main-container">
         <h3> Add A Reviewer </h3>
         <p>Reviewers will receive an email with username and login details</p>
         <form onSubmit={this.submitForm} className='form-horizontal'>

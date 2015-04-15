@@ -69,7 +69,7 @@ var FocusList = React.createClass({
 
     if (!app) {
       return (
-         <div className="FocusList">      
+         <div className="focusList">      
          <p>Loading...</p>
          </div>
         );
@@ -77,7 +77,7 @@ var FocusList = React.createClass({
 
 
     return (  
-       <div className="FocusList">  
+       <div className="focusList">  
          <Pager>
           <PageItem disabled={activePrev} onClick={this.moveBack} previous>&larr; Previous</PageItem>
           <PageItem disabled={activeNxt} onClick={this.moveForward} next>Next &rarr;</PageItem>

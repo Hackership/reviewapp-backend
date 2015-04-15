@@ -49,7 +49,7 @@ var ReviewsApp = React.createClass({
 
     return (
       <div className="main">
-        <div className="container">
+        <div className="main-container">
     	   <TabbedArea className="tabPanel" defaultActiveKey={0}>
           {_.map(apps, function(app_list, index){
               var title = titles[index] + ' ('+ app_list.length + ')';
@@ -91,7 +91,7 @@ var FocusReview = React.createClass({
 
     return (
       <div className="main">
-        <div className="container">
+        <div className="main-container">
          <FocusList apps={apps} />
         </div>
       </div>

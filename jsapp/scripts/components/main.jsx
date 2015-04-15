@@ -78,7 +78,7 @@ var MainAppWrap = React.createClass({
 				<header>
 					<Link className="btn btn-primary" to="main">Main</Link>
 					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
-					<DropdownButton title={me}>
+					<DropdownButton bsStyle="" className="pull-right" title={me}>
 						{menu}
 						<MenuItem divider />
 						<MenuItem>

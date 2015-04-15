@@ -3,10 +3,61 @@
 
 html, body {
   background: white;
+  font-family:helvetica;
+  font-weight: 400;
+}
+
+#content {
+  margin: 5px;
+  overflow-x: hidden;
+  height: 100vh;
+}
+
+.panel-icons {
+  font-size:12px;
+  margin-top:0px;
+}
+
+ul.panel-icons {
+  list-style: none;
+  padding: 0;
+  color: #8D598D;
+  font-weight: 200;
+}
+
+ul.panel-icons li {
+  display: inline;
+  padding: 0 4px;
+}
+
+.panel-header {
+  font-family:helvetica;
+  font-weight: 300;
+  font-size: 14px;
+  padding-bottom: 0px;
+  margin-bottom: -20px;
+}
+
+.panel-header strong {
+  color: green;
+}
+
+.panel-header .urgent strong {
+  color: red;
+}
+
+.applicationList > .panel-group > .panel > .panel-heading
+{
+  padding-bottom: 0px; 
+}
+
+.focusList > .panel > .panel-heading
+{
+  padding-bottom: 0px; 
 }
 
 header {
-  background: black;
+ 
 }
 
 textarea.form-control.email{
@@ -15,8 +66,15 @@ textarea.form-control.email{
 }
 
 .well.instruction {
-  background-color: #FFFF66;
+  background-color: rgba(32, 162, 96, 0.74);
+  color: white;
+  font-weight: 300;
 }
+
+.well.instruction h4 {
+  font-weight: 400;
+}
+
 
 .popup {
   margin: 1%;
@@ -79,16 +137,15 @@ textarea.form-control.email{
   color: #fff;
 }
 
-.container {
+.main-container {
   margin-top:5%;
   width: 90vw;
   height: 100%;
   margin-left:5%;
   margin-top:1%;
-  background: #E0E3E3;
   color: black;
   position:relative;
-  padding:3%;
+  padding:3%; 
   }
 
 /*.main img {
@@ -99,28 +156,21 @@ textarea.form-control.email{
   background: #424242;
 }*/
 
-.applicationList {
-  width: 90%;
-  height: 80%;
-  background: #20a260;
-  margin: 5%;
-  color:#424242;
-}
-
-.tabPanel {
-  background-color: #424242 ;
-  color:white;
-}
 
 .tabPanel a {
+  color:#20a260;
+
+}
+
+nav.tabPanel .nav.tabPanel > li.active > a{
+  background-color:#20a260;
   color:white;
+
 }
 
-.tapPanel .TabPane {
-  border-style: none;
-}
 
-/* transitions */
+
+/* transitions 
 
 .fade-enter {
   opacity: 0.01;
