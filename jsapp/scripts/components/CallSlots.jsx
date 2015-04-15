@@ -5,7 +5,7 @@
 'use strict';
 
 var React = require('react/addons'),
-	{Input, Well, Grid, Row, Col, Button, Panel, Modal} = require('react-bootstrap'),
+	{Input, Well, Grid, Row, Col, Button, Panel, Modal, ButtonToolbar} = require('react-bootstrap'),
   _ = require('underscore'),
   moment = require('moment'),
   availableZones = require("../stores/TimezonesStore"),
@@ -94,8 +94,9 @@ var AddSlot = React.createClass({
     }
 
     return (<Well>
+            <div className="cal-add-box">
               <form onSubmit={this.submitForm} className='form-horizontal' >
-                <h2>Add another availability</h2>
+                <h3>Add another availability</h3>
                 <Row>
                   <Col xsOffset={1} mdOffset={1} xs={6} md={6}>
                     <Input type="checkbox" onChange={this.setOnce}>
@@ -109,12 +110,13 @@ var AddSlot = React.createClass({
                 </Row>
                 <hr />
                 <Row>
-                  <Col xsOffset={1} mdOffset={1}>
+                  <ButtonToolbar>
                     <Button bsStyle="primary" type="submit">+ Add</Button>
-                    <a onClick={this.props.onClose}>cancel</a>
-                  </Col>
+                    <Button bsStyle="link" onClick={this.props.onClose}>cancel</Button>
+                  </ButtonToolbar>
                 </Row>
               </form>
+               </div>
             </Well>)
     }
 });
@@ -137,19 +139,19 @@ var TimeRange = React.createClass({
             );
     return (<Row>
                 <div className="col-xs-1 col-xs-offset-1">
-                  From
+                  From:
                 </div>
-                <div className="col-xs-2">
+                <div className="col-xs-3">
                   <Select onChange={this.selectFrom} value={this.props.from} options={slots} />
                 </div>
-                <div className="col-xs-1  col-xs-offset-1">
-                  Until
+                <div className="col-xs-1 col-xs-offset-0">
+                  Until:
                 </div>
-                <div className="col-xs-2">
+                <div className="col-xs-3">
                   <Select onChange={this.selectUntil} value={this.props.until} options={slots} />
                 </div>
                 <Button
-                      bsSize='xsmall'
+                      bsSize='xsmall' bsStyle="warning"
                       onClick={this.remove}>x</Button>
             </Row>)
   }
@@ -220,34 +222,43 @@ var AddMany = React.createClass({
   },
   render: function(){
     var self = this;
-    return (<Well>
-              <p>Please specify your regular availability</p>
+    return ( <Well>
+      <div className="cal-add-box">
               <Row>
-                <h4>Weekdays</h4>
+              <h4>Please specify your regular availability</h4>
+              </Row>
+              <Row>
+               <div className="title-cal"><strong>Days</strong></div>
+              </Row>
+
+              <Row>
+              <form>
                 <Input type="checkbox"
-                      wrapperClassName="col-xs-1"
+                     wrapperClassName="col-xs-1"
                       ref='mon' defaultChecked={true} label="Mon" />
                 <Input type="checkbox"
-                      wrapperClassName="col-xs-1"
+                     wrapperClassName="col-xs-1"
                       ref='tue' defaultChecked={true} label="Tue" />
                 <Input type="checkbox"
-                      wrapperClassName="col-xs-1"
-                      ref='wed' defaultChecked={true} label="Wed" />
+                     wrapperClassName="col-xs-1"
+                     ref='wed' defaultChecked={true} label="Wed" />
                 <Input type="checkbox"
                       wrapperClassName="col-xs-1"
                       ref='thur' defaultChecked={true} label="Thur" />
                 <Input type="checkbox"
-                      wrapperClassName="col-xs-1"
+                     wrapperClassName="col-xs-1"
                       ref='fri' defaultChecked={true} label="Fri" />
                 <Input type="checkbox"
-                      wrapperClassName="col-xs-1"
+                     wrapperClassName="col-xs-1"
                       ref='sat' defaultChecked={false} label="Sat" />
                 <Input type="checkbox"
                       wrapperClassName="col-xs-1"
                       ref='sun' defaultChecked={false} label="Sun" />
-              </Row>
+                </form>
+                </Row>
               <Row>
-                <h4>Time Ranges</h4>
+
+                <h5><strong>Time</strong></h5>
                 <div>
                 {_.map(this.state.slots, function(slot, idx){
                     return <TimeRange key={idx}
@@ -259,17 +270,23 @@ var AddMany = React.createClass({
                 </div>
               </Row>
               <Row>
-                <div className="col-xs-offset-1">
+                <div className="col-xs-offset-8 row-cal">
                   <Button
-                      bsSize='small'
+                      bsSize='small' bsStyle="success"
                       onClick={this.addSlot}>+ More slots</Button>
                 </div>
               </Row>
+              <div className="row-cal">
               <Row>
+              <ButtonToolbar>
                 <Button onClick={this.submit} bsSize="large" bsStyle="primary">Submit</Button>
-                <a onClick={this.props.onClose}>cancel</a>
+                <Button onClick={this.props.onClose} bsStyle="link">cancel</Button>
+                </ButtonToolbar>
               </Row>
-            </Well>);
+              </div>
+                </div>
+            </Well>
+            );
   }
 });
 
@@ -318,16 +335,16 @@ var SuggestedSlots = React.createClass({
                   <p>{_displayCall({scheduledAt: this.state.selectedSlot}, zone)}</p>
                 </div>
                 <div className='modal-footer'>
-                  <Button bsStyle="primary" onClick={this.addRegular}>Every Week</Button> <Button onClick={this.addOnce}>once only</Button> <a onClick={this.closeModal}>neither</a>
+                  <ButtonToolbar><Button bsStyle="primary" onClick={this.addRegular}>Every Week</Button> <Button bsStyle="success" onClick={this.addOnce}>Only Once</Button> <a onClick={this.closeModal}>Cancel</a></ButtonToolbar>
                 </div>
               </Modal>) : <span />;
-    return (<div>
+    return (<div className="cal-side">
               {modal}
-              <h2>Suggested Slots</h2>
-              <p>Are you available at any of these times in the next weeks?</p>
+              <h3>Suggested Slots</h3>
+              <p>Are you available at any of these times?</p>
               <ul>
                 {_.map(this.state.suggestedSlots, function(dt){
-                  return <li onClick={function(){self.addSuggestedSlot(dt)}}>{_displayCall({scheduledAt: dt}, zone)}</li>
+                  return <li><Button bsStyle="link" onClick={function(){self.addSuggestedSlot(dt)}}>{_displayCall({scheduledAt: dt}, zone)}</Button></li>
                 })}
               </ul>
             </div>)
@@ -388,6 +405,7 @@ var CallSlots = React.createClass({
     if (!slots.models.length && this.state.first){
       var zone = user.get("timezone");
       return (<Grid>
+          <p style={{color:"#20a260"}}><em>All information rendered with 24h format for local time at {zone}</em></p>
                 <Row>
                   <h2>Welcome</h2>
                   <p>Please let us know about your call availability</p>
@@ -395,7 +413,6 @@ var CallSlots = React.createClass({
                 <Row>
                   <AddMany onClose={this.onCloseFirst} zone={zone} />
                 </Row>
-                <p>All information rendered with 24h format for local time at <em>{zone}</em></p>
               </Grid>);
     }
 
@@ -418,12 +435,14 @@ var CallSlots = React.createClass({
                                     slotData = slotGroups[day];
                                 return (
                                         <Panel key={day} header={dt}>
+                                          <ButtonToolbar>
                                             {_.map(slotData, function(slot){
-                                                return <Button btSize='large'
+                                                return <Button btSize='large' bsStyle="info"
                                                             onClick={function(x){self.removeSlot(slot)}}
                                                             key={slot.ts.format('LLLL')}>{_displaySlot(slot, zone)}</Button>
                                                 })
                                             }
+                                            </ButtonToolbar>
                                         </Panel>)
                       }),
         onceSlotElems = (oneTimeSlots.length ? _.map(oneTimeSlots, function(slot){
@@ -454,40 +473,40 @@ var CallSlots = React.createClass({
     } else if (this.state.showAdd){
       showAdd = <AddSlot onClose={this.onCloseAdd} />;
     } else {
-      showAdd = <div><Button onClick={this.showAdd}>+ Add Timeslot </Button>
-                     <Button onClick={this.showAddMany}>+ Add Regulars </Button>
-                     <Button bsSize="xsmall" onClick={this.clearSlots}> clear all</Button>
-                </div>;
+      showAdd = <ButtonToolbar><Button bsStyle="success" onClick={this.showAdd}>+ Add Timeslot </Button>
+                     <Button bsStyle="success" onClick={this.showAddMany}>+ Add Regulars </Button>
+                     <Button bsStyle="warning" bsSize="xsmall" onClick={this.clearSlots}> clear all</Button>
+                </ButtonToolbar>;
     }
 
-    return (<div>
+    return (<div className="main-container">
               <Grid>
+              <Row>
+                  <p style={{color:"#20a260"}}><em>All information rendered with 24h format for local time at {zone}</em></p>
+                </Row>
                 <Row>
                   <Col xs={12} md={8}>
                     {showAdd}
-                    <div>
-                      <h4>One time Slots</h4>
+                    <div className="cal-elem">
+                      <h3>One time Slots</h3>
                       <p>click to remove</p>
                       <ul>
                         {onceSlotElems}
                       </ul>
                     </div>
-                    <div>
+                    <div className="cal-elem">
                       <h3>Regular Slots</h3>
                         <p>click to remove</p>
                         {regularSlotsElems}
                     </div>
                   </Col>
                   <Col xs={12} md={4}>
-                    <h2>Upcoming calls</h2>
+                    <h3>Upcoming calls</h3>
                     <ul>
                       {callSlotElems}
                     </ul>
                     <SuggestedSlots />
                   </Col>
-                </Row>
-                <Row>
-                  <p>All information rendered with 24h format for local time at <em>{zone}</em></p>
                 </Row>
               </Grid>
             </div>)
