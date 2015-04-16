@@ -47,7 +47,7 @@ var Application = React.createClass({
     var stage = this.props.app.get("stage");
     var active = this.props.index === this.props.activeKey;
     var tools = user.attributes.can_admin ?  <AppToolBar app={this.props.app}/> : "";
-    
+
     return (<Panel header={this.render_header()} bsStyle='info' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         {this["render_" + stage]()}
         {tools}
@@ -60,7 +60,7 @@ var Application = React.createClass({
     return (
       <Grid>
       <Col xs={1}>
-        <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} /> 
+        <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} />
       </Col>
       <Col xs={3} xs-offset={1}>
         <div className="panel-name">{app.attributes.anon_name}</div>
@@ -104,7 +104,7 @@ var Application = React.createClass({
   render_review_reply: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
- 
+
     return (
         <div>
           <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
@@ -120,7 +120,7 @@ var Application = React.createClass({
   render_reply_received: function(){
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
- 
+
     return (
         <div>
           <Instruction instruction="Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers." />
@@ -149,7 +149,7 @@ var Application = React.createClass({
     var content  = markdown.toHTML(app.get('anon_content'));
     var fizzbuzz = app.get('fizzbuzz');
     var email_button ="";
-    
+
     if (user.attributes.can_moderate || user.attributes.can_admin){
       email_button = <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>;
     }
@@ -196,7 +196,7 @@ var Application = React.createClass({
           </form>
           <Button onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
-     
+
       );
   }
 });
@@ -264,7 +264,7 @@ var CommentBox = React.createClass({
 });
 
 var EmailBox = React.createClass({
-  
+
   submitEmails: function() {
     var index;
     var emails = {};
@@ -281,7 +281,7 @@ var EmailBox = React.createClass({
   render: function() {
       var emails = this.props.emails;
       var edit = this.props.canEdit;
-      var submit = edit ? <Button onClick={this.submitEmails}>Submit</Button> : ""; 
+      var submit = edit ? <Button onClick={this.submitEmails}>Submit</Button> : "";
 
       return (
           <div className="commentBox">
@@ -289,7 +289,7 @@ var EmailBox = React.createClass({
 
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
-                
+
                 if (edit) {
                 return(<SingleEmail email={email} ref={ref}/>)
                 }
@@ -297,7 +297,7 @@ var EmailBox = React.createClass({
                 else {
                   return (<DisplayEmail email={email} />)
                 }
-                  
+
               })}
           {submit}
           </div>
@@ -306,7 +306,7 @@ var EmailBox = React.createClass({
 });
 
 var DisplayEmail = React.createClass({
-  
+
   render: function() {
 
     var email = this.props.email,
@@ -339,7 +339,7 @@ var SingleEmail = React.createClass({
       content = email['incoming'] ? email['content'] : email['anon_content'];
 
 
-      return (  
+      return (
             <Input type='textarea' className="email"
                       defaultValue={content}
                       wrapperClassName="col-xs-12"
@@ -353,7 +353,7 @@ var Instruction = React.createClass({
   render: function() {
         var text = this.props.instruction;
 
-      return ( 
+      return (
         <Well className="instruction">
           <h4>What to do with this application:</h4>
           <p>{text}</p>
@@ -372,7 +372,7 @@ var EmailCreate = React.createClass({
     },
 
   getComments: function(comments){
-    
+
     var comment_str = _.map(comments, function(comment){
             return (comment['content']);
           });
@@ -425,7 +425,7 @@ var EmailCreate = React.createClass({
         return (
             <Modal title="Edit Questions to Send" onRequestHide={this.handleToggle}>
               <div>
-                <textarea className="popup" onChange={this.commentChanged} value={this.state.comments} labelClassName="col-xs-2" 
+                <textarea className="popup" onChange={this.commentChanged} value={this.state.comments} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
                 <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
                 <br />
@@ -466,10 +466,10 @@ var AppToolBar =  React.createClass({
     },
 
   dropApplication: function(){
-    if (window.confirm("Do you really want to set this application to inactive?")) { 
+    if (window.confirm("Do you really want to set this application to inactive?")) {
       Action.dropApplication({appId: this.props.app.attributes.id});
     }
-    
+
   },
 
   subjectChanged: function(evt) {
@@ -494,7 +494,7 @@ var AppToolBar =  React.createClass({
     Action.sendGeneralEmail({appId: this.props.app.attributes.id, email: this.state.email, subject: this.state.subject});
      this.setState({
         isModalOpen: !this.state.isModalOpen
-      });  
+      });
   },
 
   render: function() {
@@ -502,8 +502,8 @@ var AppToolBar =  React.createClass({
       <div className="app-toolbar">
       <Well>
         <ButtonToolbar>
-          <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button> 
-          <Button bsStyle="link" onClick={this.handleToggle}>Email Applicant</Button>  
+          <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button>
+          <Button bsStyle="link" onClick={this.handleToggle}>Email Applicant</Button>
         </ButtonToolbar>
       </Well>
       </div>
@@ -518,9 +518,9 @@ var AppToolBar =  React.createClass({
         return (
             <Modal title="Draft Email" bsStyle="primary" onRequestHide={this.handleToggle}>
               <div>
-                <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2" 
+                <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
-                <textarea className="popup" onChange={this.emailChanged} placeholder="Content" value={this.state.email} labelClassName="col-xs-2" 
+                <textarea className="popup" onChange={this.emailChanged} placeholder="Content" value={this.state.email} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
                 <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
                 <br />
@@ -564,9 +564,9 @@ var HeaderTxtMod = React.createClass({
     var date = moment(app.attributes.changedStageAt).calendar();
     var due = moment(app.attributes.changedStageAt).add(12, 'days').calendar();
     var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar()
-      
-    if (in_rev){     
-      if(app.shouldSendEmail()){      
+
+    if (in_rev){
+      if(app.shouldSendEmail()){
         if(app.isReadyForEmail()){
             return(<h5 className="panel-header urgent"><strong>Ready For E-mail </strong>Due Date: {due}</h5>);
         }
