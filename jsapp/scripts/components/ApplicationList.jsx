@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-	{Modal, ButtonToolbar, Panel, Input, Well, Col, Row, Grid, Glyphicon, Accordion, PanelGroup, OverlayMixin, Button}  = require('react-bootstrap'),
+	{Modal, ButtonToolbar, Panel, DropdownButton, MenuItem, Input, Well, Col, Row, Grid, Glyphicon, Accordion, PanelGroup, OverlayMixin, Button}  = require('react-bootstrap'),
   {User, Gravatar} = require("./User"),
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
@@ -214,7 +214,7 @@ var Application = React.createClass({
                       wrapperClassName="col-xs-10"
                       ref="anon"/>
           </form>
-          <Button onClick={this.moveToReview}>Submit and move to next stage</Button>
+          <Button bsStyle="primary" onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
 
       );
@@ -520,12 +520,10 @@ var AppToolBar =  React.createClass({
   render: function() {
     return (
       <div className="app-toolbar">
-      <Well>
-        <ButtonToolbar>
-          <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button>
-          <Button bsStyle="link" onClick={this.handleToggle}>Email Applicant</Button>
-        </ButtonToolbar>
-      </Well>
+      <DropdownButton bsStyle="warning" className="pull-right" title="Admin Tools" block>
+          <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
+          <MenuItem bsStyle="link" onClick={this.handleToggle}>Email Applicant</MenuItem>
+     </DropdownButton>
       </div>
       );
   },
