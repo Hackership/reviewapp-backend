@@ -4,7 +4,7 @@
 
 'use strict';
 
-var {ReviewsApp, FocusReview} = require('./ReviewsApp'),
+var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
 	CallSlots = require('./CallSlots'),
 	{ApplicationList} = require('./ApplicationList'),
@@ -89,7 +89,7 @@ var MainAppWrap = React.createClass({
 						</MenuItem>
 					</DropdownButton>
 				</header>
-				<RouteHandler />
+				<RouteHandler {...this.props}/>
 			</div>
 		)
 	}
@@ -99,11 +99,14 @@ var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
 	    <Route name="callslots" path="/calls/slots" handler={CallSlots} />
-	    <Route name="main" path="/" handler={ReviewsApp} />
+	    <Route name="main" path="/" handler={StagesView}>
+	    	<Route name="appStage" path=":stage/" handler={AppsList} />
+	    </Route>
 	    <Route name="focus" path="/focus" handler={FocusReview} />
 	</Route>
 );
 
-Router.run(Routes, function (Handler) {
-  React.render(<Handler/>, content);
+Router.run(Routes, function (Handler, state) {
+  var params = state.params;
+  React.render(<Handler params={params} />, content);
 });
