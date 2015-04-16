@@ -4,7 +4,7 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.admin.form import rules
 from flask.ext.security import current_user
 from flask import redirect, url_for, request
-from app.models import User
+from app.models import User, Application, Comment, Email, Timeslot, ScheduledCall
 from app import app, db
 
 DISABLED = {'disabled': True}
@@ -46,3 +46,11 @@ class UserView(BaseAdminView, ModelView):
 
 admin = Admin(app, name="User Administration")
 admin.add_view(UserView(db.session, endpoint="users"))
+
+if app.debug:
+    admin.add_view(ModelView(Application, db.session))
+    admin.add_view(ModelView(Email, db.session))
+    admin.add_view(ModelView(Comment, db.session))
+    admin.add_view(ModelView(Timeslot, db.session))
+    admin.add_view(ModelView(ScheduledCall, db.session))
+
