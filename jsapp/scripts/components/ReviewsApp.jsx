@@ -31,7 +31,7 @@ var ReviewsApp = React.createClass({
       });
   },
 
-  render: function() {
+  render() {
     var apps = [applications.byStage('in_review'), applications.byStage('email_send'), applications.byStage('review_reply'), applications.byStage('schedule_skype'), applications.byStage('skype_scheduled')],
         titles = ['To Review','Emailed', 'Review Reply', 'Skype Invite Send', 'Skype Scheduled'];
 
@@ -63,7 +63,7 @@ var ReviewsApp = React.createClass({
 
 var FocusReview = React.createClass({
 
-  componentDidMount: function(){
+  componentDidMount() {
     var self = this;
     applications.on("all", function(){
       self.isMounted() && self.forceUpdate();
@@ -74,7 +74,7 @@ var FocusReview = React.createClass({
       });
   },
 
-  render: function() {
+  render() {
     var apps;
 
     if (user.attributes.can_admin) {

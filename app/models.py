@@ -7,11 +7,9 @@ from app.utils import send_email, generate_fancy_name
 import datetime
 import hashlib
 
+
 def hasher(self):
     return hashlib.md5(self.email).hexdigest()
-
-
-
 
 
 stages = ('incoming', 'in_review',
