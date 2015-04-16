@@ -12,12 +12,51 @@ var React = require('react/addons'),
   {user} = require('../stores/UserStore'),
   Action = require('../actions/actions'),
   markdown = require( "markdown" ).markdown,
+  {Link} = require('react-router'),
   Highlight = require('react-highlight'),
+  {applications} = require('../stores/ApplicationStore'),
   moment = require('moment');
 
 var $=require('jquery');
 
+
+var AppHeaderMixin = {
+  render_header(app){
+    var app = this.props.app,
+        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
+    return (
+      <Grid>
+        <Col xs={1}>
+          <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} />
+        </Col>
+        <Col xs={3} xs-offset={1}>
+          <div className="panel-name">{app.get("anon_name")}</div>
+          <HeaderIcons app={app} />
+        </Col>
+        <Col xs={8} xs-offset={4}>
+          {txt}
+        </Col>
+      </Grid>
+      );
+  }
+}
+
+var ApplicationListHeader = React.createClass({
+  mixins: [AppHeaderMixin],
+  render(){
+      return (
+        <li className="panel panel-info">
+          <Link className="panel-heading" to="appPage" params={{appId: this.props.app.id}}>
+            {this.render_header(this.props.app)}
+          </Link>
+        </li>
+    )
+  }
+
+})
+
 var Application = React.createClass({
+  mixins: [AppHeaderMixin],
 
   componentDidMount: function(){
     var self = this;
@@ -52,25 +91,6 @@ var Application = React.createClass({
         {this["render_" + stage]()}
         {tools}
       </Panel>);
-  },
-
-  render_header: function(app){
-    var app = this.props.app,
-        txt = user.attributes.can_moderate ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
-    return (
-      <Grid>
-      <Col xs={1}>
-        <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} />
-      </Col>
-      <Col xs={3} xs-offset={1}>
-        <div className="panel-name">{app.attributes.anon_name}</div>
-        <HeaderIcons app={app} />
-      </Col>
-      <Col xs={8} xs-offset={4}>
-        {txt}
-      </Col>
-      </Grid>
-      );
   },
 
   render_skype_scheduled: function() {
@@ -513,8 +533,7 @@ var AppToolBar =  React.createClass({
   renderOverlay: function() {
       if (!this.state.isModalOpen) {
         return <span/>;
-      }else
-      {
+      } else {
         return (
             <Modal title="Draft Email" bsStyle="primary" onRequestHide={this.handleToggle}>
               <div>
@@ -597,17 +616,31 @@ var ApplicationsList = React.createClass({
 
     return (
        <div className="applicationList">
-        <PanelGroup activeKey={this.state.activeKey} onSelect={self.handleSelect} accordion>
-        {_.map(apps, function(app, index){
-              return(
-                <Application app={app} activeKey={self.state.activeKey} index={index} />
-                )
-            })}
-        </PanelGroup>
-        </div>
+        <ul className="panel-group">
+        {_.map(apps, (app, index) =>
+          <ApplicationListHeader app={app} />
+        )}
+        </ul>
+      </div>
     );
   }
 });
 
 
-module.exports = {ApplicationList: ApplicationsList, Application: Application};
+var AppPage = React.createClass({
+  render(){
+    var app = applications.get(parseInt(this.props.params.appId));
+    return  (
+      <div className="main">
+        <div className="main-container">
+          <Application app={app} />
+        </div>
+      </div>
+      );
+  }
+})
+
+
+module.exports = {ApplicationList: ApplicationsList,
+                  ApplicationPage: AppPage,
+                  Application: Application};

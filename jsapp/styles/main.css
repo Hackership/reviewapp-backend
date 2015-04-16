@@ -81,9 +81,16 @@ ul.panel-icons li {
   color: red;
 }
 
+.applicationList > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .applicationList > .panel-group > .panel > .panel-heading
 {
-  padding-bottom: 0px; 
+  display: block;
+  padding-bottom: 0px;
 }
 
 .focusList > .panel > .panel-heading

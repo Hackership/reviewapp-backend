@@ -7,7 +7,7 @@
 var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
 	CallSlots = require('./CallSlots'),
-	{ApplicationList} = require('./ApplicationList'),
+	{ApplicationList, ApplicationPage} = require('./ApplicationList'),
 	{Gravatar} = require("./User"),
 	React = require('react'),
 	Router = require('react-router'),
@@ -102,6 +102,7 @@ var Routes = (
 	    <Route name="main" path="/" handler={StagesView}>
 	    	<Route name="appStage" path=":stage/" handler={AppsList} />
 	    </Route>
+	    <Route name="appPage" path="/app/:appId" handler={ApplicationPage} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />
 	</Route>
 );
