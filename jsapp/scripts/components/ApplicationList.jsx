@@ -548,10 +548,11 @@ var HeaderTxtRev = React.createClass({
   render: function() {
     var app = this.props.app;
     var in_rev = app.attributes.stage === 'in_review';
-    var text = in_rev? 'Due: ':'Stage Changed: ';
+    var txt = in_rev ? 'Due ' : 'Stage Changed: ';
+    var new_txt = !app.isNew() ? 'Please review, ' : '';
     var deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
     return (
-      <h5 className="panel-header"><strong>{text}{deadline}</strong></h5>
+      <h5 className="panel-header"><strong>{new_txt} </strong>{txt}{deadline}</h5>
       );
   }
 });
@@ -567,9 +568,9 @@ var HeaderTxtMod = React.createClass({
     if (in_rev){     
       if(app.shouldSendEmail()){      
         if(app.isReadyForEmail()){
-            return(<h5 className="panel-header urgent"><strong>Ready For E-mail<br />Due Date: {due}</strong></h5>);
+            return(<h5 className="panel-header urgent"><strong>Ready For E-mail </strong>Due Date: {due}</h5>);
         }
-        return(<h5 className="panel-header urgent"><strong>Urgent, Due Date: {due} </strong></h5>);
+        return(<h5 className="panel-header urgent"><strong style={{color:"red"}}>URGENT</strong> Due Date: {due}</h5>);
       }
 
       return(<h5 className="panel-header">In Review Until: {deadline}, <strong>Email Due: {due}</strong></h5>)
@@ -577,6 +578,7 @@ var HeaderTxtMod = React.createClass({
 
     return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
+
 
 var ApplicationsList = React.createClass({
 

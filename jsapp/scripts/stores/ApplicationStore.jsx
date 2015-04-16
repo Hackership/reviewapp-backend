@@ -16,7 +16,24 @@ var $=require('jquery');
 
   shouldSendEmail: function(){
     var weekAgo = moment().subtract(7, 'days');
-    return moment(this.changedStageAt) < weekAgo;
+    return moment(this.attributes.changedStageAt) < weekAgo;
+  },
+
+  isNew: function(){
+    var auth_questions;
+
+    if(this.attributes.stage === 'in_review') {
+
+      auth_questions = _.filter(this.attributes.comments, function(comment){
+        return ((comment['author']['id'] === user.get('id')) && comment['question']);
+      });
+
+      if (auth_questions.length > 0){
+        return false
+      }
+      return true
+    }
+    return true
   },
 
   isReadyForEmail: function(){
@@ -38,7 +55,7 @@ var $=require('jquery');
  	getComments: function(){
  		var comments = this.get("comments") || null;
  		if (comments){
- 			return _.filter(comments, 
+ 			return _.filter(comments,
     		function(x){return x['question'] === false});
  		}
  		return [];
@@ -47,7 +64,7 @@ var $=require('jquery');
   getQuestions: function(){
     var comments = this.get("comments") || null;
     if (comments){
-      return _.filter(comments, 
+      return _.filter(comments,
         function(x){return x['question'] === true});
     }
     return [];
@@ -56,7 +73,7 @@ var $=require('jquery');
   getEmails: function(){
     return this.get("emails");
   }
-    
+
 });
 
 var Applications = Backbone.Collection.extend({
@@ -64,9 +81,9 @@ var Applications = Backbone.Collection.extend({
 
     toEmail: function(){
     	var weekAgo = moment().subtract(7, 'days');
-    
-    	return _.filter(this.where({"stage": 'in_review'}), 
-    		function(x){return moment(x.changedStageAt) < weekAgo});
+
+    	return _.filter(this.where({"stage": 'in_review'}),
+        function(x){return moment(x.attributes.changedStageAt) < weekAgo});
     },
 
    	byStage: function(stage) {
@@ -109,7 +126,7 @@ function getApps() {
     })
 	.done(function(data){
     })
-    
+
     .fail(function(data){
     	console.log(data)
     	alert('Failed to get applications');
@@ -237,9 +254,9 @@ function dropApplication(payload) {
           });
 }
 
-// Register dispatcher 
+// Register dispatcher
 Dispatcher.register(function(payload) {
-  
+
   switch(payload.actionType) {
     case 'getApplications':
 		getApps()
