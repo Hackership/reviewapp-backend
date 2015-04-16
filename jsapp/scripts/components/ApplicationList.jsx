@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-	{Modal, Panel, Input, Well, Col, Row, Grid, Glyphicon, Accordion, PanelGroup, OverlayMixin, Button}  = require('react-bootstrap'),
+	{Modal, ButtonToolbar, Panel, Input, Well, Col, Row, Grid, Glyphicon, Accordion, PanelGroup, OverlayMixin, Button}  = require('react-bootstrap'),
   {User, Gravatar} = require("./User"),
 	ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
@@ -46,11 +46,11 @@ var Application = React.createClass({
   render: function() {
     var stage = this.props.app.get("stage");
     var active = this.props.index === this.props.activeKey;
-    var dropOut = user.attributes.can_admin ?  <DropOutButton app={this.props.app}/> : "";
+    var tools = user.attributes.can_admin ?  <AppToolBar app={this.props.app}/> : "";
     
     return (<Panel header={this.render_header()} bsStyle='info' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
         {this["render_" + stage]()}
-        {dropOut}
+        {tools}
       </Panel>);
   },
 
@@ -458,21 +458,79 @@ var SkypeScheduleButton = React.createClass({
   }
 });
 
-var DropOutButton = React.createClass({
-    
+var AppToolBar =  React.createClass({
+   mixins: [OverlayMixin],
+
+  getInitialState: function() {
+      return {'isModalOpen': false, 'email': "", 'subject': ""};
+    },
+
   dropApplication: function(){
     if (window.confirm("Do you really want to set this application to inactive?")) { 
       Action.dropApplication({appId: this.props.app.attributes.id});
     }
     
   },
+
+  subjectChanged: function(evt) {
+    this.setState({
+        subject: evt.target.value
+      });
+  },
+
+  emailChanged: function(evt) {
+    this.setState({
+            email: evt.target.value
+          });
+  },
+
+   handleToggle: function(evt) {
+      this.setState({
+        isModalOpen: !this.state.isModalOpen
+      });
+    },
+
+  sendEmail: function(){
+    Action.sendGeneralEmail({appId: this.props.app.attributes.id, email: this.state.email, subject: this.state.subject});
+     this.setState({
+        isModalOpen: !this.state.isModalOpen
+      });  
+  },
+
   render: function() {
     return (
-      <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button>  
+      <div className="app-toolbar">
+      <Well>
+        <ButtonToolbar>
+          <Button bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</Button> 
+          <Button bsStyle="link" onClick={this.handleToggle}>Email Applicant</Button>  
+        </ButtonToolbar>
+      </Well>
+      </div>
       );
-  }
+  },
 
+  renderOverlay: function() {
+      if (!this.state.isModalOpen) {
+        return <span/>;
+      }else
+      {
+        return (
+            <Modal title="Draft Email" bsStyle="primary" onRequestHide={this.handleToggle}>
+              <div>
+                <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2" 
+                        wrapperClassName="col-xs-10"/>
+                <textarea className="popup" onChange={this.emailChanged} placeholder="Content" value={this.state.email} labelClassName="col-xs-2" 
+                        wrapperClassName="col-xs-10"/>
+                <button className="btn btn-primary" onClick={this.sendEmail}>Send</button>
+                <br />
+              </div>
+            </Modal>
+          );
+      }
+    }
 });
+
 
 var HeaderIcons = React.createClass({
   render: function() {

@@ -287,6 +287,41 @@ def delete_call_slot(slotId):
     return jsonify(success=True)
 
 
+@app.route('/application/<id>/send_email', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def send_email(application):
+    email = (request.form.get("email") or request.args.get("email")) or None
+    subject = (request.form.get("subject") or request.args.get("subject")) or None
+
+    if not email:
+        abort(400, "Missing email")
+
+    if not subject:
+        subject = "Your Hackership Application"
+
+    content = render_template("emails/applicant/general.md",
+                              app=application,
+                              content=email)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=email)
+
+    db.session.add(email)
+    db.session.add(application)
+
+    # Email 
+    application.send_email(subject, content)
+
+    db.session.commit()
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/schedule_skype', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'moderator')

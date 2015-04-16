@@ -12,7 +12,7 @@ _.each([
     "postComment", "postQuestion",
 
     // Email
-    "sendEmail", "receiveEmail",
+    "sendEmail", "receiveEmail", "sendGeneralEmail",
 
     //User
     "setUser", "setTimezone",

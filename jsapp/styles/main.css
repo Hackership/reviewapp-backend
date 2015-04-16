@@ -13,6 +13,10 @@ html, body {
   height: 100vh;
 }
 
+.app-toolbar {
+  margin-top: 2vh;
+  width: 50%;
+}
 /*Skype scheduler - calendar*/
 .cal-elem {
   margin-top: 5vh;

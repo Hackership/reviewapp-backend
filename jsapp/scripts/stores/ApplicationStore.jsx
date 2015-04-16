@@ -187,6 +187,25 @@ function sendEmail(payload) {
           });
 }
 
+function sendGeneralEmail(payload){
+  var email = payload['email'];
+  var subject = payload['subject'];
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/send_email',
+          data: {email: email, subject: subject},
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 function moveToScheduleSkype(payload) {
   var app_id = payload['appId'];
   console.log('appId', app_id);
@@ -245,6 +264,9 @@ Dispatcher.register(function(payload) {
     break;
   case 'dropApplication':
     dropApplication(payload.payload)
+    break;
+  case "sendGeneralEmail":
+    sendGeneralEmail(payload.payload)
     break;
 
     default:
