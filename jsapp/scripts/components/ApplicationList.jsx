@@ -549,7 +549,7 @@ var HeaderTxtRev = React.createClass({
     var app = this.props.app;
     var in_rev = app.attributes.stage === 'in_review';
     var txt = in_rev ? 'Due ' : 'Stage Changed: ';
-    var new_txt = !app.isNew() ? 'Please review, ' : '';
+    var new_txt = app.isNew() ? 'Please review, ' : '';
     var deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
     return (
       <h5 className="panel-header"><strong>{new_txt} </strong>{txt}{deadline}</h5>
