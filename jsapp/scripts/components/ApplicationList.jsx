@@ -194,7 +194,7 @@ var Application = React.createClass({
                       wrapperClassName="col-xs-10"
                       ref="anon"/>
           </form>
-          <Button bsStyle="primary" onClick={this.moveToReview}>Submit and move to next stage</Button>
+          <Button wrapperClassName="col-xs-8" bsStyle="success" onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
 
       );
@@ -462,7 +462,7 @@ var AppToolBar =  React.createClass({
    mixins: [OverlayMixin],
 
   getInitialState: function() {
-      return {'isModalOpen': false, 'email': "", 'subject': ""};
+      return {'isModalOpen': false, 'email': "", 'subject': "", 'motivation': "NONE"};
     },
 
   dropApplication: function(){
@@ -486,7 +486,8 @@ var AppToolBar =  React.createClass({
 
    handleToggle: function(evt) {
       this.setState({
-        isModalOpen: !this.state.isModalOpen
+        isModalOpen: !this.state.isModalOpen,
+        type: evt
       });
     },
 
@@ -497,13 +498,18 @@ var AppToolBar =  React.createClass({
       });
   },
 
-  render: function() {
+  rejectApplicant: function(){
+
+  },
+
+  render: function(){
     return (
       <div className="app-toolbar">
-      <DropdownButton bsStyle="warning" className="pull-right" title="Admin Tools" block>
+      <DropdownButton bsStyle="info" className="pull-right" title="Admin Tools" block>
           <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
-          <MenuItem bsStyle="link" onClick={this.handleToggle}>Email Applicant</MenuItem>
-     </DropdownButton>
+          <MenuItem bsStyle="link" onClick={e => this.handleToggle("email")}>Email Applicant</MenuItem>
+           <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject")}>Reject Applicant</MenuItem>
+      </DropdownButton>
       </div>
       );
   },
@@ -511,10 +517,25 @@ var AppToolBar =  React.createClass({
   renderOverlay: function() {
       if (!this.state.isModalOpen) {
         return <span/>;
-      }else
-      {
+      }
+
+      if (this.state.type === 'reject'){
+         return (
+            <Modal title="Please give a motivation:" bsStyle="primary" onRequestHide={this.handleToggle}>
+              <div>
+                <textarea className="popup" onChange={this.motivationChanged} placeholder="Content" value={this.state.motivation} labelClassName="col-xs-2"
+                        wrapperClassName="col-xs-10"/>
+                <button className="btn btn-primary" onClick={this.rejectApplicant}>Submit</button>
+                <br />
+              </div>
+            </Modal>
+          );
+
+      }
+
+
         return (
-            <Modal title="Draft Email" bsStyle="primary" onRequestHide={this.handleToggle}>
+            <Modal title="Draft E-mail" bsStyle="primary" onRequestHide={this.handleToggle}>
               <div>
                 <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
@@ -526,7 +547,6 @@ var AppToolBar =  React.createClass({
             </Modal>
           );
       }
-    }
 });
 
 
@@ -576,7 +596,6 @@ var HeaderTxtMod = React.createClass({
 
     return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
-
 
 var ApplicationsList = React.createClass({
 
