@@ -22,7 +22,7 @@ var React = require('react/addons'),
 
 
 var Counter = React.createClass({
-  
+
   render: function() {
     var count = this.props.index + '/' + this.props.total;
     return (

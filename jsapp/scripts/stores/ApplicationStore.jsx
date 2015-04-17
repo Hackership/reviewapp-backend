@@ -88,7 +88,11 @@ var Applications = Backbone.Collection.extend({
 
    	byStage: function(stage) {
    		return this.where({"stage": stage});
-   },
+    },
+
+    stageCounts: function(){
+      return _.countBy(this.models, "stage");
+    },
 
     byUrgency: function(role) {
       var review_apps,
