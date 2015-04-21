@@ -692,9 +692,7 @@ var SkypeInfo = React.createClass({
     var app = this.props.app,
         name = app.get('name') ? app.get('name'): "No value",
         grant = app.get('grant') ? app.get('grant') : "No",
-        calls = _.map(app.get('calls'), call => <SkypeCall call={call} />),
-        another_call = calls[0];
-        calls.push(another_call);
+        calls = _.map(app.get('calls'), call => <SkypeCall call={call} />);
 
     return (
       <div>
