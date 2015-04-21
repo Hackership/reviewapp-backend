@@ -154,6 +154,22 @@ function postComment(payload) {
           });
 }
 
+function moveToSkyped(payload) {
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/skyped',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 function moveToReview(payload) {
 	var content = payload['anon_content'];
 	var app_id = payload['appId'];
@@ -288,6 +304,9 @@ Dispatcher.register(function(payload) {
     break;
   case "sendGeneralEmail":
     sendGeneralEmail(payload.payload)
+    break;
+  case "moveToSkyped":
+    moveToSkyped(payload.payload)
     break;
 
     default:

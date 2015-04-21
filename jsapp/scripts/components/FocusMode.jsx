@@ -46,7 +46,7 @@ var FocusList = React.createClass({
     if (this.props.apps.length > new_key){
       this.setState({key: new_key});
     }
-    
+
   },
 
   moveBack: function(evt){
@@ -58,7 +58,7 @@ var FocusList = React.createClass({
       this.setState({key: new_key});
     }
   },
-  
+
 
   render: function() {
     var apps = this.props.apps ?  this.props.apps : [],

@@ -83,14 +83,31 @@ var Application = React.createClass({
   },
 
   render: function() {
+    var app = this.props.app;
+    var txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     var stage = this.props.app.get("stage");
     var active = this.props.index === this.props.activeKey;
-    var tools = user.attributes.can_admin ?  <AppToolBar app={this.props.app}/> : "";
 
-    return (<Panel header={this.render_header()} bsStyle='info' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+    return (<div>
+        <div className="panel-background">
+        {this.render_header(this.props.app, true)}
+        </div>
         {this["render_" + stage]()}
-        {tools}
-      </Panel>);
+      </div>);
+  },
+
+  render_skyped: function() {
+    var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+
+    return (<div>
+          <Instruction instruction="Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here. " />
+          <div dangerouslySetInnerHTML={{__html: content}} />
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        </div>
+      );
   },
 
   render_skype_scheduled: function() {
@@ -103,6 +120,7 @@ var Application = React.createClass({
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <SkypedButton app={app} user={user}/>
         </div>
       );
   },
@@ -128,11 +146,11 @@ var Application = React.createClass({
     return (
         <div>
           <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
-         <div dangerouslySetInnerHTML={{__html: content}} />
+          <SkypeScheduleButton app={app} user={user} />
+          <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-          <SkypeScheduleButton app={app} user={user} />
         </div>
       );
   },
@@ -186,7 +204,7 @@ var Application = React.createClass({
 
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-           {email_button}
+          {email_button}
         </div>
       );
   },
@@ -433,7 +451,7 @@ var EmailCreate = React.createClass({
 
    render: function() {
       return (
-          <Button className="btn" bsStyle="success" onClick={this.handleToggle}>Email Applicant</Button>
+          <Button className="btn" bsStyle="info" onClick={this.handleToggle}>Email Applicant</Button>
         );
     },
 
@@ -475,6 +493,27 @@ var SkypeScheduleButton = React.createClass({
 
   scheduleSkype: function() {
      Action.moveToScheduleSkype({appId: this.props.app.attributes.id});
+  }
+});
+
+var SkypedButton = React.createClass({
+  render: function() {
+      var inactive = (this.props.app.attributes.stage === 'skype_scheduled') ? false : true,
+          visible = (this.props.user.attributes.can_admin || this.props.user.attributes.can_moderate) ? true : false,
+          app_id = this.props.app.attributes.id;
+
+      if (visible){
+        return (
+          <Button disabled={inactive} onClick={this.skyped} bsStyle='info' className="btn-form">Move to Skyped</Button>
+          );
+      }
+
+      return (<div></div>);
+
+  },
+
+  skyped: function() {
+    Action.moveToSkyped({appId: this.props.app.attributes.id});
   }
 });
 
