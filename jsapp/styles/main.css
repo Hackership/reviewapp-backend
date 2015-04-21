@@ -81,6 +81,14 @@ ul.panel-icons li {
   color: red;
 }
 
+.panel-background {
+  background-color: #D0EBF5;
+  color: #396C92;
+  padding-top:10px;
+  padding-bottom: 10px;
+  margin-bottom: 2px;
+}
+
 .applicationList > ul {
   list-style: none;
   padding: 0;
@@ -108,8 +116,8 @@ textarea.form-control.email{
 }
 
 .well.instruction {
-  background-color: rgba(32, 162, 96, 0.74);
-  color: white;
+  background-color: rgba(41, 227, 133, 0.7);
+  color: #22541E;
   font-weight: 300;
 }
 

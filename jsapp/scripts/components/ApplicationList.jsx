@@ -21,8 +21,9 @@ var $=require('jquery');
 
 
 var AppHeaderMixin = {
-  render_header(app){
+  render_header(app, tools){
     var app = this.props.app,
+        tools = (user.attributes.can_admin && tools) ?  <AppToolBar app={app}/> : "",
         txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     return (
       <Grid>
@@ -33,8 +34,11 @@ var AppHeaderMixin = {
           <div className="panel-name">{app.get("anon_name")}</div>
           <HeaderIcons app={app} />
         </Col>
-        <Col xs={8} xs-offset={4}>
+        <Col xs={5} xs-offset={4}>
           {txt}
+        </Col>
+         <Col xs={2} xs-offset={9}>
+          {tools}
         </Col>
       </Grid>
       );
@@ -45,9 +49,9 @@ var ApplicationListHeader = React.createClass({
   mixins: [AppHeaderMixin],
   render(){
       return (
-        <li className="panel panel-info">
-          <Link className="panel-heading" to="appPage" params={{appId: this.props.app.id}}>
-            {this.render_header(this.props.app)}
+        <li className="panel-background">
+          <Link to="appPage" params={{appId: this.props.app.id}}>
+            {this.render_header(this.props.app, false)}
           </Link>
         </li>
     )
