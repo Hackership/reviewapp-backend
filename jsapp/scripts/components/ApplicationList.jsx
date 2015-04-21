@@ -21,8 +21,9 @@ var $=require('jquery');
 
 
 var AppHeaderMixin = {
-  render_header(app){
+  render_header(app, tools){
     var app = this.props.app,
+        tools = (user.attributes.can_admin && tools) ?  <AppToolBar app={app}/> : "",
         txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     return (
       <Grid>
@@ -33,8 +34,11 @@ var AppHeaderMixin = {
           <div className="panel-name">{app.get("anon_name")}</div>
           <HeaderIcons app={app} />
         </Col>
-        <Col xs={8} xs-offset={4}>
+        <Col xs={5} xs-offset={4}>
           {txt}
+        </Col>
+         <Col xs={2} xs-offset={9}>
+          {tools}
         </Col>
       </Grid>
       );
@@ -45,9 +49,9 @@ var ApplicationListHeader = React.createClass({
   mixins: [AppHeaderMixin],
   render(){
       return (
-        <li className="panel panel-info">
-          <Link className="panel-heading" to="appPage" params={{appId: this.props.app.id}}>
-            {this.render_header(this.props.app)}
+        <li className="panel-background">
+          <Link to="appPage" params={{appId: this.props.app.id}}>
+            {this.render_header(this.props.app, false)}
           </Link>
         </li>
     )
@@ -83,14 +87,31 @@ var Application = React.createClass({
   },
 
   render: function() {
+    var app = this.props.app;
+    var txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     var stage = this.props.app.get("stage");
     var active = this.props.index === this.props.activeKey;
-    var tools = user.attributes.can_admin ?  <AppToolBar app={this.props.app}/> : "";
 
-    return (<Panel header={this.render_header()} bsStyle='info' collapsable={true} expanded={active} eventKey={this.props.index} onSelect={this.onSelect}>
+    return (<div>
+        <div className="panel-background">
+        {this.render_header(this.props.app, true)}
+        </div>
         {this["render_" + stage]()}
-        {tools}
-      </Panel>);
+      </div>);
+  },
+
+  render_skyped: function() {
+    var app = this.props.app;
+    var content = markdown.toHTML(app.get('anon_content'));
+
+    return (<div>
+          <Instruction instruction="Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here. " />
+          <div dangerouslySetInnerHTML={{__html: content}} />
+          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        </div>
+      );
   },
 
   render_skype_scheduled: function() {
@@ -103,6 +124,7 @@ var Application = React.createClass({
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <SkypedButton app={app} user={user}/>
         </div>
       );
   },
@@ -128,11 +150,11 @@ var Application = React.createClass({
     return (
         <div>
           <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
-         <div dangerouslySetInnerHTML={{__html: content}} />
+          <SkypeScheduleButton app={app} user={user} />
+          <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-          <SkypeScheduleButton app={app} user={user} />
         </div>
       );
   },
@@ -186,7 +208,7 @@ var Application = React.createClass({
 
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-           {email_button}
+          {email_button}
         </div>
       );
   },
@@ -214,7 +236,7 @@ var Application = React.createClass({
                       wrapperClassName="col-xs-10"
                       ref="anon"/>
           </form>
-          <Button bsStyle="primary" onClick={this.moveToReview}>Submit and move to next stage</Button>
+          <Button wrapperClassName="col-xs-8" bsStyle="success" onClick={this.moveToReview}>Submit and move to next stage</Button>
         </div>
 
       );
@@ -433,7 +455,7 @@ var EmailCreate = React.createClass({
 
    render: function() {
       return (
-          <Button className="btn" bsStyle="success" onClick={this.handleToggle}>Email Applicant</Button>
+          <Button className="btn" bsStyle="info" onClick={this.handleToggle}>Email Applicant</Button>
         );
     },
 
@@ -478,11 +500,32 @@ var SkypeScheduleButton = React.createClass({
   }
 });
 
+var SkypedButton = React.createClass({
+  render: function() {
+      var inactive = (this.props.app.attributes.stage === 'skype_scheduled') ? false : true,
+          visible = (this.props.user.attributes.can_admin || this.props.user.attributes.can_moderate) ? true : false,
+          app_id = this.props.app.attributes.id;
+
+      if (visible){
+        return (
+          <Button disabled={inactive} onClick={this.skyped} bsStyle='info' className="btn-form">Move to Skyped</Button>
+          );
+      }
+
+      return (<div></div>);
+
+  },
+
+  skyped: function() {
+    Action.moveToSkyped({appId: this.props.app.attributes.id});
+  }
+});
+
 var AppToolBar =  React.createClass({
    mixins: [OverlayMixin],
 
   getInitialState: function() {
-      return {'isModalOpen': false, 'email': "", 'subject': ""};
+      return {'isModalOpen': false, 'email': "", 'subject': "", 'motivation': "NONE"};
     },
 
   dropApplication: function(){
@@ -506,7 +549,8 @@ var AppToolBar =  React.createClass({
 
    handleToggle: function(evt) {
       this.setState({
-        isModalOpen: !this.state.isModalOpen
+        isModalOpen: !this.state.isModalOpen,
+        type: evt
       });
     },
 
@@ -517,13 +561,18 @@ var AppToolBar =  React.createClass({
       });
   },
 
-  render: function() {
+  rejectApplicant: function(){
+
+  },
+
+  render: function(){
     return (
       <div className="app-toolbar">
-      <DropdownButton bsStyle="warning" className="pull-right" title="Admin Tools" block>
+      <DropdownButton bsStyle="info" className="pull-right" title="Admin Tools" block>
           <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
-          <MenuItem bsStyle="link" onClick={this.handleToggle}>Email Applicant</MenuItem>
-     </DropdownButton>
+          <MenuItem bsStyle="link" onClick={e => this.handleToggle("email")}>Email Applicant</MenuItem>
+           <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject")}>Reject Applicant</MenuItem>
+      </DropdownButton>
       </div>
       );
   },
@@ -531,9 +580,21 @@ var AppToolBar =  React.createClass({
   renderOverlay: function() {
       if (!this.state.isModalOpen) {
         return <span/>;
-      } else {
+      }
+
+      if (this.state.type === 'reject'){
+         return (
+            <Modal title="Please give a motivation:" bsStyle="primary" onRequestHide={this.handleToggle}>
+              <div>
+                <textarea className="popup" onChange={this.motivationChanged} placeholder="Content" value={this.state.motivation} labelClassName="col-xs-2"
+                        wrapperClassName="col-xs-10"/>
+                <button className="btn btn-primary" onClick={this.rejectApplicant}>Submit</button>
+                <br />
+              </div>
+            </Modal>
+          );}
         return (
-            <Modal title="Draft Email" bsStyle="primary" onRequestHide={this.handleToggle}>
+            <Modal title="Draft E-mail" bsStyle="primary" onRequestHide={this.handleToggle}>
               <div>
                 <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
@@ -545,7 +606,6 @@ var AppToolBar =  React.createClass({
             </Modal>
           );
       }
-    }
 });
 
 
@@ -595,7 +655,6 @@ var HeaderTxtMod = React.createClass({
 
     return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
-
 
 var ApplicationsList = React.createClass({
 

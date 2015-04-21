@@ -341,6 +341,19 @@ def switch_to_schedule_skype(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/move_to_stage/skyped', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application_at_stage("skype_scheduled")
+def switch_to_skyped(application):
+    application.stage = "skyped"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/inactive', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'moderator')

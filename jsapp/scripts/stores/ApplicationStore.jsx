@@ -91,7 +91,7 @@ var Applications = Backbone.Collection.extend({
     },
 
     stageCounts: function(){
-      return _.countBy(this.models, "stage");
+      return _.countBy(this.models, a => a.get('stage'));
     },
 
     byUrgency: function(role) {
@@ -149,6 +149,22 @@ function postComment(payload) {
           }).done(function(resp) {
           	console.log(resp);
           	applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToSkyped(payload) {
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/skyped',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
           }).fail(function(msg){
             console.err('ERROR', msg);
           });
@@ -288,6 +304,9 @@ Dispatcher.register(function(payload) {
     break;
   case "sendGeneralEmail":
     sendGeneralEmail(payload.payload)
+    break;
+  case "moveToSkyped":
+    moveToSkyped(payload.payload)
     break;
 
     default:

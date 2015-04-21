@@ -46,7 +46,7 @@ var FocusList = React.createClass({
     if (this.props.apps.length > new_key){
       this.setState({key: new_key});
     }
-    
+
   },
 
   moveBack: function(evt){
@@ -58,7 +58,7 @@ var FocusList = React.createClass({
       this.setState({key: new_key});
     }
   },
-  
+
 
   render: function() {
     var apps = this.props.apps ?  this.props.apps : [],
@@ -69,20 +69,20 @@ var FocusList = React.createClass({
 
     if (!app) {
       return (
-         <div className="focusList">      
+         <div className="focusList">
          <p>Loading...</p>
          </div>
         );
     }
 
 
-    return (  
-       <div className="focusList">  
+    return (
+       <div className="focusList">
          <Pager>
           <PageItem disabled={activePrev} onClick={this.moveBack} previous>&larr; Previous</PageItem>
           <PageItem disabled={activeNxt} onClick={this.moveForward} next>Next &rarr;</PageItem>
            <Counter index={count} total={apps.length} />
-        </Pager>    
+        </Pager>
         <Application app={app} activeKey={this.state.key} index={this.state.key}/>
        </div>
     );

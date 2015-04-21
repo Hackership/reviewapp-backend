@@ -30,7 +30,8 @@ function availableStages() {
     {key: 'email_send', title: 'Emailed'},
     {key: 'review_reply', title: 'Review Reply'},
     {key: 'schedule_skype', title: 'Skype Invite Send'},
-    {key: 'skype_scheduled', title: 'Skype Scheduled'}
+    {key: 'skype_scheduled', title: 'Skype Scheduled'},
+    {key: 'skyped', title: 'Skyped'}
     ];
 
   if (user.attributes.can_admin) {
