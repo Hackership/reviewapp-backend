@@ -64,16 +64,24 @@ class AnonEmailSchema(EmailSchema):
         exclude = ('content',)
 
 
+class ScheduledCallSchema(Schema):
+    class Meta:
+        fields = ('id', 'scheduledAt', 'failed', 'calendar_id', 'callers', 'skype_name')
+
+    callers = fields.Nested(UserSchema, many=True)
+
+
 # restricted Access
 class AnonymousApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'anon_content',
                   'members', 'fizzbuzz', 'stage', 'batch', 'comments',
-                  'emails', 'gravatar', 'anon_name')
+                  'emails', 'gravatar', 'anon_name', 'calls')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
     emails = fields.Nested(AnonEmailSchema, many=True)
+    calls = fields.Nested(ScheduledCallSchema, many=True)
 
 
 # this only goes to Admins
@@ -82,18 +90,12 @@ class ApplicationSchema(Schema):
         fields = ('id', 'createdAt', 'changedStageAt', 'content',
                   'name', 'email', 'anon_content', 'members',
                   'fizzbuzz', 'stage', 'batch', 'comments', 'emails',
-                  'gravatar', 'anon_name')
+                  'gravatar', 'anon_name', 'calls')
 
     members = fields.Nested(UserSchema, many=True)
     comments = fields.Nested(CommentSchema, many=True)
     emails = fields.Nested(EmailSchema, many=True)
-
-
-class ScheduledCallSchema(Schema):
-    class Meta:
-        fields = ('id', 'scheduledAt', 'failed', 'calendar_id', 'callers')
-
-    callers = fields.Nested(UserSchema, many=True)
+    calls = fields.Nested(ScheduledCallSchema, many=True)
 
 
 class ExternalApplicationSchema(Schema):

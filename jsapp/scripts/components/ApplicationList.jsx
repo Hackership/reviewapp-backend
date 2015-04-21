@@ -14,7 +14,7 @@ var React = require('react/addons'),
   markdown = require( "markdown" ).markdown,
   {Link} = require('react-router'),
   Highlight = require('react-highlight'),
-  {applications} = require('../stores/ApplicationStore'),
+  {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
   moment = require('moment');
 
 var $=require('jquery');
@@ -57,7 +57,8 @@ var ApplicationListHeader = React.createClass({
     )
   }
 
-})
+});
+
 
 var Application = React.createClass({
   mixins: [AppHeaderMixin],
@@ -91,11 +92,14 @@ var Application = React.createClass({
     var txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
     var stage = this.props.app.get("stage");
     var active = this.props.index === this.props.activeKey;
+    var instruction = getInstructionForStage(app.get('stage'));
 
     return (<div>
         <div className="panel-background">
         {this.render_header(this.props.app, true)}
         </div>
+        <Instruction instruction={instruction} />
+        <MetaInfo app={app} />
         {this["render_" + stage]()}
       </div>);
   },
@@ -105,7 +109,6 @@ var Application = React.createClass({
     var content = markdown.toHTML(app.get('anon_content'));
 
     return (<div>
-          <Instruction instruction="Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here. " />
           <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
@@ -117,10 +120,13 @@ var Application = React.createClass({
   render_skype_scheduled: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
+    var fizzbuzz = app.get('fizzbuzz');
 
     return (<div>
-          <Instruction instruction="Skype Scheduled. Please leave comments for the interviewers" />
           <div dangerouslySetInnerHTML={{__html: content}} />
+          <Highlight>
+            {fizzbuzz}
+          </Highlight>
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
@@ -134,7 +140,6 @@ var Application = React.createClass({
     var content = markdown.toHTML(app.get('anon_content'));
 
     return (<div>
-          <Instruction instruction="Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!" />
           <div dangerouslySetInnerHTML={{__html: content}} />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
@@ -146,12 +151,16 @@ var Application = React.createClass({
   render_review_reply: function() {
     var app = this.props.app;
     var content = markdown.toHTML(app.get('anon_content'));
+    var fizzbuzz = app.get('fizzbuzz');
 
     return (
         <div>
-          <Instruction instruction="Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!" />
           <SkypeScheduleButton app={app} user={user} />
           <div dangerouslySetInnerHTML={{__html: content}} />
+          <h4><strong>Coding Challenge</strong></h4>
+          <Highlight>
+            {fizzbuzz}
+          </Highlight>
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
           <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
@@ -165,7 +174,6 @@ var Application = React.createClass({
 
     return (
         <div>
-          <Instruction instruction="Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers." />
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
         </div>
       );
@@ -177,7 +185,6 @@ var Application = React.createClass({
 
     return (
       <div>
-        <Instruction instruction="Email Send. No Action Required." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
             <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={false} />
@@ -198,7 +205,6 @@ var Application = React.createClass({
 
     return (
       <div>
-          <Instruction instruction="Review Stage. Please read through this application and add questions for the applicant in the box below." />
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
 
           <h4><strong>Coding Challenge</strong></h4>
@@ -224,7 +230,6 @@ var Application = React.createClass({
 
     return (
        <div>
-         <Instruction instruction="Anonymization Stage. Please Anonymize this application by removing names and other identifiers" />
           <div className="content-app">
           </div>
           <form>
@@ -655,6 +660,73 @@ var HeaderTxtMod = React.createClass({
 
     return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
+
+
+var MetaInfo = React.createClass({
+  render: function() {
+    var app = this.props.app,
+        skype_info = app.get('stage')==='skype_scheduled' ? <SkypeInfo app={app} /> : <div />,
+        batch = app.get('batch') ? app.get('batch'): "No value",
+        member_string = (app.get('members').length > 0) ? _.map(app.get('members'), member => member.name).join(', ') : "None";
+
+
+    return (
+      <div className="meta">
+      <Row>
+        <Col xs={12} xs-offset={0}>
+      <h5><strong>GENERAL INFO</strong></h5>
+      <p><strong>Reviewers: </strong>{member_string}</p>
+      <p><strong>Batch: </strong> {batch}</p>
+        </Col>
+      </Row>
+      <Row>
+      {skype_info}
+     </Row>
+      </div>
+    );
+  }
+});
+
+var SkypeInfo = React.createClass({
+  render: function() {
+    var app = this.props.app,
+        name = app.get('name') ? app.get('name'): "No value",
+        grant = app.get('grant') ? app.get('grant') : "No",
+        calls = _.map(app.get('calls'), call => <SkypeCall call={call} />),
+        another_call = calls[0];
+        calls.push(another_call);
+
+    return (
+      <div>
+      <Col xs={4} xs-offset={0}>
+      <h5><strong>SKYPE INFO</strong></h5>
+      <p><strong>Name: </strong> {name}</p>
+      <p><strong>Grant applicant: </strong>{grant}</p>
+      <br />
+      </Col>
+      {calls}
+      </div>
+      );
+  }
+});
+
+var SkypeCall = React.createClass({
+  render: function() {
+    var call = this.props.call,
+        skype_name = call.skype_name,
+        zone = user.get('timezone'),
+        date = moment.tz(call.scheduledAt, zone).format("DD/MM/YYYY hh:mm"),
+        callers_string = (call.callers.length > 0) ? _.map(call.callers, caller => caller.name).join(', ') : "None";
+  return (
+    <Col xs={4} xs-offset={4}>
+      <h5><strong>CALLS</strong></h5>
+      <p><strong>Time: </strong>{date}</p>
+      <p><strong>Skype Name: </strong>{skype_name}</p>
+      <p><strong>Callers: </strong>{callers_string}</p>
+    </Col>
+    );
+  }
+})
 
 var ApplicationsList = React.createClass({
 

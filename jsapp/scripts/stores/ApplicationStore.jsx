@@ -274,6 +274,31 @@ function dropApplication(payload) {
           });
 }
 
+function availableStages() {
+  var stages = [
+    {key: 'in_review', title: 'To Review', instruction: "Review Stage. Please read through this application and add questions for the applicant in the box below."},
+    {key: 'email_send', title: 'Emailed', instruction: "Email Send. No Action Required."},
+    {key: 'review_reply', title: 'Review Reply', instruction: "Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!"},
+    {key: 'schedule_skype', title: 'Skype Invite Sent', instruction: "Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!"},
+    {key: 'skype_scheduled', title: 'Skype Scheduled', instruction: "Skype Scheduled. Please leave comments for the interviewers" },
+    {key: 'skyped', title: 'Skyped', instruction: "Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here. "}
+    ];
+
+  if (user.attributes.can_admin) {
+      stages.splice(0, 0, {key: 'incoming', title: "Incoming", instruction: "Anonymization Stage. Please Anonymize this application by removing names and other identifiers"});
+  }
+
+  if (user.attributes.can_moderate) {
+      stages.splice(3,0, {key: 'reply_received', title: "Reply Incoming", instruction: "Email Anonymization Stage. Please anonymize replies by removing names, emails and other identifiers."});
+  }
+
+  return stages;
+}
+
+var getInstructionForStage = function(stage){
+  return  _.filter(availableStages(), st => (st.key === stage))[0].instruction;
+}
+
 // Register dispatcher
 Dispatcher.register(function(payload) {
 
@@ -314,4 +339,6 @@ Dispatcher.register(function(payload) {
   }
 });
 
-module.exports = {applications: applications}
+module.exports = {applications: applications,
+                  availableStages: availableStages,
+                  getInstructionForStage: getInstructionForStage}

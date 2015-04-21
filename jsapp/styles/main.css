@@ -116,6 +116,7 @@ textarea.form-control.email{
 }
 
 .well.instruction {
+  margin-top: 5px;
   background-color: rgba(41, 227, 133, 0.7);
   color: #22541E;
   font-weight: 300;
@@ -125,6 +126,15 @@ textarea.form-control.email{
   font-weight: 400;
 }
 
+.meta {
+  padding: 20px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  margin-top: 5px;
+  background-color: rgba(182, 239, 210, 0.4);
+  color: #22541E;
+  font-weight: 300;
+}
 
 .popup {
   margin: 1%;
