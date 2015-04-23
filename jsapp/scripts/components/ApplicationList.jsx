@@ -552,17 +552,22 @@ var AppToolBar =  React.createClass({
           });
   },
 
-   handleToggle: function(evt) {
-      this.setState({
-        isModalOpen: !this.state.isModalOpen,
-        type: evt
-      });
-    },
+  closeModal: function(){
+    this.setState({isModalOpen: false});
+  },
+
+  handleToggle: function(type, evt) {
+    evt.preventDefault();
+    this.setState({
+      isModalOpen: !this.state.isModalOpen,
+      type: type
+    });
+  },
 
   sendEmail: function(){
     Action.sendGeneralEmail({appId: this.props.app.attributes.id, email: this.state.email, subject: this.state.subject});
      this.setState({
-        isModalOpen: !this.state.isModalOpen
+        isModalOpen: false
       });
   },
 
@@ -575,8 +580,8 @@ var AppToolBar =  React.createClass({
       <div className="app-toolbar">
       <DropdownButton bsStyle="info" className="pull-right" title="Admin Tools" block>
           <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.handleToggle("email")}>Email Applicant</MenuItem>
-           <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject")}>Reject Applicant</MenuItem>
+          <MenuItem bsStyle="link" onClick={e => this.handleToggle("email", e)}>Email Applicant</MenuItem>
+          <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject", e)}>Reject Applicant</MenuItem>
       </DropdownButton>
       </div>
       );
@@ -589,7 +594,7 @@ var AppToolBar =  React.createClass({
 
       if (this.state.type === 'reject'){
          return (
-            <Modal title="Please give a motivation:" bsStyle="primary" onRequestHide={this.handleToggle}>
+            <Modal title="Please give a motivation:" bsStyle="primary" onRequestHide={this.closeModal}>
               <div>
                 <textarea className="popup" onChange={this.motivationChanged} placeholder="Content" value={this.state.motivation} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
@@ -599,7 +604,7 @@ var AppToolBar =  React.createClass({
             </Modal>
           );}
         return (
-            <Modal title="Draft E-mail" bsStyle="primary" onRequestHide={this.handleToggle}>
+            <Modal title="Draft E-mail" bsStyle="primary" onRequestHide={this.closeModal}>
               <div>
                 <Input type='text' onChange={this.subjectChanged} placeholder="Subject" value={this.state.subject} labelClassName="col-xs-2"
                         wrapperClassName="col-xs-10"/>
