@@ -19,6 +19,7 @@ var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
 	RouteHandler = Router.RouteHandler,
   	{applications} = require('../stores/ApplicationStore'),
 	{user} = require('../stores/UserStore'),
+	{EmailList} = require('./EmailList'),
 	_ = require("underscore");
 
 var content = document.getElementById('content');
@@ -78,6 +79,7 @@ var MainAppWrap = React.createClass({
 				<header>
 					<Link className="btn btn-primary" to="main">Main</Link>
 					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
+					<Link className="btn btn-primary" to="emails">New Emails</Link>
 					<DropdownButton bsStyle="info" className="pull-right" title={me}>
 						{menu}
 						<MenuItem divider />
@@ -98,6 +100,7 @@ var MainAppWrap = React.createClass({
 var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
+	    <Route name="emails" path="/emails/new" handler={EmailList} />
 	    <Route name="callslots" path="/calls/slots" handler={CallSlots} />
 	    <Route name="main" path="/" handler={StagesView}>
 	    	<Route name="appStage" path=":stage/" handler={AppsList} />
