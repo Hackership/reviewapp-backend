@@ -72,12 +72,20 @@ var $=require('jquery');
 
   getEmails: function(){
     return this.get("emails");
+  },
+
+  newEmails: function(){
+    return _.filter(this.get('emails'), email => !email.anon_content).length > 0
   }
 
 });
 
 var Applications = Backbone.Collection.extend({
     model: Application,
+
+    newEmails: function(){
+      return _.filter(this.models, a => _.filter(a.get('emails'), email => email.anon_content).length > 0);
+    },
 
     toEmail: function(){
     	var weekAgo = moment().subtract(7, 'days');
