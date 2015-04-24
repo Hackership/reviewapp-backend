@@ -25,7 +25,6 @@ var EmailBox = React.createClass({
       content = this.refs["email"+index].getContent();
       email = this.props.emails[index];
       emails[email['id']] = content;
-      console.log(emails);
     }
     Action.moveToEmailReview({appId: this.props.app_id, content: emails});
   },
