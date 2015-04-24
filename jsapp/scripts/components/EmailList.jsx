@@ -12,9 +12,6 @@ var React = require('react/addons'),
   {applications} = require('../stores/ApplicationStore'),
   {user} = require('../stores/UserStore');
 
-// CSS
-require('../../styles/normalize.css');
-require('../../styles/main.css');
 
 var EmailList = React.createClass({
     render() {
