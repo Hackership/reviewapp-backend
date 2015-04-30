@@ -197,15 +197,12 @@ function moveToReview(payload) {
 }
 
 function moveToEmailReview(payload) {
-  var content = payload['content'];
   var app_id = payload['appId'];
   console.log('appId', app_id);
 
-
     $.ajax({
           type: 'POST',
-          url: '/application/' + app_id + '/move_to_stage/review_reply',
-          data: content,
+          url: '/application/' +app_id +'/move_to_stage/review_reply',
           }).done(function(resp) {
             console.log(resp);
             applications.get(app_id).set(resp.application);

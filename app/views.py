@@ -372,19 +372,10 @@ def switch_to_inactive(application):
 @roles_accepted('admin', 'moderator')
 @with_application_at_stage("reply_received")
 def switch_to_review_reply(application):
-    anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
-    if anon_content:
-        application.anon_content = anon_content
+
     application.stage = "review_reply"
     application.changedStageAt = datetime.now()
     db.session.add(application)
-    for email in application.emails:
-        new_content = (request.form.get("{}".format(email.id)) or request.args.get("{}".format(email.id))) or None
-        if not new_content:
-            continue
-        email.anon_content = new_content
-        db.session.add(email)
-
     db.session.commit()
 
     # Email Reviewers

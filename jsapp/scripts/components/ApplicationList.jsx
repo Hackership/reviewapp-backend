@@ -49,6 +49,16 @@ var Application = React.createClass({
      this.setState({email_content: event.target.value});
   },
 
+  moveToEmailReview: function(event){
+
+     var has_content = _.every(this.props.app.get('emails'), function(email) {return email.anon_content});
+     if (has_content){
+        Action.moveToEmailReview({appId: this.props.app.get('id')});
+     }else{
+      alert("Please anonymize all emails");
+      }
+  },
+
   render: function() {
     var app = this.props.app;
     var txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
@@ -137,6 +147,7 @@ var Application = React.createClass({
     return (
         <div>
           <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
+          <Button bsStyle="success" onClick={this.moveToEmailReview}> Move to next stage </Button>
         </div>
       );
   },
