@@ -455,6 +455,8 @@ def schedule(application):
                          skype_name=skype,
                          callers=users)
 
+    application.member = list(set(application.members + call.callers))
+
     call.calendar_id = add_call_to_calendar(call, application)
     application.stage = 'skype_scheduled'
     db.session.add(call)
