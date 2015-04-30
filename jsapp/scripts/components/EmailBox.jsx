@@ -47,11 +47,11 @@ var EmailBox = React.createClass({
 var DisplayEmail = React.createClass({
 
   render: function() {
-
+    console.log('content email:', this.props.email['content']);
     var email = this.props.email,
-        anon_content = markdown.toHTML(email['anon_content'] || ''),
-        content = markdown.toHTML(email['content'] || ''),
-        display_content = User.can_admin && !anon_content ? content : anon_content,
+        anon_content = markdown.toHTML(email['anon_content'] || 'No anon content'),
+        content = markdown.toHTML(email['content'] || 'No Content'),
+        display_content = (user.attributes.can_moderate && !email['anon_content'] ) ? content : anon_content,
         author = <User user={email.author} />,
         date = ' '+ email['createdAt'],
         incoming = email['incoming'] ? 'incoming' : 'outgoing';
@@ -96,7 +96,7 @@ submitEmail: function(evt) {
           date = ' '+ email['createdAt'],
           anon_content = email['anon_content'] || '',
           content = email['content'] || '',
-          display_content = User.can_admin && !anon_content ? content : anon_content;
+          display_content = (user.attributes.can_moderate && !email['anon_content'] ) ? content : anon_content;
 
       return (
         <div className="textBox">
