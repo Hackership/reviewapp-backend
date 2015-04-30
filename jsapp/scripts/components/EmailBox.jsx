@@ -20,7 +20,7 @@ var React = require('react/addons'),
 var EmailBox = React.createClass({
 
   render: function() {
-      var emails = this.props.emails,
+      var emails = _.sortBy(this.props.emails, 'createdAt'),
           edit = this.props.canEdit,
           app_id = this.props.app_id,
           visible = user.attributes.can_moderate;

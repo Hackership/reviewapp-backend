@@ -39,7 +39,7 @@ var CommentBox = React.createClass({
   },
 
   render: function() {
-      var comments = this.props.comments ? this.props.comments : "";
+      var comments = this.props.comments ? _.sortBy(this.props.comments, 'createdAt'): "";
       var new_comment = this.state.comment ? this.state.comment : "";
       var self = this;
 
