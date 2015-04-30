@@ -21,12 +21,14 @@ var EmailListItem = React.createClass({
 	render: function() {
     	 var app = applications.get(parseInt(this.props.params.appId));
 
-    return (<div>
-        <div className="panel-background">
-        	{this.render_header(app, true)}
-        </div>
-       	<EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
-      </div>);
+    return (<div className="main">
+        	 <div className="main-container">
+        	  <div div className="panel-background">
+        		{this.render_header(app, true)}
+        	  </div>
+       		  <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={false} />
+      		</div>
+      	</div>);
   }
 })
 

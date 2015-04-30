@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-  {Nav, Button, Input} = require('react-bootstrap'),
+  {Nav, Button, Input, Gravatar} = require('react-bootstrap'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
@@ -46,34 +46,30 @@ var EmailBox = React.createClass({
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
 
-                if (edit) {
-                return(<SingleEmail email={email} ref={ref}/>)
-                }
-
-                else {
-                  return (<DisplayEmail email={email} />)
-                }
-
-              })}
+               return (<DisplayEmail email={email} />);
+             })}
           {submit}
           </div>
         );
     }
-});
+  }
+)
 
 var DisplayEmail = React.createClass({
 
   render: function() {
 
     var email = this.props.email,
-        content = markdown.toHTML(email['anon_content'] || ''),
+        anon_content = markdown.toHTML(email['anon_content'] || ''),
+        content = markdown.toHTML(email['content'] || ''),
+        display_content = User.can_admin && !anon_content ? content : anon_content,
         author = <User user={email.author} />,
         date = ' '+ email['createdAt'],
         incoming = email['incoming'] ? 'incoming' : 'comment';
 
     return (
-        <div className={incoming}>
-            <div  dangerouslySetInnerHTML={{__html: content}}>
+      <div className={incoming}>
+            <div  dangerouslySetInnerHTML={{__html: display_content}}>
             </div>
             <p>
             by: {author},

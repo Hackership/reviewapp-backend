@@ -19,13 +19,19 @@ var EmailList = React.createClass({
       var apps = applications.newEmails();
       console.log('HELLO WORLD');
 
-      return  <div className="applicationList">
-        <ul className="panel-group">
-        {_.map(apps, (app, index) =>
-          <EmailAppHeader app={app} />
-        )}
-        </ul>
-      </div>
+      return(
+      	<div className="main">
+        	<div className="main-container">
+        		<div className="applicationList">
+        			<ul className="panel-group">
+        			{_.map(apps, (app, index) =>
+          			<EmailAppHeader app={app} />
+        			)}
+        			</ul>
+      			</div>
+      		</div>
+      	</div>
+      )
     }
 });
 
