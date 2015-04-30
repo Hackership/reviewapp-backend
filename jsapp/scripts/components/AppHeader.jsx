@@ -11,11 +11,13 @@ var React = require('react/addons'),
   ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
   {Link} = require('react-router'),
+  {AppToolBar} = require('./AppToolBar'),
   moment = require('moment');
 
   var AppHeaderMixin = {
   render_header(app, tools){
     var app = app || this.props.app,
+        tools = tools ? <AppToolBar app={app} /> : "",
         txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />;
     return (
       <Grid>
@@ -30,6 +32,7 @@ var React = require('react/addons'),
           {txt}
         </Col>
          <Col xs={2} xs-offset={9}>
+         {tools}
         </Col>
       </Grid>
       );
