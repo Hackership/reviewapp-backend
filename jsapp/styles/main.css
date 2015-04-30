@@ -29,7 +29,6 @@ html, body {
 
 .cal-side {
   margin-top: 5vh;
-  
 }
 
 .title-cal {
@@ -176,9 +175,22 @@ textarea.form-control.email{
 
 .incoming {
   padding: 5px;
-  background-color: white;
-  color:#20a260;
+  background-color: #EFFAFC;
   margin-bottom: 5px;
+  border-bottom-color: #B5E4B5;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+.outgoing {
+  padding: 5px;
+  background-color: white;
+  color: black;
+  margin-bottom: 5px;
+  text-align: left;
+  border-bottom-color: #B5E4B5;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
 }
 
 .content-app {

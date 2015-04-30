@@ -84,7 +84,7 @@ var Applications = Backbone.Collection.extend({
     model: Application,
 
     newEmails: function(){
-      return _.filter(this.models, a => _.filter(a.get('emails'), email => !email.anon_content).length > 0);
+      return _.filter(this.models, a => _.filter(a.get('emails'), email => email.anon_content).length > 0);
     },
 
     toEmail: function(){

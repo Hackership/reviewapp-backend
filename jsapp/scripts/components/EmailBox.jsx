@@ -12,6 +12,7 @@ var React = require('react/addons'),
   {applications} = require('../stores/ApplicationStore'),
   markdown = require( "markdown" ).markdown,
   {User, Gravatar} = require("./User"),
+  {TwoWayEdit} = require("./TwoWayEdit"),
   {user} = require('../stores/UserStore');
 
 
@@ -46,7 +47,8 @@ var EmailBox = React.createClass({
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
 
-               return (<DisplayEmail email={email} />);
+               return <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} email={email} /> 
+
              })}
           {submit}
           </div>
@@ -54,6 +56,7 @@ var EmailBox = React.createClass({
     }
   }
 )
+
 
 var DisplayEmail = React.createClass({
 
@@ -65,7 +68,7 @@ var DisplayEmail = React.createClass({
         display_content = User.can_admin && !anon_content ? content : anon_content,
         author = <User user={email.author} />,
         date = ' '+ email['createdAt'],
-        incoming = email['incoming'] ? 'incoming' : 'comment';
+        incoming = email['incoming'] ? 'incoming' : 'outgoing';
 
     return (
       <div className={incoming}>
@@ -80,7 +83,7 @@ var DisplayEmail = React.createClass({
   }
 });
 
-var SingleEmail = React.createClass({
+var EditEmail = React.createClass({
 
   getContent: function() {
     return this.refs.anon.getValue();
