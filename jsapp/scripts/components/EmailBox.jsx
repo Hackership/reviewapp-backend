@@ -6,39 +6,23 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-  {Nav, Button, Input, Gravatar} = require('react-bootstrap'),
+  {Nav, Button, Input, Gravatar, ButtonToolbar} = require('react-bootstrap'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
   markdown = require( "markdown" ).markdown,
   {User, Gravatar} = require("./User"),
   {TwoWayEdit} = require("./TwoWayEdit"),
+  Action = require('../actions/actions'),
   {user} = require('../stores/UserStore');
 
 
 var EmailBox = React.createClass({
 
-  submitEmails: function() {
-    var index;
-    var emails = {};
-    var email;
-    for (index=0; index < this.props.emails.length; index++){
-      content = this.refs["email"+index].getContent();
-      email = this.props.emails[index];
-      emails[email['id']] = content;
-    }
-
-    if (!this.props.stage || !this.props.stage === "reply_received"){
-       Action.anonymizeEmails({appId: this.props.app_id, content: emails});
-    }else{
-       Action.moveToEmailReview({appId: this.props.app_id, content: emails});
-    }
-  },
-
   render: function() {
-      var emails = this.props.emails;
-      var edit = this.props.canEdit;
-      var submit = edit ? <Button onClick={this.submitEmails}>Submit</Button> : "";
+      var emails = this.props.emails,
+          edit = this.props.canEdit,
+          app_id = this.props.app_id;
 
       return (
           <div className="commentBox">
@@ -47,10 +31,11 @@ var EmailBox = React.createClass({
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
 
-               return <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} email={email} /> 
+               return (<div className="emailBox">
+               <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} email={email} app_id={app_id}/>
+               </div>)
 
              })}
-          {submit}
           </div>
         );
     }
@@ -75,8 +60,7 @@ var DisplayEmail = React.createClass({
             <div  dangerouslySetInnerHTML={{__html: display_content}}>
             </div>
             <p>
-            by: {author},
-            {date}
+            <em> by: {author},{date}</em>
             </p>
           </div>
         );
@@ -85,20 +69,50 @@ var DisplayEmail = React.createClass({
 
 var EditEmail = React.createClass({
 
+submitEmail: function(evt) {
+    console.log("POST EMAIL");
+
+    var content = this.refs.anon.getValue();
+    var emails = {};
+
+    emails[this.props.email['id']] = content;
+    Action.anonymizeEmails({appId: this.props.app_id, content: emails});
+
+    this.cancelEdit(evt);
+  },
+
+  cancelEdit: function(evt) {
+    this.props.cancelEdit();
+  },
+
   getContent: function() {
     return this.refs.anon.getValue();
 
-},
+  },
   render: function() {
       var email = this.props.email,
-      content = email['incoming'] ? email['content'] : email['anon_content'];
-
+          author = <User user={email.author} />,
+          date = ' '+ email['createdAt'],
+          anon_content = email['anon_content'] || '',
+          content = email['content'] || '',
+          display_content = User.can_admin && !anon_content ? content : anon_content;
 
       return (
-            <Input type='textarea' className="email"
-                      defaultValue={content}
+        <div className="textBox">
+            <Input type='textarea'
+                      className="emailEdit"
+                      defaultValue={display_content}
                       wrapperClassName="col-xs-12"
                       ref="anon"/>
+            <p>
+            <em> by: {author},{date}</em>
+            <br />
+            </p>
+            <ButtonToolbar>
+              <Button onClick={this.submitEmail} bsStyle="success">Submit</Button>
+              <Button onClick={this.cancelEdit} bsStyle="warning">Cancel</Button>
+            </ButtonToolbar>
+        </div>
         );
     }
 });

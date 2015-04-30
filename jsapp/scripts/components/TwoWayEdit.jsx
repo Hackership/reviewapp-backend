@@ -5,7 +5,8 @@
 'use strict';
 
 var React = require('react/addons'),
-  {Button}  = require('react-bootstrap'),
+   _ = require('underscore'),
+  {Button, Col, Row}  = require('react-bootstrap'),
   {user} = require('../stores/UserStore');
 
 
@@ -18,16 +19,28 @@ var TwoWayEdit = React.createClass({
 		this.setState({editMode: true});
 	},
 
+	resetEdit: function(){
+		this.setState({editMode: false});
+	},
+
 	render: function(){
+		var child_props = _.extend({cancelEdit: this.resetEdit}, this.props);
 		if (this.state.editMode){
 			return(
-				<div>{React.createElement(this.props.editComp, this.props)}</div>
+				<div>{React.createElement(this.props.editComp, child_props)}</div>
 				)
 		}
 
 		return(
-			<div><Button onClick={this.editPressed}>Edit</Button>
-			{React.createElement(this.props.displayComp, this.props)}
+			<div className="editComp">
+			<Row>
+				<Col xs={8}>
+					{React.createElement(this.props.displayComp, child_props)}
+				</Col>
+				<Col xs={3} xs-offset={1}>
+					<Button onClick={this.editPressed} bsStyle="info" bsSize="small">Edit</Button>
+				</Col>
+			</Row>
 			</div>)
 	}
 });

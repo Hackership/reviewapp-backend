@@ -108,10 +108,6 @@ header {
  
 }
 
-textarea.form-control.email{
-  height: 40vh;
-  min-height: 250px;
-}
 
 .well.instruction {
   margin-top: 5px;
@@ -176,21 +172,36 @@ textarea.form-control.email{
 .incoming {
   padding: 5px;
   background-color: #EFFAFC;
-  margin-bottom: 5px;
-  border-bottom-color: #B5E4B5;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+  border-top-color: #B5E4B5;
+  border-top-width: 1px;
+  border-top-style: solid;
 }
 
 .outgoing {
   padding: 5px;
   background-color: white;
   color: black;
-  margin-bottom: 5px;
   text-align: left;
-  border-bottom-color: #B5E4B5;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+  border-top-color: #B5E4B5;
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+
+.editComp {
+  background-color: white;
+}
+
+.emailBox {
+  margin: 5px;
+}
+
+.textBox{
+  padding-bottom: 10px;
+}
+
+textarea.form-control.emailEdit{
+  height: 40vh;
+  min-height: 30vh;
 }
 
 .content-app {
