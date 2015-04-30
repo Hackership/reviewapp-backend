@@ -18,6 +18,7 @@ var React = require('react/addons'),
   {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
   {AppHeaderMixin, ApplicationListHeader, HeaderTxtRev, HeaderTxtMod} = require('./AppHeader'),
   {AppToolBar} = require('./AppToolBar'),
+  {CommentBox} = require('./CommentBox'),
   moment = require('moment');
 
 var $=require('jquery');
@@ -219,68 +220,6 @@ var Application = React.createClass({
 
       );
   }
-});
-
-
-var CommentBox = React.createClass({
-
-  postComment: function() {
-
-    if (this.props.question) {
-      Action.postComment({appId: this.props.appId, comment: this.state.comment, question: '1'});
-      this.setState({comment: ''});
-    }
-    else{
-      Action.postComment({appId: this.props.appId, comment: this.state.comment});
-      this.setState({comment: ''});
-    }
-  },
-
-  getInitialState: function(){
-    return {};
-  },
-
-  commentChanged: function(event) {
-    this.setState({comment: event.target.value});
-  },
-
-  render: function() {
-      var comments = this.props.comments ? this.props.comments : "";
-      var new_comment = this.state.comment ? this.state.comment : "";
-
-      return (
-          <div className="commentBox">
-           <h3>{this.props.hdr}:</h3>
-
-          {_.map(comments, function(comment){
-            var content = comment['content'],
-                author = <User user={comment.author} />,
-                date = ' '+ comment['createdAt'];
-
-                return(
-                  <div className="comment">
-                    <p>
-                    <strong>{content}</strong> <br />
-                    by: {author},
-                    {date}
-                    </p>
-                  </div>
-                  )
-              })}
-              <form>
-            <Input type='textarea'
-                  wrapperClassName="col-xs-9"
-                  placeholder={this.props.place}
-                  onChange={this.commentChanged}
-                  value={new_comment}
-                  ref="comment" />
-            <button className="btn btn-primary btn-form"
-                    type="submit"
-                    onClick={this.postComment}>Add</button>
-        </form>
-          </div>
-        );
-    }
 });
 
 

@@ -165,7 +165,19 @@ header {
 
 .comment {
   padding: 5px;
-  background-color: #F0F0F0;
+  background-color: white;
+  border-top-color: #B5E4B5;
+  border-top-width: 1px;
+  border-top-style: solid;
+  margin-bottom: 5px;
+}
+
+.comment-me {
+  padding: 5px;
+  background-color: #EFFAFC;
+  border-top-color: #B5E4B5;
+  border-top-width: 1px;
+  border-top-style: solid;
   margin-bottom: 5px;
 }
 
