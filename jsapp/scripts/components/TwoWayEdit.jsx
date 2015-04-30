@@ -26,7 +26,7 @@ var TwoWayEdit = React.createClass({
 		}
 
 		return(
-			<div><Button onClick={this.TwoWayEdit}>Edit</Button>
+			<div><Button onClick={this.editPressed}>Edit</Button>
 			{React.createElement(this.props.displayComp, this.props)}
 			</div>)
 	}
