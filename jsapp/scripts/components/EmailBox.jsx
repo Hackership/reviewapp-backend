@@ -22,7 +22,8 @@ var EmailBox = React.createClass({
   render: function() {
       var emails = this.props.emails,
           edit = this.props.canEdit,
-          app_id = this.props.app_id;
+          app_id = this.props.app_id,
+          visible = user.attributes.can_moderate;
 
       return (
           <div className="commentBox">
@@ -30,14 +31,14 @@ var EmailBox = React.createClass({
 
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
-
                return (<div className="emailBox">
-               <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} email={email} app_id={app_id}/>
+               <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} visible={visible} email={email} app_id={app_id}/>
                </div>)
 
              })}
           </div>
         );
+
     }
   }
 )

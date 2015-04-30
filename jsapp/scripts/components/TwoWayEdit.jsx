@@ -25,6 +25,7 @@ var TwoWayEdit = React.createClass({
 
 	render: function(){
 		var child_props = _.extend({cancelEdit: this.resetEdit}, this.props);
+		var edit_button = this.props.visible? <Button onClick={this.editPressed} bsStyle="info" bsSize="small">Edit</Button> : "";
 		if (this.state.editMode){
 			return(
 				<div>{React.createElement(this.props.editComp, child_props)}</div>
@@ -38,7 +39,7 @@ var TwoWayEdit = React.createClass({
 					{React.createElement(this.props.displayComp, child_props)}
 				</Col>
 				<Col xs={3} xs-offset={1}>
-					<Button onClick={this.editPressed} bsStyle="info" bsSize="small">Edit</Button>
+					{edit_button}
 				</Col>
 			</Row>
 			</div>)
