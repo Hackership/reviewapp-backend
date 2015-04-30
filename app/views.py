@@ -175,6 +175,16 @@ def with_application(func):
     return wrapper
 
 
+def with_comment(func):
+    @wraps(func)
+    def wrapper(id, *args, **kwargs):
+        comment = db.session.query(Comment).get(id)
+        if not comment:
+            abort(404, "Comment Not Found")
+        return func(comment, *args, **kwargs)
+    return wrapper
+
+
 def verify_key(func):
     @wraps(func)
     def wrapper(application, key, *args, **kwargs):
@@ -540,6 +550,23 @@ def add_comment(application):
     db.session.commit()
 
     # email to other reviewers or moderator?
+
+    return _render_application(application)
+
+@app.route('/comment/<id>/edit', methods=['POST'])
+@login_required
+@with_comment
+def edit_comment(comment):
+    content = request.form.get("comment") or request.args.get("comment")
+    if not content:
+        abort(400, "Please pass a comment")
+
+    comment.content = content
+
+    db.session.add(comment)
+    db.session.commit()
+
+    application = db.session.query(Application).get(comment.application_id)
 
     return _render_application(application)
 

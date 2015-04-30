@@ -91,7 +91,9 @@ var Comment = React.createClass({
 var EditComment = React.createClass({
 
   submitComment: function(evt) {
-    console.log('SUBMIT COMMENT');
+    var content = this.refs.comment.getValue();
+    var appId = this.props.app_id;
+    Action.editComment({comment_id: this.props.comment['id'], appId: appId, comment: content});
     this.cancelEdit(evt);
   },
 

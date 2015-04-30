@@ -162,6 +162,26 @@ function postComment(payload) {
           });
 }
 
+function editComment(payload){
+  var comment = payload['comment'];
+  var comment_id = payload['comment_id'];
+  var app_id = payload['appId'];
+  var content = {comment: comment};
+
+
+    $.ajax({
+          type: 'POST',
+          url: '/comment/' + comment_id + '/edit',
+          data: content,
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+
+}
+
 function moveToSkyped(payload) {
   var app_id = payload['appId'];
   console.log('appId', app_id);
@@ -357,6 +377,9 @@ Dispatcher.register(function(payload) {
     break;
   case "anonymizeEmails":
     anonymizeEmails(payload.payload)
+    break;
+  case 'editComment':
+    editComment(payload.payload)
     break;
 
     default:

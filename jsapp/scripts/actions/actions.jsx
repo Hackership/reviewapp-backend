@@ -9,7 +9,7 @@ _.each([
     "moveToSkyped", "dropApplication",
 
     // Comments & questions
-    "postComment", "postQuestion",
+    "postComment", "postQuestion", "editComment",
 
     // Email
     "sendEmail", "receiveEmail", "sendGeneralEmail", "anonymizeEmails",
