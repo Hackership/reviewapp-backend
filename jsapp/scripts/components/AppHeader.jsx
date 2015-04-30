@@ -15,9 +15,8 @@ var React = require('react/addons'),
 
   var AppHeaderMixin = {
   render_header(app, tools){
-    var app = this.props.app,
-        tools = (user.attributes.can_admin && tools) ?  <AppToolBar app={app}/> : "",
-        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
+    var app = app || this.props.app,
+        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />;
     return (
       <Grid>
         <Col xs={1}>
@@ -31,12 +30,11 @@ var React = require('react/addons'),
           {txt}
         </Col>
          <Col xs={2} xs-offset={9}>
-          {tools}
         </Col>
       </Grid>
       );
   }
-}
+};
 
 var ApplicationListHeader = React.createClass({
   mixins: [AppHeaderMixin],
@@ -50,6 +48,19 @@ var ApplicationListHeader = React.createClass({
     )
   }
 
+});
+
+var EmailAppHeader = React.createClass({ 
+  mixins: [AppHeaderMixin],
+  render: function() {
+    return (
+        <li className="panel-background">
+          <Link to="emailPage" params={{appId: this.props.app.id}}>
+            {this.render_header(this.props.app, false)}
+          </Link>
+        </li>
+    )
+  }
 });
 
 var HeaderIcons = React.createClass({
@@ -101,4 +112,5 @@ var HeaderTxtMod = React.createClass({
 
 
 module.exports = {ApplicationListHeader: ApplicationListHeader,
-                  AppHeaderMixin: AppHeaderMixin};
+                  AppHeaderMixin: AppHeaderMixin,
+                  EmailAppHeader: EmailAppHeader};

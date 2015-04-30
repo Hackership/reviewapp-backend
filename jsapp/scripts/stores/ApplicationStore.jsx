@@ -84,7 +84,7 @@ var Applications = Backbone.Collection.extend({
     model: Application,
 
     newEmails: function(){
-      return _.filter(this.models, a => _.filter(a.get('emails'), email => !email.anon_content).length > 0);
+      return _.filter(this.models, a => _.filter(a.get('emails'), email => email.anon_content).length > 0);
     },
 
     toEmail: function(){
@@ -214,6 +214,22 @@ function moveToEmailReview(payload) {
           });
 }
 
+function anonymizeEmails(payload) {
+  var content = payload['content'];
+  var app_id = payload['appId'];
+
+    $.ajax({
+          type: 'POST',
+          url: '/application/' + app_id + '/anon_emails',
+          data: content,
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 function sendEmail(payload) {
 	var email = payload['email'];
 	var app_id = payload['appId'];
@@ -307,6 +323,7 @@ var getInstructionForStage = function(stage){
   return  _.filter(availableStages(), st => (st.key === stage))[0].instruction;
 }
 
+
 // Register dispatcher
 Dispatcher.register(function(payload) {
 
@@ -340,6 +357,9 @@ Dispatcher.register(function(payload) {
     break;
   case "moveToSkyped":
     moveToSkyped(payload.payload)
+    break;
+  case "anonymizeEmails":
+    anonymizeEmails(payload.payload)
     break;
 
     default:

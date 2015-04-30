@@ -6,7 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-  {Nav} = require('react-bootstrap'),
+  {Nav, Button, Input} = require('react-bootstrap'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
@@ -26,7 +26,12 @@ var EmailBox = React.createClass({
       email = this.props.emails[index];
       emails[email['id']] = content;
     }
-    Action.moveToEmailReview({appId: this.props.app_id, content: emails});
+
+    if (!this.props.stage || !this.props.stage === "reply_received"){
+       Action.anonymizeEmails({appId: this.props.app_id, content: emails});
+    }else{
+       Action.moveToEmailReview({appId: this.props.app_id, content: emails});
+    }
   },
 
   render: function() {

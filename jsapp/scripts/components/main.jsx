@@ -20,7 +20,12 @@ var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
   	{applications} = require('../stores/ApplicationStore'),
 	{user} = require('../stores/UserStore'),
 	{EmailList} = require('./EmailList'),
+	{EmailListItem} = require('./EmailListItem'),
 	_ = require("underscore");
+
+// CSS
+require('../../styles/normalize.css');
+require('../../styles/main.css');
 
 var content = document.getElementById('content');
 
@@ -101,6 +106,7 @@ var Routes = (
     <Route path="/" handler={MainAppWrap}>
 	    <Route name="reviewer" path="/reviewer/new" handler={AddReviewer} />
 	    <Route name="emails" path="/emails/new" handler={EmailList} />
+	    	 <Route name="emailPage" path="/emails/app/:appId" handler={EmailListItem} />
 	    <Route name="callslots" path="/calls/slots" handler={CallSlots} />
 	    <Route name="main" path="/" handler={StagesView}>
 	    	<Route name="appStage" path=":stage/" handler={AppsList} />

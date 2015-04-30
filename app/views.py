@@ -395,6 +395,29 @@ def switch_to_review_reply(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/anon_emails', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def anonymize_emails(application):
+    anon_content = (request.form.get("anon_content") or request.args.get("anon_content")) or None
+    if anon_content:
+        application.anon_content = anon_content
+
+    db.session.add(application)
+    for email in application.emails:
+        new_content = (request.form.get("{}".format(email.id)) or request.args.get("{}".format(email.id))) or None
+        if not new_content:
+            continue
+        email.anon_content = new_content
+        db.session.add(email)
+
+    db.session.commit()
+
+    return _render_application(application)
+
+
+
 @app.route('/application/<id>/external/<key>', methods=['GET'])
 @with_application
 @verify_key

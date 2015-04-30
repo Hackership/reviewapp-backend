@@ -10,15 +10,23 @@ var React = require('react/addons'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
+  {ApplicationListHeader, EmailAppHeader} = require('./AppHeader'),
   {user} = require('../stores/UserStore');
 
 
 var EmailList = React.createClass({
-    render() {
-      var app_list = applications.newEmails();
-      return <ApplicationList apps={app_list} />
+    render: function() {
+      var apps = applications.newEmails();
+      console.log('HELLO WORLD');
+
+      return  <div className="applicationList">
+        <ul className="panel-group">
+        {_.map(apps, (app, index) =>
+          <EmailAppHeader app={app} />
+        )}
+        </ul>
+      </div>
     }
 });
 
-
-module.exports={EmailList: EmailList};
+module.exports = {EmailList: EmailList};

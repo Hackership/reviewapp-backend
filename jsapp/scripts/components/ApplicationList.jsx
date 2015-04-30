@@ -16,7 +16,7 @@ var React = require('react/addons'),
   Highlight = require('react-highlight'),
   {EmailBox} = require('./EmailBox'),
   {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
-  {AppHeaderMixin, ApplicationListHeader} = require('./AppHeader'),
+  {AppHeaderMixin, ApplicationListHeader, HeaderTxtRev, HeaderTxtMod} = require('./AppHeader'),
   moment = require('moment');
 
 var $=require('jquery');
@@ -57,7 +57,7 @@ var Application = React.createClass({
 
     return (<div>
         <div className="panel-background">
-        {this.render_header(this.props.app, true)}
+        {this.render_header(app, true)}
         </div>
         <Instruction instruction={instruction} />
         <MetaInfo app={app} />
