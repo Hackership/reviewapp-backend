@@ -19,13 +19,13 @@ var React = require('react/addons'),
 
 var CommentBox = React.createClass({
 
-  postComment: function() {
+  postComment: function(evt) {
+    evt.preventDefault();
 
     if (this.props.question) {
       Action.postComment({appId: this.props.appId, comment: this.state.comment, question: '1'});
       this.setState({comment: ''});
-    }
-    else{
+    } else {
       Action.postComment({appId: this.props.appId, comment: this.state.comment});
       this.setState({comment: ''});
     }
@@ -51,19 +51,16 @@ var CommentBox = React.createClass({
           {_.map(comments, function(comment){
             var visible = comment.author.id === user.get('id'),
                 app_id = self.props.appId;
-              return <TwoWayEdit editComp={EditComment} displayComp={Comment} stage={self.props.stage} visible={visible} app_id={app_id} comment={comment} />
+              return <TwoWayEdit key={comment.id} editComp={EditComment} displayComp={Comment} stage={self.props.stage} visible={visible} app_id={app_id} comment={comment} />
               })}
-              <form>
-            <Input type='textarea'
-                  wrapperClassName="col-xs-9"
-                  placeholder={this.props.place}
-                  onChange={this.commentChanged}
-                  value={new_comment}
-                  ref="comment" />
-            <button className="btn btn-primary btn-form"
-                    type="submit"
-                    onClick={this.postComment}>Add</button>
-        </form>
+          <Input type='textarea'
+                wrapperClassName="col-xs-9"
+                placeholder={this.props.place}
+                onChange={this.commentChanged}
+                value={new_comment}
+                ref="comment" />
+          <button className="btn btn-primary btn-form"
+                  onClick={this.postComment}>Add</button>
           </div>
         );
     }
