@@ -62,7 +62,8 @@ var MainAppWrap = React.createClass({
         			</Alert>);
 		}
 
-		var menu = [];
+		var menu = [],
+			emails = null;
 		if (user.get("can_skype")){
 			menu.push(<MenuItem key='callslots'><Link to="callslots"> Manage Call Slots</Link></MenuItem>)
 		}
@@ -72,19 +73,21 @@ var MainAppWrap = React.createClass({
 			menu.push(<MenuItem key='add-admin'><a href="/admin"> Admin Area</a></MenuItem>)
 			menu.push(<MenuItem key='add-reviewer'><Link to="reviewer"> Add Reviewer</Link></MenuItem>)
 			menu.push(<MenuItem key="admin-out" divider />)
+
+
+
+			emails = <Link className="btn btn-primary" to="emails">New Emails ({applications.newEmails().length})</Link>
 		}
 		menu.push(<MenuItem key='logout'><a href="/logout">Logout </a></MenuItem>)
 
-
 		var me = <Gravatar hash={user.get("gravatar")} size={25} />
-
 
 		return (
 			<div>
 				<header>
 					<Link className="btn btn-primary" to="main">Main</Link>
 					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
-					<Link className="btn btn-primary" to="emails">New Emails</Link>
+					{emails}
 					<DropdownButton bsStyle="info" className="pull-right" title={me}>
 						{menu}
 						<MenuItem divider />
