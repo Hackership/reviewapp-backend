@@ -415,7 +415,10 @@ var SkypeCall = React.createClass({
         callers_string = (call.callers.length > 0) ? _.map(call.callers, caller => caller.name).join(', ') : "None";
   return (
     <Col xs={4} xs-offset={4}>
-      <h5><strong>CALLS</strong></h5>
+      {
+        call.failed ? <h5 title="failed attempt">Call <Glyphicon glyph="remove" /></h5>:
+        <h5 title="right on schedule"><strong>Call <Glyphicon glyph="earphone"/></strong></h5>
+      }
       <p><strong>Time: </strong>{date}</p>
       <p><strong>Skype Name: </strong>{skype_name}</p>
       <p><strong>Callers: </strong>{callers_string}</p>
