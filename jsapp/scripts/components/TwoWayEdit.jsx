@@ -35,10 +35,10 @@ var TwoWayEdit = React.createClass({
 		return(
 			<div className="editComp">
 			<Row>
-				<Col xs={8}>
+				<Col xs={10}>
 					{React.createElement(this.props.displayComp, child_props)}
 				</Col>
-				<Col xs={3} xs-offset={1}>
+				<Col xs={2} xs-offset={1}>
 					{edit_button}
 				</Col>
 			</Row>

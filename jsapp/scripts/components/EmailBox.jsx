@@ -14,15 +14,17 @@ var React = require('react/addons'),
   {User, Gravatar} = require("./User"),
   {TwoWayEdit} = require("./TwoWayEdit"),
   Action = require('../actions/actions'),
+  moment = require('moment'),
   {user} = require('../stores/UserStore');
 
 
 var EmailBox = React.createClass({
 
   render: function() {
-      var emails = _.sortBy(this.props.emails, 'createdAt'),
+      var emails = _.sortBy(this.props.emails, 'createdAt').reverse(),
           edit = this.props.canEdit,
           app_id = this.props.app_id,
+          stage = this.props.stage,
           visible = user.attributes.can_moderate;
 
       return (
@@ -32,7 +34,7 @@ var EmailBox = React.createClass({
           {_.map(emails, function(email, index){
               var ref = 'email' + index;
                return (<div className="emailBox">
-               <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} visible={visible} email={email} app_id={app_id}/>
+               <TwoWayEdit editComp={EditEmail} displayComp={DisplayEmail} visible={visible} email={email} stage={stage} app_id={app_id}/>
                </div>)
 
              })}
@@ -47,18 +49,18 @@ var EmailBox = React.createClass({
 var DisplayEmail = React.createClass({
 
   render: function() {
-    console.log('content email:', this.props.email['content']);
     var email = this.props.email,
         anon_content = markdown.toHTML(email['anon_content'] || 'No anon content'),
         content = markdown.toHTML(email['content'] || 'No Content'),
         display_content = (user.attributes.can_moderate && !email['anon_content'] ) ? content : anon_content,
         author = <User user={email.author} />,
-        date = ' '+ email['createdAt'],
+        date = ' '+ moment( email['createdAt']).calendar(),
+        stage = this.props.stage === email['stage'] ? 'bold-font' : '',
         incoming = email['incoming'] ? 'incoming' : 'outgoing';
 
     return (
       <div className={incoming}>
-            <div  dangerouslySetInnerHTML={{__html: display_content}}>
+            <div  className={stage} dangerouslySetInnerHTML={{__html: display_content}}>
             </div>
             <p>
             <em> by: {author},{date}</em>
@@ -93,7 +95,7 @@ submitEmail: function(evt) {
   render: function() {
       var email = this.props.email,
           author = <User user={email.author} />,
-          date = ' '+ email['createdAt'],
+          date = ' '+ moment( email['createdAt']).calendar(),
           anon_content = email['anon_content'] || '',
           content = email['content'] || '',
           display_content = (user.attributes.can_moderate && !email['anon_content'] ) ? content : anon_content;

@@ -83,9 +83,9 @@ var Application = React.createClass({
 
     return (<div>
           <div dangerouslySetInnerHTML={{__html: content}} />
-          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
       );
   },
@@ -100,9 +100,9 @@ var Application = React.createClass({
           <Highlight>
             {fizzbuzz}
           </Highlight>
-          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <SkypedButton app={app} user={user}/>
         </div>
       );
@@ -114,9 +114,9 @@ var Application = React.createClass({
 
     return (<div>
           <div dangerouslySetInnerHTML={{__html: content}} />
-          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
       );
     },
@@ -134,9 +134,9 @@ var Application = React.createClass({
           <Highlight>
             {fizzbuzz}
           </Highlight>
-          <EmailBox emails={app.get('emails')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
+          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
       );
   },
@@ -147,7 +147,7 @@ var Application = React.createClass({
 
     return (
         <div>
-          <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={true} />
+          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={true} />
           <Button bsStyle="success" onClick={this.moveToEmailReview}> Move to next stage </Button>
         </div>
       );
@@ -161,7 +161,10 @@ var Application = React.createClass({
       <div>
           <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
           </div>
-            <EmailBox emails={app.get('emails')} app_id={app.get('id')} canEdit={false} />
+            <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={false} />
+             <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+            <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        
         </div>
       );
   },
@@ -171,7 +174,8 @@ var Application = React.createClass({
     var app = this.props.app;
     var content  = markdown.toHTML(app.get('anon_content'));
     var fizzbuzz = app.get('fizzbuzz');
-    var email_button ="";
+    var email_button ="",
+        emails = app.get('emails').length > 0 ? <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={false} /> : "";
 
     if (user.attributes.can_moderate || user.attributes.can_admin){
       email_button = <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>;
@@ -185,9 +189,9 @@ var Application = React.createClass({
           <Highlight>
             {fizzbuzz}
           </Highlight>
-
-          <CommentBox comments={app.getQuestions()} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-          <CommentBox comments={app.getComments()} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+          {emails}
+          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
           {email_button}
         </div>
       );

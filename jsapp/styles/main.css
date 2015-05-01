@@ -172,18 +172,19 @@ header {
   margin-bottom: 5px;
 }
 
-.comment-me {
+.bold-comment {
   padding: 5px;
-  background-color: #EFFAFC;
+  background-color: white;
   border-top-color: #B5E4B5;
   border-top-width: 1px;
   border-top-style: solid;
   margin-bottom: 5px;
+  font-weight: 600;
 }
 
 .incoming {
   padding: 5px;
-  background-color: #EFFAFC;
+  background-color: white;
   border-top-color: #B5E4B5;
   border-top-width: 1px;
   border-top-style: solid;
@@ -191,7 +192,7 @@ header {
 
 .outgoing {
   padding: 5px;
-  background-color: white;
+  background-color: #EFFAFC;
   color: black;
   text-align: left;
   border-top-color: #B5E4B5;
@@ -206,6 +207,9 @@ header {
 .emailBox {
   margin: 5px;
 }
+.bold-font {
+  font-weight: 600;
+}
 
 .textBox{
   padding-bottom: 10px;
@@ -214,6 +218,8 @@ header {
 textarea.form-control.emailEdit{
   height: 40vh;
   min-height: 30vh;
+  margin-bottom: 10px;
+
 }
 
 .content-app {

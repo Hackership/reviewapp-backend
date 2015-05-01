@@ -14,6 +14,7 @@ var React = require('react/addons'),
   {User, Gravatar} = require("./User"),
   {TwoWayEdit} = require("./TwoWayEdit"),
   Action = require('../actions/actions'),
+  moment = require('moment'),
   {user} = require('../stores/UserStore');
 
 var CommentBox = React.createClass({
@@ -39,7 +40,7 @@ var CommentBox = React.createClass({
   },
 
   render: function() {
-      var comments = this.props.comments ? _.sortBy(this.props.comments, 'createdAt'): "";
+      var comments = this.props.comments ? _.sortBy(this.props.comments, 'createdAt').reverse(): "";
       var new_comment = this.state.comment ? this.state.comment : "";
       var self = this;
 
@@ -50,7 +51,7 @@ var CommentBox = React.createClass({
           {_.map(comments, function(comment){
             var visible = comment.author.id === user.get('id'),
                 app_id = self.props.appId;
-              return <TwoWayEdit editComp={EditComment} displayComp={Comment} visible={visible} app_id={app_id} comment={comment} />
+              return <TwoWayEdit editComp={EditComment} displayComp={Comment} stage={self.props.stage} visible={visible} app_id={app_id} comment={comment} />
               })}
               <form>
             <Input type='textarea'
@@ -73,15 +74,14 @@ var Comment = React.createClass({
     var comment = this.props.comment,
         content = comment['content'],
         author = <User user={comment.author} />,
-        date = ' '+ comment['createdAt'],
-        cssClass = comment.author.id === user.get('id') ? "comment-me" : "comment";
+        date = ' '+ moment(comment['createdAt']).calendar(),
+        cssClass = this.props.stage === comment['stage'] ? 'bold-comment' : 'comment';
 
         return(
           <div className={cssClass}>
             <p>
-            <strong>{content}</strong> <br />
-            by: {author},
-            {date}
+            {content}<br /></p>
+            <p><em>{author}, {date}</em>
             </p>
           </div>
     );
@@ -108,7 +108,7 @@ var EditComment = React.createClass({
   render: function() {
       var comment = this.props.comment,
           author = <User user={comment.author} />,
-          date = ' '+ comment['createdAt'],
+          date = ' '+ ' '+ moment(comment['createdAt']).calendar(),
           content = comment['content'];
 
       return (
@@ -118,10 +118,6 @@ var EditComment = React.createClass({
                       defaultValue={content}
                       wrapperClassName="col-xs-12"
                       ref="comment"/>
-            <p>
-            <em> by: {author},{date}</em>
-            <br />
-            </p>
             <ButtonToolbar>
               <Button onClick={this.submitComment} bsStyle="success">Submit</Button>
               <Button onClick={this.cancelEdit} bsStyle="warning">Cancel</Button>
