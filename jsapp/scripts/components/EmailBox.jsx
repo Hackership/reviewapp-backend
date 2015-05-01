@@ -50,7 +50,8 @@ var DisplayEmail = React.createClass({
 
   render: function() {
     var email = this.props.email,
-        anon_content = markdown.toHTML(email['anon_content'] || 'No anon content'),
+        anon_content = markdown.toHTML(email['anon_content'] || 'No anonymous content'),
+        needs_anon = email['anon_content'] ? "": <p className="red-text">Please Anonymize:</p>,
         content = markdown.toHTML(email['content'] || 'No Content'),
         display_content = (user.attributes.can_moderate && !email['anon_content'] ) ? content : anon_content,
         author = <User user={email.author} />,
@@ -60,6 +61,7 @@ var DisplayEmail = React.createClass({
 
     return (
       <div className={incoming}>
+            {needs_anon}
             <div  className={stage} dangerouslySetInnerHTML={{__html: display_content}}>
             </div>
             <p>

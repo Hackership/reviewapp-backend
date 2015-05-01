@@ -31,6 +31,9 @@ html, body {
   margin-top: 5vh;
 }
 
+.red-text{
+  color: red;
+}
 .title-cal {
   margin-top: 2vh;
   padding-top: -2vh;
