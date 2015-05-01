@@ -17,7 +17,6 @@ var React = require('react/addons'),
 var EmailList = React.createClass({
     render: function() {
       var apps = applications.newEmails();
-      console.log('HELLO WORLD');
 
       return(
       	<div className="main">

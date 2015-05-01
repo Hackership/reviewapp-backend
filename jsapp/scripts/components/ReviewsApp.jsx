@@ -29,7 +29,6 @@ var StagesView = React.createClass({
 
   statics: {
     willTransitionTo: function (transition, params) {
-      console.log(params);
       if (params.stage) return;
 
       var stageCounts = applications.stageCounts(),
