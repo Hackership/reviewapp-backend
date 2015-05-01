@@ -431,7 +431,7 @@ var ApplicationsList = React.createClass({
   },
 
   render: function() {
-    var apps = this.props.apps;
+    var apps = _.sortBy(this.props.apps, 'changedStageAt');
 
     var app = apps[0],
         self = this;
