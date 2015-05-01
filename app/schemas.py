@@ -98,6 +98,19 @@ class ApplicationSchema(Schema):
     calls = fields.Nested(ScheduledCallSchema, many=True)
 
 
+class ModeratorApplicationSchema(Schema):
+    class Meta:
+        fields = ('id', 'createdAt', 'changedStageAt', 'content',
+                  'name', 'email', 'anon_content', 'members',
+                  'fizzbuzz', 'stage', 'batch', 'comments', 'emails',
+                  'gravatar', 'anon_name', 'calls')
+
+    members = fields.Nested(UserSchema, many=True)
+    comments = fields.Nested(CommentSchema, many=True)
+    emails = fields.Nested(AnonEmailSchema, many=True)
+    calls = fields.Nested(ScheduledCallSchema, many=True)
+
+
 class ExternalApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'name',
@@ -108,7 +121,12 @@ class ExternalApplicationSchema(Schema):
 
 class AppStateSchema(Schema):
     user = fields.Nested(MeUserSchema)
-    applications = fields.Nested(ApplicationSchema, many=True)
+    applications = fields.Nested(AnonymousApplicationSchema, many=True)
+
+
+class ModeratorAppStateSchema(Schema):
+    user = fields.Nested(MeUserSchema)
+    applications = fields.Nested(ModeratorApplicationSchema, many=True)
 
 
 class AdminAppStateSchema(Schema):
@@ -120,4 +138,5 @@ class AdminAppStateSchema(Schema):
 users_schema = UserSchema(many=True)
 me_schema = MeUserSchema()
 admin_app_state = AdminAppStateSchema()
+mod_app_state = ModeratorAppStateSchema()
 app_state = AppStateSchema()

@@ -25,7 +25,7 @@ var EmailBox = React.createClass({
           edit = this.props.canEdit,
           app_id = this.props.app_id,
           stage = this.props.stage,
-          visible = user.attributes.can_moderate;
+          visible = user.attributes.can_admin;
 
       return (
           <div className="commentBox">

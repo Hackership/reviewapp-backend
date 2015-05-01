@@ -11,8 +11,9 @@ from app.utils import generate_password, send_email, generate_fancy_name
 from app.calendar import add_call_to_calendar, remove_call_from_calendar
 from app.models import (User, Application, Email, Comment,
                         Timeslot, ScheduledCall, REVIEW_STAGES)
-from app.schemas import (me_schema, admin_app_state, app_state,
+from app.schemas import (me_schema, admin_app_state, mod_app_state, app_state,
                          AnonymousApplicationSchema, ApplicationSchema,
+                         ModeratorApplicationSchema,
                          ExternalApplicationSchema, TimeslotSchema)
 
 from app import app, db, user_datastore
@@ -198,6 +199,8 @@ def _render_application(application):
     schema = AnonymousApplicationSchema()
     if current_user.has_role("admin"):
         schema = ApplicationSchema()
+    elif current_user.has_role("moderator"):
+        schema = ModeratorApplicationSchema()
     return jsonify({"application": schema.dump(application).data})
 
 
@@ -231,14 +234,14 @@ def get_state():
     schema = app_state
     query = Application.query.filter(Application.stage in REVIEW_STAGES)
 
-    if current_user.has_role('admin') or current_user.has_role('moderator'):
+    if current_user.has_role('admin'):
         schema = admin_app_state
-        query = Application.query
-
-    if not current_user.has_role('admin') and not current_user.has_role('moderator'):
-        query = filter(lambda app: app.stage in REVIEW_STAGES, current_user.applications)
+        query = Application.query.all()
+    elif current_user.has_role('moderator'):
+        schema = mod_app_state
+        query = Application.query.all()
     else:
-        query = query.all()
+        query = filter(lambda app: app.stage in REVIEW_STAGES, current_user.applications)
 
     return jsonify(schema.dump({"user": current_user._get_current_object(),
                                 "applications": query}).data)

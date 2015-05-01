@@ -53,7 +53,7 @@ var ApplicationListHeader = React.createClass({
 
 });
 
-var EmailAppHeader = React.createClass({ 
+var EmailAppHeader = React.createClass({
   mixins: [AppHeaderMixin],
   render: function() {
     return (
