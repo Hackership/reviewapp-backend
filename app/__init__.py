@@ -107,9 +107,9 @@ if app.debug:
         user_datastore.commit()
 
     def log_message(message, app):
-        app.logger.debug(u"Email {} from {} to {}:\n{}\n".format(
+        app.logger.debug(u"Email %s from %s to %s:\n%s\n",
                         message.subject, message.sender,
-                        message.recipients, message.body))
+                        message.recipients, message.body)
 
     email_dispatched.connect(log_message)
 

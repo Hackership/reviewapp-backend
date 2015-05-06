@@ -4,7 +4,7 @@ import urllib
 import json
 import random
 
-postData = {"Name":"GUI Michael",
+postData = {"Name":"GUI Michaél",
             "Other contacts":"Skype - GUIDO\nFacebook - https://www.facebook.com/ccken",
             "Links":"LinkedIn - https://il.linkedin.com/pub/gidken/4b/b64/5b4\nA website I created a few months ago - http://example.com/\nMy musical adventure - https://www.youtube.com/watch?v=hK9jdDM0u8Y",
             "Where did you hear about us?":"I was searching for a coding school to upgrade my programming skills and I came across a link in a ü random blog",
