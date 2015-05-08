@@ -380,6 +380,118 @@ def switch_to_inactive(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/move_to_stage/accepted', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_accepted(application):
+    application.stage = "accepted"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    content = render_template("emails/applicant/accepted.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('You have been accepted', content)
+
+    db.session.commit()
+    return _render_application(application)
+
+
+@app.route('/application/<id>/move_to_stage/grant_review', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_grant_review(application):
+    application.stage = "grant_review"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    content = render_template("emails/applicant/grant_review.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('You have been accepted', content)
+
+    db.session.commit()
+
+    return _render_application(application)
+
+
+@app.route('/application/<id>/move_to_stage/grant_accepted', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_grant_accepted(application):
+    application.stage = "grant_accepted"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    content = render_template("emails/applicant/grant_accepted.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('Your grant has been accepted', content)
+
+    db.session.commit()
+    return _render_application(application)
+
+
+@app.route('/application/<id>/move_to_stage/rejected', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_rejected(application):
+    application.stage = "rejected"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
+@app.route('/application/<id>/move_to_stage/deposit_paid', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_deposit_paid(application):
+    application.stage = "deposit_paid"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
+
 @app.route('/application/<id>/move_to_stage/review_reply', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'moderator')
@@ -527,7 +639,6 @@ def switch_to_email_send(application):
     db.session.add(email)
     db.session.add(application)
 
-    # Email Reviewers
     application.send_email('Your application to Hackership', content)
 
     db.session.commit()

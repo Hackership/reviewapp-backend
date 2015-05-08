@@ -315,6 +315,63 @@ function dropApplication(payload) {
           });
 }
 
+function moveToAccepted(payload) {
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/accepted',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToGrantReview(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/grant_review',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToGrantAccepted(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/grant_accepted',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToDepositPaid(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/deposit_paid',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+
 function availableStages() {
   var stages = [
     {key: 'in_review', title: 'To Review', instruction: "Review Stage. Please read through this application and add questions for the applicant in the box below."},
@@ -322,7 +379,11 @@ function availableStages() {
     {key: 'review_reply', title: 'Review Reply', instruction: "Email Review Stage. Please review the applicant's email answers to our questions. Add any comments or further questions you have in the boxes below!"},
     {key: 'schedule_skype', title: 'Skype Invite Sent', instruction: "Skype Invitation Stage. The applicant has received an e-mail to schedule a Skype call. If needed: add additional comments and questions below!"},
     {key: 'skype_scheduled', title: 'Skype Scheduled', instruction: "Skype Scheduled. Please leave comments for the interviewers" },
-    {key: 'skyped', title: 'Skyped', instruction: "Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here. "}
+    {key: 'skyped', title: 'Skyped', instruction: "Skyped! Decision time, do we accept this applicant yes/no? Please leave comments here."},
+    {key: 'accepted', title: 'Accepted', instruction: "Applicant has been accepted. Waiting for deposit to be paid"},
+    {key: 'grant_review', title: 'Review Grant', instruction: "Applicant accepted. Reviewing grant information"},
+    {key: 'grant_accepted', title: 'Grant Accepted', instruction: "Applicant accepted and will receive a grant."},
+    {key: 'deposit_paid', title: 'Deposit Paid', instruction: "Applicant accepted and we received the first payment."}
     ];
 
   if (user.attributes.can_admin) {
@@ -369,6 +430,18 @@ Dispatcher.register(function(payload) {
   case 'dropApplication':
     dropApplication(payload.payload)
     break;
+  case "moveToAccepted":
+    moveToAccepted(payload.payload)
+  break;
+  case "moveToGrantReview":
+    moveToGrantReview(payload.payload)
+  break;
+  case "moveToGrantAccepted":
+    moveToGrantAccepted(payload.payload)
+  break;
+  case "moveToDepositPaid":
+    moveToDepositPaid(payload.payload)
+  break;
   case "sendGeneralEmail":
     sendGeneralEmail(payload.payload)
     break;
