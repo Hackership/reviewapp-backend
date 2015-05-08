@@ -315,6 +315,63 @@ function dropApplication(payload) {
           });
 }
 
+function moveToAccepted(payload) {
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/accepted',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToGrantReview(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/grant_review',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToGrantAccepted(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/grant_accepted',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+function moveToDepositPaid(payload){
+  var app_id = payload['appId'];
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage/deposit_paid',
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
+
 function availableStages() {
   var stages = [
     {key: 'in_review', title: 'To Review', instruction: "Review Stage. Please read through this application and add questions for the applicant in the box below."},
