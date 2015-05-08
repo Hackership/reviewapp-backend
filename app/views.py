@@ -390,6 +390,21 @@ def switch_to_accepted(application):
     db.session.add(application)
     db.session.commit()
 
+    content = render_template("emails/applicant/accepted.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('You have been accepted', content)
+
+    db.session.commit()
     return _render_application(application)
 
 
@@ -401,6 +416,22 @@ def switch_to_grant_review(application):
     application.stage = "grant_review"
     application.changedStageAt = datetime.now()
     db.session.add(application)
+    db.session.commit()
+
+    content = render_template("emails/applicant/grant_review.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('You have been accepted', content)
+
     db.session.commit()
 
     return _render_application(application)
@@ -416,6 +447,21 @@ def switch_to_grant_accepted(application):
     db.session.add(application)
     db.session.commit()
 
+    content = render_template("emails/applicant/grant_accepted.md",
+                              app=application)
+
+    email = Email(author_id=current_user._get_current_object().id,
+                  content=content,
+                  incoming=False,
+                  stage=application.stage,
+                  application_id=application.id,
+                  anon_content=content)
+
+    db.session.add(email)
+
+    application.send_email('Your grant has been accepted', content)
+
+    db.session.commit()
     return _render_application(application)
 
 
@@ -593,7 +639,6 @@ def switch_to_email_send(application):
     db.session.add(email)
     db.session.add(application)
 
-    # Email Reviewers
     application.send_email('Your application to Hackership', content)
 
     db.session.commit()
