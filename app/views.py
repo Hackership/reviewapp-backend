@@ -406,6 +406,19 @@ def switch_to_grant_review(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/move_to_stage/grant_accepted', methods=['POST'])
+@login_required
+@roles_accepted('admin', 'moderator')
+@with_application
+def switch_to_grant_accepted(application):
+    application.stage = "grant_accepted"
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/rejected', methods=['POST'])
 @login_required
 @roles_accepted('admin', 'moderator')
