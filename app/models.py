@@ -20,7 +20,7 @@ stages = ('incoming', 'in_review',
           'grant_accepted', 'grant_rejected', 'archived',
           'inactive')
 
-REVIEW_STAGES = ('in_review', 'email_send', 'review_reply',
+REVIEW_STAGES = ('in_review', 'email_send', 'review_reply', 'skype_scheduled',
                  'skyped', 'accepted', 'rejected')
 
 MOD_STAGES = ('in_review', 'email_send', 'review_reply', 'reply_received',
