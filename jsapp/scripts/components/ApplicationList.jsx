@@ -59,14 +59,33 @@ var Application = React.createClass({
       alert("Please anonymize all emails");
       }
   },
+  moveToAccepted: function(event){
+      Action.moveToAccepted({appId: this.props.app.get('id')});
+  },
+
+  moveToGrantReview: function(evt){
+    Action.moveToGrantReview({appId: this.props.app.get('id')});
+  },
+
+  moveToGrantAccepted: function(event){
+    Action.moveToGrantAccepted({appId: this.props.app.get('id')});
+  },
+
+  moveToDepositPaid: function(event){
+    Action.moveToDepositPaid({appId: this.props.app.get('id')});
+  },
 
   render: function() {
-    var app = this.props.app;
-    var txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />
-    var stage = this.props.app.get("stage");
-    var active = this.props.index === this.props.activeKey;
-    var instruction = getInstructionForStage(app.get('stage'));
+    var app = this.props.app,
+        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />,
+        stage = this.props.app.get("stage"),
+        active = this.props.index === this.props.activeKey,
+        instruction = getInstructionForStage(app.get('stage')),
+        content = markdown.toHTML(app.get('anon_content')),
+        fizzbuzz = app.get('fizzbuzz'),
+        emails = app.get('emails').length > 0 ? <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} /> : "";
 
+  if (stage === 'incoming'){
     return (<div>
         <div className="panel-background">
         {this.render_header(app, true)}
@@ -74,35 +93,67 @@ var Application = React.createClass({
         <Instruction instruction={instruction} />
         <MetaInfo app={app} />
         {this["render_" + stage]()}
-      </div>);
+        </div>);
+  }
+
+    return (<div>
+        <div className="panel-background">
+        {this.render_header(app, true)}
+        </div>
+        <Instruction instruction={instruction} />
+        <MetaInfo app={app} />
+         <div dangerouslySetInnerHTML={{__html: content}} />
+          <Highlight>
+            {fizzbuzz}
+          </Highlight>
+        {emails}
+        <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
+        <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
+        {this["render_" + stage]()}
+        </div>);
+  },
+
+  render_grant_accepted: function() {
+   var app = this.props.app;
+
+    return (<div>
+          </div>
+      );
+  },
+
+  render_deposit_paid: function() {
+   var app = this.props.app;
+
+    return (<div>
+          </div>
+      );
+  },
+
+  render_grant_review: function() {
+    return (<Button bsStyle="info" onClick={this.moveToGrantAccepted}>Move to Grant Approved</Button>
+      );
+  },
+
+  render_accepted: function() {
+     return (<Button bsStyle="info" onClick={this.moveToDepositPaid}>Move to Deposit Paid</Button>
+      );
   },
 
   render_skyped: function() {
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
 
-    return (<div>
-          <div dangerouslySetInnerHTML={{__html: content}} />
-          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-        </div>
+    return (<ButtonToolbar>
+            <Button bsStyle="info" onClick={this.moveToAccepted}>Accept Applicant (no grants)</Button>
+            <Button bsStyle="info" onClick={this.moveToGrantReview}>Accept and Move to Grant Review</Button>
+          </ButtonToolbar>
       );
   },
 
+
   render_skype_scheduled: function() {
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
-    var fizzbuzz = app.get('fizzbuzz');
 
     return (<div>
-          <div dangerouslySetInnerHTML={{__html: content}} />
-          <Highlight>
-            {fizzbuzz}
-          </Highlight>
-          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
           <SkypedButton app={app} user={user}/>
         </div>
       );
@@ -110,61 +161,37 @@ var Application = React.createClass({
 
   render_schedule_skype: function() {
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
 
     return (<div>
-          <div dangerouslySetInnerHTML={{__html: content}} />
-          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-        </div>
+          </div>
       );
     },
 
   render_review_reply: function() {
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
-    var fizzbuzz = app.get('fizzbuzz');
 
     return (
         <div>
           <SkypeScheduleButton app={app} user={user} />
-          <div dangerouslySetInnerHTML={{__html: content}} />
-          <h4><strong>Coding Challenge</strong></h4>
-          <Highlight>
-            {fizzbuzz}
-          </Highlight>
-          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} edit={false} />
-          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
         </div>
       );
   },
 
   render_reply_received: function(){
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content'));
 
     return (
         <div>
-          <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={true} />
-          <Button bsStyle="success" onClick={this.moveToEmailReview}> Move to next stage </Button>
+         <Button bsStyle="success" onClick={this.moveToEmailReview}> Move to next stage </Button>
         </div>
       );
   },
 
   render_email_send: function(){
     var app = this.props.app;
-    var content = markdown.toHTML(app.get('anon_content') || '');
 
     return (
       <div>
-          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}>
-          </div>
-            <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={false} />
-             <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-            <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-        
         </div>
       );
   },
@@ -172,10 +199,7 @@ var Application = React.createClass({
 
   render_in_review: function(){
     var app = this.props.app;
-    var content  = markdown.toHTML(app.get('anon_content'));
-    var fizzbuzz = app.get('fizzbuzz');
-    var email_button ="",
-        emails = app.get('emails').length > 0 ? <EmailBox emails={app.get('emails')} stage={app.get('stage')} app_id={app.get('id')} canEdit={false} /> : "";
+    var email_button ="";
 
     if (user.attributes.can_moderate || user.attributes.can_admin){
       email_button = <EmailCreate app_id={app.get('id')} comments={app.getComments()} questions={app.getQuestions()}/>;
@@ -183,16 +207,7 @@ var Application = React.createClass({
 
     return (
       <div>
-          <div className="content-app" dangerouslySetInnerHTML={{__html: content}}></div>
-
-          <h4><strong>Coding Challenge</strong></h4>
-          <Highlight>
-            {fizzbuzz}
-          </Highlight>
-          {emails}
-          <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-          <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
-          {email_button}
+         {email_button}
         </div>
       );
   },
