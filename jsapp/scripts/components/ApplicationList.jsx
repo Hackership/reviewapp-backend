@@ -142,10 +142,14 @@ var Application = React.createClass({
   render_skyped: function() {
     var app = this.props.app;
 
-    return (<ButtonToolbar>
+    return (<div>
+          <p><strong>Once you accept an applicant,
+          they will automatically receive an acceptance email</strong></p>
+      <ButtonToolbar>
             <Button bsStyle="info" onClick={this.moveToAccepted}>Accept Applicant (no grants)</Button>
             <Button bsStyle="info" onClick={this.moveToGrantReview}>Accept and Move to Grant Review</Button>
           </ButtonToolbar>
+        </div>
       );
   },
 
