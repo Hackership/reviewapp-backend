@@ -385,6 +385,8 @@ var MetaInfo = React.createClass({
         stages = ['skype_scheduled', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted'],
         stage = app.get('stage'),
         skype_info = _.contains(stages, stage) ? <SkypeInfo app={app} /> : <div />,
+        email = app.get('email'),
+        email_str = _.contains(stages, stage) && email ? <p><strong>Email:</strong> {email} </p>: "",
         batch = app.get('batch') ? app.get('batch'): "No value",
         member_string = (app.get('members').length > 0) ? _.map(app.get('members'), member => member.name).join(', ') : "None";
 
@@ -396,6 +398,7 @@ var MetaInfo = React.createClass({
       <h5><strong>GENERAL INFO</strong></h5>
       <p><strong>Reviewers: </strong>{member_string}</p>
       <p><strong>Batch: </strong> {batch}</p>
+      {email_str}
         </Col>
       </Row>
       <Row>
