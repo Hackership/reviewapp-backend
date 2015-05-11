@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from app import app
 from apiclient.discovery import build
 from httplib2 import Http
@@ -44,8 +46,8 @@ def add_call_to_calendar(call, application):
         'end': {'dateTime': (call.scheduledAt + timedelta(minutes=30)).isoformat()  + "+0000"},
         'attendees': attendees,
         'location': 'Skype',
-        'summary': 'HS Interview {}'.format(application.name),
-        'description': 'Skype call with {} Applicant {}({}): {}'.format(
+        'summary': u'HS Interview {}'.format(application.name),
+        'description': u'Skype call with {} Applicant {}({}): {}'.format(
             application.batch, application.name, call.skype_name, application.id)
     }
 
