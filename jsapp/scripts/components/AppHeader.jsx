@@ -25,7 +25,7 @@ var React = require('react/addons'),
           <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} />
         </Col>
         <Col xs={3} xs-offset={1}>
-          <div className="panel-name">{app.get("anon_name")}</div>
+          <Headername app={app} />
           <HeaderIcons app={app} />
         </Col>
         <Col xs={5} xs-offset={4}>
@@ -65,6 +65,22 @@ var EmailAppHeader = React.createClass({
     )
   }
 });
+
+var Headername = React.createClass({
+  render: function(){
+    var stages = ['skype_scheduled', 'skyped', 'accepted', 'rejected', 'grant_review', 'deposit_paid', 'grant_accepted'],
+        stage = this.props.app.get('stage'),
+        anon_name = this.props.app.get('anon_name'),
+        name = this.props.app.get('name') ? this.props.app.get('name') : "";
+
+        if (name && _.contains(stages, stage)){
+            return (<div className="panel-name">{name}, {anon_name}</div>);
+        }
+    return (
+        <div className="panel-name">{anon_name}</div>
+      );
+  }
+})
 
 var HeaderIcons = React.createClass({
   render: function() {

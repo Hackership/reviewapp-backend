@@ -382,7 +382,9 @@ var SkypedButton = React.createClass({
 var MetaInfo = React.createClass({
   render: function() {
     var app = this.props.app,
-        skype_info = app.get('stage')==='skype_scheduled' ? <SkypeInfo app={app} /> : <div />,
+        stages = ['skype_scheduled', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted'],
+        stage = app.get('stage'),
+        skype_info = _.contains(stages, stage) ? <SkypeInfo app={app} /> : <div />,
         batch = app.get('batch') ? app.get('batch'): "No value",
         member_string = (app.get('members').length > 0) ? _.map(app.get('members'), member => member.name).join(', ') : "None";
 
