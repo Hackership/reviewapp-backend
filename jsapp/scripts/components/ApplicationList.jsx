@@ -382,7 +382,7 @@ var SkypedButton = React.createClass({
 var MetaInfo = React.createClass({
   render: function() {
     var app = this.props.app,
-        stages = ['skype_scheduled', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted'],
+        stages = ['skype_scheduled', 'accepted', 'rejected', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted'],
         stage = app.get('stage'),
         skype_info = _.contains(stages, stage) ? <SkypeInfo app={app} /> : <div />,
         email = app.get('email'),
