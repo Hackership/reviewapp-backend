@@ -20,6 +20,7 @@ var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
   	{applications} = require('../stores/ApplicationStore'),
 	{user} = require('../stores/UserStore'),
 	{EmailList} = require('./EmailList'),
+	{Search} = require('./SearchMode'),
 	{EmailListItem} = require('./EmailListItem'),
 	_ = require("underscore");
 
@@ -87,6 +88,7 @@ var MainAppWrap = React.createClass({
 				<header>
 					<Link className="btn btn-primary" to="main">Main</Link>
 					<Link className="btn btn-primary" to="focus">Focus Mode</Link>
+					<Link className="btn btn-primary" to="search">Search</Link>
 					{emails}
 					<DropdownButton bsStyle="info" className="pull-right" title={me}>
 						{menu}
@@ -116,6 +118,7 @@ var Routes = (
 	    </Route>
 	    <Route name="appPage" path="/app/:appId" handler={ApplicationPage} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />
+	    <Route name="search" path="/search" handler={Search} />
 	</Route>
 );
 

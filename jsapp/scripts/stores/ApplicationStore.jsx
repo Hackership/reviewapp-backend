@@ -83,6 +83,11 @@ var $=require('jquery');
 var Applications = Backbone.Collection.extend({
     model: Application,
 
+    searchFor: function(name){
+      var search_name = name.toLowerCase();
+      return _.filter(this.models, a => a.get('name').toLowerCase().indexOf(search_name) > -1)
+    },
+
     newEmails: function(){
       return _.filter(this.models, a => _.filter(a.get('emails'), email => !email.anon_content).length > 0);
     },

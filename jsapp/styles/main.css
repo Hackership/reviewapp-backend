@@ -218,6 +218,10 @@ header {
   padding-bottom: 10px;
 }
 
+.searchBox{
+  margin-bottom: 20px;
+}
+
 textarea.form-control.emailEdit{
   height: 40vh;
   min-height: 30vh;
