@@ -21,6 +21,7 @@ var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
 	{user} = require('../stores/UserStore'),
 	{EmailList} = require('./EmailList'),
 	{Search} = require('./SearchMode'),
+	{AppState} = require('./AppState'),
 	{EmailListItem} = require('./EmailListItem'),
 	_ = require("underscore");
 
@@ -35,16 +36,22 @@ var MainAppWrap = React.createClass({
 	getInitialState: function(){
 		return {loading: 10};
 	},
+
 	componentWillMount: function() {
 
 		var self = this;
-    	user.on("all", function(){
-      		self.setState({loading: self.state.loading + 45});
-    	});
-	    applications.on("all", function(){
-	      self.setState({loading: self.state.loading + 45});
-	    });
-		Actions.getApplications();
+  	user.on("all", function(){
+    		self.setState({loading: self.state.loading + 45});
+  	});
+    applications.on("all", function(){
+      self.setState({loading: self.state.loading + 45});
+    });
+		Actions.bootstrap();
+	},
+
+	forceRefresh: function(evt){
+		evt.preventDefault();
+	  Actions.forceRefresh();
 	},
 
 	render: function(){
@@ -67,18 +74,18 @@ var MainAppWrap = React.createClass({
 			emails = null;
 		if (user.get("can_skype")){
 			menu.push(<MenuItem key='callslots'><Link to="callslots"> Manage Call Slots</Link></MenuItem>)
+			menu.push(<MenuItem key="call-slots-out" divider />)
 		}
 
 		if (user.get("can_admin")){
-			menu.push(<MenuItem key="admin-in" divider />)
 			menu.push(<MenuItem key='add-admin'><a href="/admin"> Admin Area</a></MenuItem>)
 			menu.push(<MenuItem key='add-reviewer'><Link to="reviewer"> Add Reviewer</Link></MenuItem>)
 			menu.push(<MenuItem key="admin-out" divider />)
 
-
-
 			emails = <Link className="btn btn-primary" to="emails">New Emails ({applications.newEmails().length})</Link>
 		}
+
+		menu.push(<MenuItem key='appstate'><a onClick={this.forceRefresh} title="click to force refresh"><AppState /></a></MenuItem>)
 		menu.push(<MenuItem key='logout'><a href="/logout">Logout </a></MenuItem>)
 
 		var me = <Gravatar hash={user.get("gravatar")} size={25} />

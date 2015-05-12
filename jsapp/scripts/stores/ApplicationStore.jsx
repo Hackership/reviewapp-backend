@@ -8,9 +8,8 @@
  	 moment = require('moment'),
  	 _ =require('underscore'),
    {user} = require('./UserStore'),
- 	 Dispatcher = require('../dispatchers/dispatcher');
-
-var $=require('jquery');
+ 	 Dispatcher = require('../dispatchers/dispatcher'),
+   $ = require('jquery');
 
  var Application = Backbone.Model.extend({
 

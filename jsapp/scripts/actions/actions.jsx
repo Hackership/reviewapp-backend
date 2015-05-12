@@ -4,6 +4,8 @@ var AppDispatcher = require('../dispatchers/dispatcher'),
     actions = {};
 
 _.each([
+    "bootstrap", "forceRefresh",
+
     //applications
     "getApplications", "updateApplication", "moveToReview", "moveToEmailReview", "moveToScheduleSkype",
     "moveToSkyped", "dropApplication", "moveToAccepted", "moveToGrantReview",
