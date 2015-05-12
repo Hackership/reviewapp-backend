@@ -143,10 +143,10 @@ function getApps() {
 	.done(function(data){
     })
 
-    .fail(function(data){
-    	console.log(data)
-    	alert('Failed to get applications');
-   });
+   //  .fail(function(data){
+   //  	console.log(data)
+   //  	alert('Failed to get applications');
+   // });
 }
 
 function postComment(payload) {
