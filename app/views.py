@@ -44,7 +44,6 @@ def _filter_for_open_slots(users_per_slot):
     users_map = dict([(x.id, x) for x in User.query.all()])
 
     for key, uids in users_per_slot.iteritems():
-        print key, uids
         uids = set(uids)
         users = map(lambda x: users_map[x], uids)
         leads = filter(lambda x: x.is_skypelead(), users)
@@ -106,7 +105,7 @@ def _find_available_slots(**kwargs):
     return _filter_actually_available(_find_slots(**kwargs))
 
 
-def _find_slots(futureWeeks=3, minimum=25):
+def _find_slots(futureWeeks=3, minimum=48):
     tomorrow = datetime.utcnow() + timedelta(hours=minimum)
 
     slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
