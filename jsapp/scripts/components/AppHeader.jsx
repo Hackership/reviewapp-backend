@@ -12,12 +12,14 @@ var React = require('react/addons'),
   {user} = require('../stores/UserStore'),
   {Link} = require('react-router'),
   {AppToolBar} = require('./AppToolBar'),
+  {MoveButton} = require('./MoveToStage'),
   moment = require('moment');
 
   var AppHeaderMixin = {
   render_header(app, tools){
     var app = app || this.props.app,
         tools = tools ? <AppToolBar app={app} /> : "",
+        stages = tools ? <MoveButton app={app} />: "",
         txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />;
     return (
       <Grid>
@@ -28,11 +30,14 @@ var React = require('react/addons'),
           <Headername app={app} />
           <HeaderIcons app={app} />
         </Col>
-        <Col xs={5} xs-offset={4}>
+        <Col xs={3} xs-offset={4}>
           {txt}
         </Col>
-         <Col xs={2} xs-offset={9}>
+         <Col xs={2} xs-offset={7}>
          {tools}
+         </Col>
+        <Col xs={2} xs-offset={9}>
+         {stages}
         </Col>
       </Grid>
       );

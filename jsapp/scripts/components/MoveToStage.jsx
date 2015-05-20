@@ -10,8 +10,9 @@ var React = require('react/addons'),
   {User, Gravatar} = require("./User"),
   ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
+  Action = require('../actions/actions'),
+  markdown = require( "markdown" ).markdown,
   {Link} = require('react-router'),
-  {AppToolBar} = require('./AppToolBar'),
   moment = require('moment');
 
 var MoveButton = React.createClass({
@@ -22,21 +23,10 @@ var MoveButton = React.createClass({
 
 	moveToStage: function(type, evt){
 		evt.preventDefault();
-		var search_apps = applications.searchFor(this.state.search);
-		this.setState({
-		    apps: search_apps
-		  });
+		if (window.confirm("By moving stages manually NO automatic emails will be send")) {
+			Action.moveToStage({stage: type, appId: this.props.app.get('id')});
+		}
 	},
-
-
-  handleToggle: function(type, evt) {
-    evt.preventDefault();
-    this.setState({
-      isModalOpen: !this.state.isModalOpen,
-      type: type
-    });
-  },
-
 
 	render: function(){
 		 return (
@@ -45,8 +35,8 @@ var MoveButton = React.createClass({
           <MenuItem bsStyle="link" onClick={e => this.moveToStage('skyped', e)}>Skyped</MenuItem>
           <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_review', e)}>Grant Review</MenuItem>
           <MenuItem bsStyle="link" onClick={e => this.moveToStage('accepted', e)}>Accepted, no grant</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_accepted')}>Grant Accepted</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage(e)}>Deposit Paid</MenuItem>
+          <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_accepted', e)}>Grant Accepted</MenuItem>
+          <MenuItem bsStyle="link" onClick={e => this.moveToStage('deposit_paid', e)}>Deposit Paid</MenuItem>
       </DropdownButton>
       </div>
       );

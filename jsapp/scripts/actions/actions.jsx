@@ -7,7 +7,7 @@ _.each([
     //applications
     "getApplications", "updateApplication", "moveToReview", "moveToEmailReview", "moveToScheduleSkype",
     "moveToSkyped", "dropApplication", "moveToAccepted", "moveToGrantReview",
-    "moveToGrantAccepted", "moveToDepositPaid",
+    "moveToGrantAccepted", "moveToDepositPaid", "moveToStage",
 
     // Comments & questions
     "postComment", "postQuestion", "editComment",
