@@ -612,6 +612,23 @@ def switch_to_review(application):
     return _render_application(application)
 
 
+@app.route('/application/<id>/move_to_stage', methods=['POST'])
+@login_required
+@roles_accepted('admin')
+@with_application
+def switch_to_stage(application):
+    stage = (request.form.get("stage") or request.args.get("stage")) or None
+    if not stage:
+        abort(400, "Missing stage")
+
+    application.stage = stage
+    application.changedStageAt = datetime.now()
+    db.session.add(application)
+    db.session.commit()
+
+    return _render_application(application)
+
+
 @app.route('/application/<id>/move_to_stage/email_send', methods=['POST'])
 @login_required
 @roles_accepted('moderator', 'admin')

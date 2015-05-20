@@ -375,6 +375,23 @@ function moveToDepositPaid(payload){
           });
 }
 
+function moveToStage(payload){
+  var app_id = payload['appId'];
+  var stage = payload['stage'];
+
+  console.log('appId', app_id);
+  $.ajax({
+          type: 'POST',
+          url: '/application/' +app_id +'/move_to_stage',
+          data: {stage: stage},
+          }).done(function(resp) {
+            console.log(resp);
+            applications.get(app_id).set(resp.application);
+          }).fail(function(msg){
+            console.err('ERROR', msg);
+          });
+}
+
 
 function availableStages() {
   var stages = [
@@ -445,6 +462,9 @@ Dispatcher.register(function(payload) {
   break;
   case "moveToDepositPaid":
     moveToDepositPaid(payload.payload)
+  break;
+  case "moveToStage":
+    moveToStage(payload.payload)
   break;
   case "sendGeneralEmail":
     sendGeneralEmail(payload.payload)
