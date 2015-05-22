@@ -40,15 +40,16 @@ def _clean_time(dt):
     return dt.strftime("%Y-%m-%d %H:{}").format((dt.minute / 30 and "30:00" or "00:00"))
 
 
-def _filter_for_open_slots(users_per_slot):
-    users_map = dict([(x.id, x) for x in User.query.all()])
+def _filter_for_open_slots(users_per_slot, users_map=None):
+    if users_map is None:
+        users_map = dict([(x.id, x) for x in User.query.all()])
 
     for key, uids in users_per_slot.iteritems():
         uids = set(uids)
         users = map(lambda x: users_map[x], uids)
         leads = filter(lambda x: x.is_skypelead(), users)
         if len(uids) % 2 == 0 and leads and (float(len(uids)) / len(leads) == 2):
-            # we have an evently distributed slot, ignore
+            # we have an evenly distributed slot, ignore
             continue
 
         yield (key, uids, leads)
@@ -74,8 +75,9 @@ def _find_open_slots(user, **kwargs):
             yield date
 
 
-def _filter_actually_available(users_per_slot):
-    users_map = dict([(x.id, x) for x in User.query.all()])
+def _filter_actually_available(users_per_slot, users_map=None):
+    if users_map is None:
+        users_map = dict([(x.id, x) for x in User.query.all()])
 
     actually_available = []
 
@@ -101,17 +103,22 @@ def _filter_actually_available(users_per_slot):
     return sorted(actually_available)
 
 
-def _find_available_slots(**kwargs):
-    return _filter_actually_available(_find_slots(**kwargs))
+def _find_available_slots(users_map=None, **kwargs):
+    return _filter_actually_available(_find_slots(**kwargs), users_map=users_map)
 
 
-def _find_slots(futureWeeks=3, minimum=48):
-    tomorrow = datetime.utcnow() + timedelta(hours=minimum)
+def _find_slots(futureWeeks=3, minimum=48, slots_query=None,
+                scheduled_query=None, tomorrow=None):
 
-    slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
-            and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
+    if tomorrow is None:
+        tomorrow = datetime.utcnow() + timedelta(hours=minimum)
 
-    scheduled_query = ScheduledCall.query.filter(ScheduledCall.scheduledAt >= tomorrow).join()
+    if slots_query is None:
+        slots_query = Timeslot.query.filter(or_(Timeslot.once == False,
+                and_(Timeslot.once == True, Timeslot.datetime >= tomorrow)))
+
+    if scheduled_query is None:
+        scheduled_query = ScheduledCall.query.filter(ScheduledCall.scheduledAt >= tomorrow).join()
 
     blocked = {}
     for call in scheduled_query:
