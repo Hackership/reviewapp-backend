@@ -409,6 +409,7 @@ function availableStages() {
 
   if (user.attributes.can_admin) {
       stages.splice(0, 0, {key: 'incoming', title: "Incoming", instruction: "Anonymization Stage. Please Anonymize this application by removing names and other identifiers"});
+      stages.push({key: 'inactive', title: "Inactive", instruction: null});
   }
 
   if (user.attributes.can_moderate) {
