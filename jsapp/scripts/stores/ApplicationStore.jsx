@@ -419,7 +419,8 @@ function availableStages() {
 }
 
 var getInstructionForStage = function(stage){
-  return  _.filter(availableStages(), st => (st.key === stage))[0].instruction;
+  var stage = _.find(availableStages(), st => (st.key === stage));
+  return  stage ? stage.instruction : '';
 }
 
 

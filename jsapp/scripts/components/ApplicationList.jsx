@@ -109,24 +109,12 @@ var Application = React.createClass({
         {emails}
         <CommentBox comments={app.getComments()} stage={app.get('stage')} appId={app.get('id')} hdr="Comments" place="Add Comment" />
         <CommentBox comments={app.getQuestions()} stage={app.get('stage')} question={true} appId={app.get('id')} hdr="Questions to applicants" place="Ask Question"/>
-        {this["render_" + stage]()}
+        {(this["render_" + stage] || this.render_fallback)()}
         </div>);
   },
 
-  render_grant_accepted: function() {
-   var app = this.props.app;
-
-    return (<div>
-          </div>
-      );
-  },
-
-  render_deposit_paid: function() {
-   var app = this.props.app;
-
-    return (<div>
-          </div>
-      );
+  render_fallback: function(){
+    return null;
   },
 
   render_grant_review: function() {
@@ -163,13 +151,6 @@ var Application = React.createClass({
       );
   },
 
-  render_schedule_skype: function() {
-    var app = this.props.app;
-
-    return (<div>
-          </div>
-      );
-    },
 
   render_review_reply: function() {
     var app = this.props.app;
@@ -190,16 +171,6 @@ var Application = React.createClass({
         </div>
       );
   },
-
-  render_email_send: function(){
-    var app = this.props.app;
-
-    return (
-      <div>
-        </div>
-      );
-  },
-
 
   render_in_review: function(){
     var app = this.props.app;
@@ -249,7 +220,8 @@ var Application = React.createClass({
 var Instruction = React.createClass({
 
   render: function() {
-        var text = this.props.instruction;
+      var text = this.props.instruction;
+      if (!text) return null;
 
       return (
         <Well className="instruction">
@@ -382,7 +354,7 @@ var SkypedButton = React.createClass({
 var MetaInfo = React.createClass({
   render: function() {
     var app = this.props.app,
-        stages = ['skype_scheduled', 'accepted', 'rejected', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted'],
+        stages = ['skype_scheduled', 'accepted', 'rejected', 'skyped', 'grant_review', 'deposit_paid', 'grant_accepted', 'inactive'],
         stage = app.get('stage'),
         skype_info = _.contains(stages, stage) ? <SkypeInfo app={app} /> : <div />,
         email = app.get('email'),
