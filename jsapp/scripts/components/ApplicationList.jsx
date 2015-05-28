@@ -14,11 +14,14 @@ var React = require('react/addons'),
   markdown = require( "markdown" ).markdown,
   {Link} = require('react-router'),
   Highlight = require('react-highlight'),
+  availableZones = require("../stores/TimezonesStore"),
+  Select = require('react-select'),
   {EmailBox} = require('./EmailBox'),
   {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
   {AppHeaderMixin, ApplicationListHeader, HeaderTxtRev, HeaderTxtMod} = require('./AppHeader'),
   {AppToolBar} = require('./AppToolBar'),
   {CommentBox} = require('./CommentBox'),
+  {OpenSlots} = require("./OpenSlots"),
   moment = require('moment');
 
 var $=require('jquery');
@@ -307,20 +310,52 @@ var EmailCreate = React.createClass({
 });
 
 var SkypeScheduleButton = React.createClass({
+  mixins: [OverlayMixin],
+
+  getInitialState: function() {
+    return {'isModalOpen': false, selectedZone: user.get("timezone") || availableZones[0]}
+  },
+  handleToggle: function(evt) {
+    this.setState({
+      isModalOpen: !this.state.isModalOpen
+    });
+  },
+
+  setTimezone: function(zone){
+    this.setState({selectedZone: zone});
+  },
+
+  renderSelector: function(){
+    return (<span>Confirm Open Call Slots
+              <Select value={this.state.selectedZone} options={availableZones} onChange={this.setTimezone}/>
+          </span>);
+  },
+
+  renderOverlay: function() {
+    if (!this.state.isModalOpen) return null;
+
+    return (
+        <Modal title={this.renderSelector()} onRequestHide={this.handleToggle}>
+          <div>
+            <p>Please confirm these Time Slots are good to be send (right now and the foreseeable future)</p>
+            <OpenSlots timezone={this.state.selectedZone} />
+            <br />
+            <button className="btn btn-primary" onClick={this.scheduleSkype}>Confirm</button>
+          </div>
+        </Modal>
+      );
+  },
 
   render: function() {
     var inactive = (this.props.app.attributes.stage === 'review_reply') ? false : true,
         visible = (this.props.user.attributes.can_admin || this.props.user.attributes.can_moderate) ? true : false,
         app_id = this.props.app.attributes.id;
 
-    if (visible){
-      return (
-        <Button disabled={inactive} onClick={this.scheduleSkype} bsStyle='info' className="btn-form">Schedule Skype</Button>
-        );
-    }
+    if (!visible) return null;
 
-    return (<div></div>);
-
+    return (
+      <Button disabled={inactive} onClick={this.handleToggle} bsStyle='info' className="btn-form">Schedule Skype</Button>
+      );
   },
 
   scheduleSkype: function() {

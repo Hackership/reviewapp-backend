@@ -8,7 +8,7 @@ moment.tz.load(zones);
 
 var availableZones = _.map(zones.zones, function(x){
     var name = x.split('|')[0];
-    return {value: name, label: name.replace("_", " ")};
+    return {value: name, label: name.replace("_", " "), name: name};
 });
 
 module.exports = availableZones;

@@ -10,11 +10,11 @@ var React = require('react'),
     _ = require("underscore"),
     moment = require('moment'),
     availableZones = require("../stores/TimezonesStore"),
+    {OpenSlots} = require("./OpenSlots"),
     Select = require('react-select'),
     $ = require('jquery');
 
 require("react-select/dist/default.css");
-
 var NotFound = React.createClass({
     render: function(){
         return (
@@ -33,18 +33,12 @@ var Scheduler = React.createClass({
         $.getJSON("/application/" + params.app_id + "/external/" + params.key
             ).then(function(data){
                 this.setState({'info': data, loading: false});
-                this._refresh_slots();
             }.bind(this)
             ).fail(function(){
                 this.setState({'failed': true,
                                'loading': false});
             }.bind(this))
 
-    },
-    _refresh_slots: function(){
-        $.getJSON("/api/available_slots").then(function(data){
-            this.setState({loadingSlots: false, slots: _.map(data.slots, function(x){return moment.tz(x, "UTC")})})
-        }.bind(this))
     },
     getInitialState: function(){
         return {selectedSlot: false, loading: true, success: false, failed: false, loadingSlots: true, reselect: false}
@@ -60,9 +54,7 @@ var Scheduler = React.createClass({
     },
 
     selectZone: function(slot){
-        console.log(slot);
         this.setState({selectedSlot: slot});
-
     },
     scheduleCall: function(evt){
         evt.preventDefault();
@@ -137,7 +129,6 @@ var Scheduler = React.createClass({
             var call = _.find(this.state.info.calls, function(call){
                                 return !call.failed;
                                 });
-            console.log(call);
             if (call){
                 var zone = this.state.timezone.name,
                     title = <h3>Call scheduled</h3>,
@@ -153,39 +144,13 @@ var Scheduler = React.createClass({
 
         }
 
-        var slots = <p>Loading available Time Slots</p>;
-        if (!this.state.loadingSlots){
-            if (!this.state.slots){
-                slots = <p>No Slots open available at the moment. Please come back later</p>
-            } else {
-                var zone = this.state.timezone.name,
-                    self = this,
-                    slotGroups = _.groupBy(this.state.slots, function(slot){
-                        return slot.tz(zone).format('YYYYDDDD');
-                    }),
-
-                slots = _.map(_.sortBy(_.keys(slotGroups),
-                                       function(x) {return x}),
-                              function(timestamp){
-                                var dt = <h3>{moment(timestamp, 'YYYYDDDD').format("dddd, MMMM Do YYYY")}</h3>,
-                                    slots = slotGroups[timestamp];
-                                return (
-                                        <Panel key={timestamp} header={dt}>
-                                            {_.map(slots, function(slot){
-                                                return <Button btSize='large' onClick={function(x){self.selectZone(slot)}} key={slot.format('LLLL')}>{slot.tz(zone).format('HH:mm ')}</Button>
-                                            })}
-                                        </Panel>
-                                        )
-                              });
-
-            }
-        }
         return (
             <div>
                 {head}
-                <h3>Please select the timeslot, youʼd like to have the call at</h3>
-                <p>Times are shown in 24h format, adapted for the local timezone of <em>{this.state.timezone.name}</em> (<a onClick={this.resetTimezone}>change</a>)</p>
-                {slots}
+                <h3>Please select the timeslot, youʼd like to have the call at!</h3>
+                <p>Times are shown in 24h format, adapted for the local timezone of <em>{this.state.timezone.name}</em> (<a onClick={this.resetTimezone}>change</a>).</p>
+                <OpenSlots timezone={this.state.timezone} selectZone={this.selectZone} />
+                <p> If none of these times work for you, please try again later or send an email to your individual email address (including your timezone and availablility) and we'll try to find a different time!</p>
             </div>
         );
     }
