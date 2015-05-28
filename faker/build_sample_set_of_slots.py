@@ -29,11 +29,11 @@ for counter in [1,2,3]:
 
     user = User.query.filter(User.email=="skypee{}@example.org".format(counter)).first()
     for x in xrange(25):
-        db.session.add(Timeslot(user=user.id, once=random.choice(ONCE), datetime=make_time(hours=x* (counter + 2))))
+        db.session.add(Timeslot(user=user, once=random.choice(ONCE), datetime=make_time(hours=x* (counter + 2))))
 
 user = User.query.filter(User.email=="skypelead@example.org").first()
 
 for x in xrange(25):
-    db.session.add(Timeslot(user=user.id, once=random.choice(ONCE), datetime=make_time(hours=x*2.5)))
+    db.session.add(Timeslot(user=user, once=random.choice(ONCE), datetime=make_time(hours=x*2.5)))
 
 db.session.commit()
