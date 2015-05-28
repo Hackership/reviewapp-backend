@@ -299,7 +299,7 @@ var SuggestedSlots = React.createClass({
   },
   _refreshSuggestions: function(){
     $.getJSON("/api/suggested_slots").then(function(data){
-      this.setState({"suggestedSlots": data.slots});
+      this.setState({"suggestedSlots":  _.map(data.slots, function(x){return moment.tz(x, "UTC"); })});
     }.bind(this));
   },
   getInitialState: function(){
