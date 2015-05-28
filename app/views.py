@@ -231,7 +231,7 @@ def available_slots():
 @login_required
 @roles_accepted('skypee', 'skypelead')
 def suggested_slots():
-    return jsonify({"slots": [x for x in _find_open_slots(current_user)][:10]})
+    return jsonify({"slots": sorted([x for x in _find_open_slots(current_user)][:10])})
 
 
 @app.route('/api/app_state')
