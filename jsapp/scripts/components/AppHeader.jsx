@@ -15,16 +15,21 @@ var React = require('react/addons'),
   {MoveButton} = require('./MoveToStage'),
   moment = require('moment');
 
-  var AppHeaderMixin = {
+let DE_ANON_STAGES = ['skype_scheduled', 'skyped',
+                      'accepted', 'rejected', 'grant_review',
+                      'deposit_paid', 'grant_accepted',
+                      'inactive'];
+
+var AppHeaderMixin = {
   render_header(app, tools){
     var app = app || this.props.app,
-        tools = tools ? <AppToolBar app={app} /> : "",
-        stages = tools ? <MoveButton app={app} />: "",
+        tools = tools ? <AppToolBar app={app} /> : null,
+        stages = tools ? <MoveButton app={app} />: null,
         txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />;
     return (
       <Grid>
         <Col xs={1}>
-          <Gravatar forceDefault={true} hash={app.get('gravatar')} size={40} />
+          <Gravatar forceDefault={!_.contains(DE_ANON_STAGES, app.get('stage'))} hash={app.get('gravatar')} size={40} />
         </Col>
         <Col xs={3} xs-offset={1}>
           <Headername app={app} />
@@ -73,7 +78,7 @@ var EmailAppHeader = React.createClass({
 
 var Headername = React.createClass({
   render: function(){
-    var stages = ['skype_scheduled', 'skyped', 'accepted', 'rejected', 'grant_review', 'deposit_paid', 'grant_accepted'],
+    var stages = DE_ANON_STAGES,
         stage = this.props.app.get('stage'),
         anon_name = this.props.app.get('anon_name'),
         name = this.props.app.get('name') ? this.props.app.get('name') : "";
