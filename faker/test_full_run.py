@@ -46,11 +46,15 @@ inbound_email(from_email=email,
               text="I am super qualified")
 
 
-inbound_email(from_email=email,
+inbound_email(from_email="Other{}".format(email),
               email=target_email,
               text="Wanted to add: I am super qualified. REALLY")
 
+assert len(application.emails) == 3, "Anon email hasn't been processed properly"
+
 anon_emails = dict([(str(x.id), "anon email {}".format(x.id)) for x in application.emails])
+
+
 
 next_stage(application, 'review_reply', **anon_emails)
 
