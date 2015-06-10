@@ -29,17 +29,21 @@ var MoveButton = React.createClass({
 	},
 
 	render: function(){
-		 return (
-      <div className="app-toolbar">
-      <DropdownButton bsStyle="info" className="pull-right" title="Manually Move Stage" block>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('skyped', e)}>Skyped</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_review', e)}>Grant Review</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('accepted', e)}>Accepted, no grant</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_accepted', e)}>Grant Accepted</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.moveToStage('deposit_paid', e)}>Deposit Paid</MenuItem>
-      </DropdownButton>
-      </div>
-      );
+		 if (user.attributes.can_moderate || user.attributes.can_admin){
+       return (
+        <div className="app-toolbar">
+        <DropdownButton bsStyle="info" className="pull-right" title="Manually Move Stage" block>
+            <MenuItem bsStyle="link" onClick={e => this.moveToStage('skyped', e)}>Skyped</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_review', e)}>Grant Review</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.moveToStage('accepted', e)}>Accepted, no grant</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_accepted', e)}>Grant Accepted</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.moveToStage('deposit_paid', e)}>Deposit Paid</MenuItem>
+        </DropdownButton>
+        </div>
+        );
+     }else{
+      return (<div></div>)
+     }
 	}
 });
 
