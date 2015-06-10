@@ -22,6 +22,8 @@ var AddReviewer = React.createClass({
       roles.push('moderator');
     } else if (this.refs.reviewer.getChecked()) {
       roles.push('reviewer');
+    } else if (this.refs.reviewer.getChecked()){
+      roles.push('coach');
     }
 
     if (this.refs.skypelead.getChecked()){
@@ -87,6 +89,7 @@ var AddReviewer = React.createClass({
              <Input type='checkbox' ref='reviewer' label="is Reviewer" defaultChecked={true} />
              <Input type='checkbox' ref='moderator' label="is Moderator" />
              <Input type='checkbox' ref='admin' label="is Admin" />
+             <Input type='checkbox' ref='coach' label="is Coach" />
             </Col>
             <Col xs={4}>
              <Input type='radio' wrapperClassName='' ref='noSkype' label="doesn't do skype" defaultChecked={true}  name='skype' />

@@ -67,15 +67,19 @@ var AppToolBar =  React.createClass({
   },
 
   render: function(){
-    return (
-      <div className="app-toolbar">
-      <DropdownButton bsStyle="info" className="pull-right" title="Admin Tools" block>
-          <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.handleToggle("email", e)}>Email Applicant</MenuItem>
-          <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject", e)}>Reject Applicant</MenuItem>
-      </DropdownButton>
-      </div>
-      );
+    if (user.attributes.can_moderate || user.attributes.can_admin){
+      return (
+        <div className="app-toolbar">
+        <DropdownButton bsStyle="info" className="pull-right" title="Admin Tools" block>
+            <MenuItem bsStyle="link" onClick={this.dropApplication}>Applicant Dropped Out</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.handleToggle("email", e)}>Email Applicant</MenuItem>
+            <MenuItem bsStyle="link" onClick={e => this.handleToggle("reject", e)}>Reject Applicant</MenuItem>
+        </DropdownButton>
+        </div>
+        );
+    }else{
+      return (<div></div>)
+    }
   },
 
   renderOverlay: function() {

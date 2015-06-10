@@ -26,6 +26,8 @@ REVIEW_STAGES = ('in_review', 'email_send', 'review_reply', 'skype_scheduled',
 MOD_STAGES = ('in_review', 'email_send', 'review_reply', 'reply_received',
               'skyped', 'accepted', 'rejected')
 
+COACH_STAGES = ('accepted', 'grant_accepted', 'deposit_paid')
+
 roles_users = db.Table('roles_users',
                        db.Column('user_id', db.Integer(),
                                  db.ForeignKey('user.id')),
@@ -70,9 +72,16 @@ class User(db.Model, UserMixin):
     def can_moderate(self):
         return self.has_role("moderator") or self.has_role("admin")
 
+    def is_coach(self):
+        return self.has_role("coach")
+
     @property
     def admin(self):
         return self.can_admin()
+
+    @property
+    def coach(self):
+        return self.is_coach()
 
     @property
     def moderator(self):

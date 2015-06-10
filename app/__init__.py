@@ -48,7 +48,7 @@ security = Security(app, user_datastore)
 
 @app.before_first_request
 def ensure_roles():
-    for rolename in ["admin", "moderator", "skypelead", "skypee", 'reviewer']:
+    for rolename in ["admin", "moderator", "skypelead", "skypee", 'reviewer', 'coach']:
         user_datastore.find_or_create_role(rolename)
 
 if app.debug:
@@ -61,6 +61,12 @@ if app.debug:
                 user_datastore.create_user(
                     email='reviewer@example.org', password='password'),
                 'reviewer')
+
+        if not user_datastore.get_user('coach@example.org'):
+            user_datastore.add_role_to_user(
+                user_datastore.create_user(
+                    email='coach@example.org', password='password'),
+                user_datastore.find_role("coach"))
 
         if not user_datastore.get_user('moderator@example.org'):
             user_datastore.add_role_to_user(

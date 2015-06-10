@@ -23,12 +23,13 @@ class Call(Schema):
 class MeUserSchema(Schema):
     class Meta:
         fields = ('id', 'name', 'email', 'can_moderate', 'timezone',
-                  'can_admin', 'can_skype', 'timeslots', 'calls', 'gravatar')
+                  'can_admin', 'is_coach', 'can_skype', 'timeslots', 'calls', 'gravatar')
         exclude = ('password',)
 
     can_admin = fields.Method("check_admin")
     can_moderate = fields.Method("check_moderate")
     can_skype = fields.Method("check_skypee")
+    is_coach = fields.Method("check_coach")
 
     timeslots = fields.Nested(TimeslotSchema, many=True)
     calls = fields.Nested(Call, many=True)
@@ -41,6 +42,9 @@ class MeUserSchema(Schema):
 
     def check_admin(self, obj):
         return obj.can_admin()
+
+    def check_coach(self, obj):
+        return obj.is_coach()
 
 
 class CommentSchema(Schema):
@@ -111,6 +115,19 @@ class ModeratorApplicationSchema(Schema):
     calls = fields.Nested(ScheduledCallSchema, many=True)
 
 
+class CoachApplicationSchema(Schema):
+    class Meta:
+        fields = ('id', 'createdAt', 'changedStageAt', 'content',
+                  'name', 'email', 'anon_content', 'members',
+                  'fizzbuzz', 'stage', 'batch', 'comments', 'emails',
+                  'gravatar', 'anon_name', 'calls')
+
+    members = fields.Nested(UserSchema, many=True)
+    comments = fields.Nested(CommentSchema, many=True)
+    emails = fields.Nested(AnonEmailSchema, many=True)
+    calls = fields.Nested(ScheduledCallSchema, many=True)
+
+
 class ExternalApplicationSchema(Schema):
     class Meta:
         fields = ('id', 'createdAt', 'changedStageAt', 'name',
@@ -134,9 +151,15 @@ class AdminAppStateSchema(Schema):
     applications = fields.Nested(ApplicationSchema, many=True)
 
 
+class CoachAppStateSchema(Schema):
+    user = fields.Nested(MeUserSchema)
+    applications = fields.Nested(CoachApplicationSchema, many=True)
+
+
 # Schema instances
 users_schema = UserSchema(many=True)
 me_schema = MeUserSchema()
 admin_app_state = AdminAppStateSchema()
 mod_app_state = ModeratorAppStateSchema()
 app_state = AppStateSchema()
+coach_app_state = CoachAppStateSchema()
