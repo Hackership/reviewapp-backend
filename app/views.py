@@ -10,10 +10,11 @@ from sqlalchemy.exc import IntegrityError
 from app.utils import generate_password, send_email, generate_fancy_name
 from app.calendar import add_call_to_calendar, remove_call_from_calendar
 from app.models import (User, Application, Email, Comment,
-                        Timeslot, ScheduledCall, REVIEW_STAGES)
+                        Timeslot, ScheduledCall, REVIEW_STAGES, COACH_STAGES)
 from app.schemas import (me_schema, admin_app_state, mod_app_state, app_state,
+                         coach_app_state,
                          AnonymousApplicationSchema, ApplicationSchema,
-                         ModeratorApplicationSchema,
+                         ModeratorApplicationSchema, CoachApplicationSchema,
                          ExternalApplicationSchema, TimeslotSchema)
 
 from app import app, db, user_datastore
@@ -207,6 +208,8 @@ def _render_application(application):
         schema = ApplicationSchema()
     elif current_user.has_role("moderator"):
         schema = ModeratorApplicationSchema()
+    elif current_user.has_role("coach"):
+        schema = CoachApplicationSchema()
     return jsonify({"application": schema.dump(application).data})
 
 
@@ -246,6 +249,9 @@ def get_state():
     elif current_user.has_role('moderator'):
         schema = mod_app_state
         query = Application.query.all()
+    elif current_user.has_role('coach'):
+        schema = coach_app_state
+        query =  filter(lambda app: app.stage in COACH_STAGES, Application.query.all())
     else:
         query = filter(lambda app: app.stage in REVIEW_STAGES, current_user.applications)
 

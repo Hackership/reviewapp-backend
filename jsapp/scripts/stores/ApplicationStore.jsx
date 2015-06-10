@@ -407,6 +407,14 @@ function availableStages() {
     {key: 'deposit_paid', title: 'Deposit Paid', instruction: "Applicant accepted and we received the first payment."}
     ];
 
+  if (user.attributes.is_coach) {
+    console.log("COACH");
+    stages = [{key: 'accepted', title: 'Accepted', instruction: "Applicant has been accepted. Waiting for deposit to be paid"},
+    {key: 'grant_accepted', title: 'Grant Accepted', instruction: "Applicant accepted and will receive a grant."},
+    {key: 'deposit_paid', title: 'Deposit Paid', instruction: "Applicant accepted and we received the first payment."}
+    ];
+  }
+
   if (user.attributes.can_admin) {
       stages.splice(0, 0, {key: 'incoming', title: "Incoming", instruction: "Anonymization Stage. Please Anonymize this application by removing names and other identifiers"});
       stages.push({key: 'inactive', title: "Inactive", instruction: null});
