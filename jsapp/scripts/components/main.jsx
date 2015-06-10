@@ -4,7 +4,7 @@
 
 'use strict';
 
-var {StagesView, AppsList, FocusReview} = require('./ReviewsApp'),
+var {StagesView, AppsList, FocusReview, BatchFilterView} = require('./ReviewsApp'),
 	AddReviewer = require('./AddReviewer'),
 	CallSlots = require('./CallSlots'),
 	{ApplicationList, ApplicationPage} = require('./ApplicationList'),
@@ -120,8 +120,10 @@ var Routes = (
 	    <Route name="emails" path="/emails/new" handler={EmailList} />
 	    	 <Route name="emailPage" path="/emails/app/:appId" handler={EmailListItem} />
 	    <Route name="callslots" path="/calls/slots" handler={CallSlots} />
-	    <Route name="main" path="/" handler={StagesView}>
-	    	<Route name="appStage" path=":stage/" handler={AppsList} />
+	    <Route name="main" path="/" handler={BatchFilterView}>
+	    	<Route name="batch" path=":batch/" handler={StagesView}>
+	    		<Route name="appStage" path=":stage/" handler={AppsList} />
+	    	</Route>
 	    </Route>
 	    <Route name="appPage" path="/app/:appId" handler={ApplicationPage} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />

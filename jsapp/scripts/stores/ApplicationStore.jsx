@@ -98,12 +98,28 @@ var Applications = Backbone.Collection.extend({
         function(x){return moment(x.attributes.changedStageAt) < weekAgo});
     },
 
+    getBatch: function(batch){
+      return _.filter(this.where({"batch": batch}));
+    },
+
    	byStage: function(stage) {
    		return this.where({"stage": stage});
     },
 
     stageCounts: function(){
       return _.countBy(this.models, a => a.get('stage'));
+    },
+
+    stageCountsForBatch: function(batch){
+      return _.countBy(this.where({'batch':batch}), a => a.get('stage'));
+    },
+
+    byStageForBatch: function(stage, batch){
+      return this.where({"batch": batch, 'stage': stage});
+    },
+
+    batchCount: function(){
+      return _.countBy(this.models, a => a.get('batch'));
     },
 
     byUrgency: function(role) {
@@ -134,6 +150,7 @@ var Applications = Backbone.Collection.extend({
 }});
 
 var applications = new Applications();
+
 
 function getApps() {
 	$.getJSON("/api/app_state", function(data) {
