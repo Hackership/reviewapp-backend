@@ -425,7 +425,6 @@ function availableStages() {
     ];
 
   if (user.attributes.is_coach) {
-    console.log("COACH");
     stages = [{key: 'accepted', title: 'Accepted', instruction: "Applicant has been accepted. Waiting for deposit to be paid"},
     {key: 'grant_accepted', title: 'Grant Accepted', instruction: "Applicant accepted and will receive a grant."},
     {key: 'deposit_paid', title: 'Deposit Paid', instruction: "Applicant accepted and we received the first payment."}

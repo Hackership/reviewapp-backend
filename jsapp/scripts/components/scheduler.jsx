@@ -21,11 +21,10 @@ var NotFound = React.createClass({
             <div>
                 <h2>404 - Resource not found</h2>
                 <p>If you arrived here after clicking a link in an email, try copy pasting it instead. If this keeps happning, please inform the administrators!</p>
-
             </div>
             );
     }
-})
+});
 
 var Scheduler = React.createClass({
     componentWillMount: function(){
