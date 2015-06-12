@@ -30,10 +30,26 @@ var BatchFilterView = React.createClass({
   statics: {
     willTransitionTo: function (transition, params) {
       console.log(params.batch)
-      if (params.batch) return;
+      if (params.stage && params.batch) return;
 
-      transition.redirect("batch", {batch: (params.batch || 'all')});
+      var stageCounts = applications.stageCounts(),
+          stages = availableStages(),
+          stage = (_.find(stages, function(stage){
+                          return stageCounts[stage.key];
+                        }) || stages[0]).key;
+      transition.redirect("batch", {stage: stage, batch: 'all'});
     }
+  },
+
+  componentDidMount: function(){
+    var self = this;
+    applications.on("all", function(){
+      self.isMounted() && self.forceUpdate();
+    });
+
+    user.on("all", function(){
+        self.isMounted() && self.forceUpdate();
+      });
   },
 
   render() {
@@ -41,9 +57,9 @@ var BatchFilterView = React.createClass({
         all_title = "All" + ' (' + applications.length +')',
         ber_title = "15-07-BER" + ' ('+ (batchCount['15-07-BER'] || 0) + ')',
         st_title = "15-09-ST" + ' ('+ (batchCount['15-09-ST'] || 0) + ')',
-        all = <Link to="batch" params={{batch: 'all'}} bsStyle="info" active>{all_title}</Link>,
-        ber = <Link to="batch" params={{batch: '15-07-BER'}} bsStyle="info" active>{ber_title}</Link>,
-        cr = <Link to="batch"  params={{batch: '15-09-ST'}} bsStyle="info" active>{st_title}</Link>;
+        all = <Link to="batch" params={{batch: 'all', stage: this.props.params.stage}} bsStyle="info" active>{all_title}</Link>,
+        ber = <Link to="batch" params={{batch: '15-07-BER', stage: this.props.params.stage}} bsStyle="info" active>{ber_title}</Link>,
+        cr = <Link to="batch"  params={{batch: '15-09-ST', stage: this.props.params.stage}} bsStyle="info" active>{st_title}</Link>;
 
         return(
           <div className="filters">
@@ -70,7 +86,7 @@ var StagesView = React.createClass({
           stage = (_.find(stages, function(stage){
                           return stageCounts[stage.key];
                         }) || stages[0]).key;
-      transition.redirect("appStage", {stage: stage, batch: 'all'});
+      transition.redirect("appStage", {stage: stage, batch: this.props.params.batch});
     }
   },
 
@@ -96,7 +112,7 @@ var StagesView = React.createClass({
               <ul className="tabPanel nav nav-tabs">
                 {_.map(stages, (stage, index) =>
                   <li className={stage.key === activeStage? "active" : ""} eventKey={stage.key}>
-                    <Link to="appStage" params={{stage: stage.key}}>{stage.title + ' ('+ (stageCounts[stage.key] || 0) + ')'}</Link>
+                    <Link to="appStage" params={{stage: stage.key, batch: this.props.params.batch}}>{stage.title + ' ('+ (stageCounts[stage.key] || 0) + ')'}</Link>
                   </li>
                 )}
               </ul>
