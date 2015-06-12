@@ -57,9 +57,9 @@ var BatchFilterView = React.createClass({
         all_title = "All" + ' (' + applications.length +')',
         ber_title = "15-07-BER" + ' ('+ (batchCount['15-07-BER'] || 0) + ')',
         st_title = "15-09-ST" + ' ('+ (batchCount['15-09-ST'] || 0) + ')',
-        all = <Link to="batch" params={{batch: 'all', stage: activeStage}} bsStyle="info" active>{all_title}</Link>,
-        ber = <Link to="batch" params={{batch: '15-07-BER', stage: activeStage}} bsStyle="info" active>{ber_title}</Link>,
-        cr = <Link to="batch"  params={{batch: '15-09-ST', stage: activeStage}} bsStyle="info" active>{st_title}</Link>;
+        all = <Link className="btn btn-info" to="batch" params={{batch: 'all', stage: activeStage}} active>{all_title}</Link>,
+        ber = <Link className="btn btn-info" to="batch" params={{batch: '15-07-BER', stage: activeStage}} active>{ber_title}</Link>,
+        cr = <Link className="btn btn-info" to="batch"  params={{batch: '15-09-ST', stage: activeStage}} active>{st_title}</Link>;
 
         return(
           <div className="filters">
