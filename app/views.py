@@ -782,30 +782,30 @@ def _handle_email(email):
 
     sender = email['from_email'].strip().lower()
 
-    if application.email.lower() == sender:
-        db_mail = Email(incoming=True,
-                        stage=application.stage,
-                        application_id=application.id,
-                        content=email["text"])
-
-        if application.stage == 'email_send':
-            application.stage = "reply_received"
-            db.session.add(application)
-
-        db.session.add(db_mail)
-        db.session.commit()
-
-        return
 
     user = User.query.filter(User.email == sender).first()
-    if not user:
-        raise BounceError("User unknown")
+    if user:
+        comment = Comment(author_id=user.id,
+                          application_id=application.id,
+                          stage=application.stage,
+                          content=email["text"])
+        db.session.add(comment)
+        db.session.commit()
+        return
 
-    comment = Comment(author_id=user.id,
-                      application_id=application.id,
-                      stage=application.stage,
-                      content=email["text"])
-    db.session.add(comment)
+    # Unless we found a user, we assume this is incoming
+    # for whomever asked
+
+    db_mail = Email(incoming=True,
+                    stage=application.stage,
+                    application_id=application.id,
+                    content=email["text"])
+
+    if application.stage == 'email_send':
+        application.stage = "reply_received"
+        db.session.add(application)
+
+    db.session.add(db_mail)
     db.session.commit()
 
 
