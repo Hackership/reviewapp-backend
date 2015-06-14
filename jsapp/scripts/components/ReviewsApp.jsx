@@ -29,14 +29,14 @@ var BatchFilterView = React.createClass({
 
   statics: {
     willTransitionTo: function (transition, params) {
-      if (params.stage && params.batch) return;
+      if (params.batch && (applications.batchCount()[params.batch] || params.batch === 'all')) return;
 
-      var stageCounts = applications.stageCounts(),
-          stages = availableStages(),
-          stage = (_.find(stages, function(stage){
-                          return stageCounts[stage.key];
-                        }) || stages[0]).key;
-      transition.redirect("batch", {stage: stage, batch: params.batch || 'all'});
+      if (params.batch){
+        // redirect to from the old days before batch-separation
+        transition.redirect("appStage", {stage: params.batch, batch: 'all'});
+      } else {
+        transition.redirect("batch", {batch: 'all'});
+      }
     }
   },
 
