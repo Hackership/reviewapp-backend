@@ -6,8 +6,7 @@
 
 var React = require('react/addons'),
   _ = require('underscore'),
-  {Button, ButtonGroup}  = require('react-bootstrap'),
-	{Nav} = require('react-bootstrap'),
+  {Button, ButtonGroup, Nav}  = require('react-bootstrap'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications, availableStages} = require('../stores/ApplicationStore'),

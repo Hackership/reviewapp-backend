@@ -4,8 +4,7 @@
 
 'use strict';
 
-var {ReviewsApp} = require('./ReviewsApp'),
-    {FocusReview} = require('./ReviewsApp'),
+var {ReviewsApp, FocusReview} = require('./ReviewsApp'),
     AddReviewer = require('./AddReviewer'),
     CallSlots = require('./CallSlots'),
     {ApplicationList} = require('./ApplicationList'),
