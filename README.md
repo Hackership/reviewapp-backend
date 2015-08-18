@@ -16,7 +16,8 @@ python manager.py runserver
 ```
 
 ###Run JS App:
-```webpack --watch --colors
+```
+webpack --watch --colors
 ```
 
 Et voila, head over to localhost:5000 to see the app in action.
