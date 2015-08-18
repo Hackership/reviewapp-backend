@@ -158,12 +158,10 @@ function getApps() {
     	Actions.setUser(data['user']);
     })
 	.done(function(data){
-    })
+    }).fail(function(msg){
+            console.err('ERROR', msg);
+    });
 
-   //  .fail(function(data){
-   //  	console.log(data)
-   //  	alert('Failed to get applications');
-   // });
 }
 
 function postComment(payload) {

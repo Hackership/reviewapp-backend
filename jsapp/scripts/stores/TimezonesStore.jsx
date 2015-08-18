@@ -11,4 +11,4 @@ var availableZones = _.map(zones.zones, function(x){
     return {value: name, label: name.replace("_", " "), name: name};
 });
 
-module.exports = availableZones;
+module.exports = {availableZones: availableZones};
