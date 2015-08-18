@@ -105,4 +105,4 @@ var AddReviewer = React.createClass({
   }
 });
 
-module.exports = AddReviewer;
+module.exports = {AddReviewer: AddReviewer};

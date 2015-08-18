@@ -514,4 +514,4 @@ var CallSlots = React.createClass({
   }
 });
 
-module.exports = CallSlots;
+module.exports = {CallSlots: CallSlots};

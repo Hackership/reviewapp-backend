@@ -84,4 +84,4 @@ var FocusList = React.createClass({
 });
 
 
-module.exports = FocusList;
+module.exports = {FocusList: FocusList};
