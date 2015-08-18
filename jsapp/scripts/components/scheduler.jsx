@@ -149,7 +149,7 @@ var Scheduler = React.createClass({
                 <h3>Please select the timeslot, youʼd like to have the call at!</h3>
                 <p>Times are shown in 24h format, adapted for the local timezone of <em>{this.state.timezone.name}</em> (<a onClick={this.resetTimezone}>change</a>).</p>
                 <OpenSlots timezone={this.state.timezone} selectZone={this.selectZone} />
-                <p> If none of these times work for you, please try again later or send an email to your individual email address (including your timezone and availablility) and we'll try to find a different time!</p>
+                <p> If none of these times work for you, please try again later or send an email to your individual email address (including your timezone and availablility) and we will try to find a different time!</p>
             </div>
         );
     }
