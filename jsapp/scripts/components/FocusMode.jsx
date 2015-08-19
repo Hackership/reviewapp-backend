@@ -12,7 +12,7 @@ var React = require('react/addons'),
   Action = require('../actions/actions'),
   markdown = require( "markdown" ).markdown,
   Highlight = require('react-highlight'),
-  {Application} = require('./ApplicationList');
+  {Application} = require('./Application');
 
 
 var Counter = React.createClass({

@@ -10,8 +10,7 @@ var React = require('react/addons'),
   ReactTransitionGroup = React.addons.TransitionGroup,
   {user} = require('../stores/UserStore'),
   {Link} = require('react-router'),
-  {AppHeaderMixin} = require('../mixins/AppHeaderMixin'),
-  moment = require('moment');
+  {AppHeaderMixin} = require('../mixins/AppHeaderMixin');
 
 
 
