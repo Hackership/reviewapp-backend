@@ -19,7 +19,6 @@ var React = require('react/addons'),
   {EmailBox} = require('./EmailBox'),
   {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
   {ApplicationListHeader} = require('./AppHeader'),
-  {HeaderTxtRev, HeaderTxtMod} = require('../mixins/AppHeaderMixin'),
   {AppHeaderMixin} = require('../mixins/AppHeaderMixin'),
   {AppToolBar} = require('./AppToolBar'),
   {CommentBox} = require('./CommentBox'),
@@ -82,7 +81,6 @@ var Application = React.createClass({
 
   render: function() {
     var app = this.props.app,
-        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />,
         stage = this.props.app.get("stage"),
         active = this.props.index === this.props.activeKey,
         instruction = getInstructionForStage(app.get('stage')),

@@ -14,21 +14,17 @@ let DE_ANON_STAGES = ['skype_scheduled', 'skyped',
                       'deposit_paid', 'grant_accepted',
                       'inactive'];
 
-var Headername = React.createClass({
-  render: function(){
-    var stages = DE_ANON_STAGES,
-        stage = this.props.app.get('stage'),
-        anon_name = this.props.app.get('anon_name'),
-        name = this.props.app.get('name') ? this.props.app.get('name') : "";
+function userName(app){
+  var stages = DE_ANON_STAGES,
+      stage = app.get('stage'),
+      name = app.get('name'),
+      anon_name = app.get('anon_name');
 
-        if (name && _.contains(stages, stage)){
-            return (<div className="panel-name">{name}, {anon_name}</div>);
+        if (app.get('name') && _.contains(stages, app.get('stage'))){
+            return name +" -- "+ anon_name;
         }
-    return (
-        <div className="panel-name">{anon_name}</div>
-      );
-  }
-})
+    return anon_name;
+}
 
 var HeaderIcons = React.createClass({
   render: function() {
@@ -42,39 +38,37 @@ var HeaderIcons = React.createClass({
   }
 });
 
-var HeaderTxtRev = React.createClass({
+var AppStatusRev = React.createClass({
   render: function() {
     var app = this.props.app;
-    var in_rev = app.attributes.stage === 'in_review';
-    var txt = in_rev ? 'Due ' : 'Stage Changed: ';
-    var new_txt = app.isNew() ? 'Please review, ' : '';
-    var deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
+        in_rev = app.get("stage") === 'in_review';
+        txt = in_rev ? 'Due ' : 'Stage Changed: ';
+        new_txt = app.isNew() ? 'Please review, ' : '';
+        deadline = in_rev? moment(app.attributes.changedStageAt).add(7, 'days').calendar() : moment(app.attributes.changedStageAt).calendar();
     return (
       <h5 className="panel-header"><strong>{new_txt} </strong>{txt}{deadline}</h5>
       );
   }
 });
 
-var HeaderTxtMod = React.createClass({
+var AppStatusMod = React.createClass({
   render: function() {
-    var app = this.props.app;
-    var in_rev = app.attributes.stage === 'in_review';
-    var date = moment(app.attributes.changedStageAt).calendar();
-    var due = moment(app.attributes.changedStageAt).add(12, 'days').calendar();
-    var deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar()
+    var app = this.props.app,
+        date = moment(app.attributes.changedStageAt).calendar(),
+        due = moment(app.attributes.changedStageAt).add(12, 'days').calendar(),
+        deadline = moment(app.attributes.changedStageAt).add(7, 'days').calendar();
 
-    if (in_rev){
+    if (app.attributes.stage === 'in_review'){
       if(app.shouldSendEmail()){
-        if(app.isReadyForEmail()){
+
+        if (app.isReadyForEmail()){
             return(<h5 className="panel-header urgent"><strong>Ready For E-mail </strong>Due Date: {due}</h5>);
         }
         return(<h5 className="panel-header urgent"><strong style={{color:"red"}}>URGENT</strong> Due Date: {due}</h5>);
       }
-
-      return(<h5 className="panel-header">In Review Until: {deadline}, <strong>Email Due: {due}</strong></h5>)
+    return(<h5 className="panel-header">In Review Until: {deadline}, <strong>Email Due: {due}</strong></h5>)
     }
-
-    return (<h5 className="panel-header">Changed State At: {date}</h5>);
+  return (<h5 className="panel-header">Changed State At: {date}</h5>);
 }});
 
 var AppHeaderMixin = {
@@ -82,14 +76,15 @@ var AppHeaderMixin = {
     var app = app || this.props.app,
         tools = tools ? <AppToolBar app={app} /> : null,
         stages = tools ? <MoveButton app={app} />: null,
-        txt = user.get("can_moderate") ? <HeaderTxtMod app={app} /> : <HeaderTxtRev app={app} />;
+        txt = user.get("can_moderate") ? <AppStatusMod app={app} /> : <AppStatusRev app={app} />,
+        name = userName(app);
     return (
       <Grid>
         <Col xs={1}>
           <Gravatar forceDefault={!_.contains(DE_ANON_STAGES, app.get('stage'))} hash={app.get('gravatar')} size={40} />
         </Col>
         <Col xs={3} xs-offset={1}>
-          <Headername app={app} />
+          <div className="panel-name">{name}</div>
           <HeaderIcons app={app} />
         </Col>
         <Col xs={3} xs-offset={4}>
