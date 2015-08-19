@@ -10,7 +10,7 @@ var React = require('react/addons'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications} = require('../stores/ApplicationStore'),
-  {ApplicationListHeader, EmailAppHeader} = require('./AppHeader'),
+  {AppHeader} = require('./AppHeader'),
   {user} = require('../stores/UserStore');
 
 
@@ -24,7 +24,7 @@ var EmailList = React.createClass({
         		<div className="applicationList">
         			<ul className="panel-group">
         			{_.map(apps, (app, index) =>
-          			<EmailAppHeader app={app} />
+          			<AppHeader app={app} link="emailPage" />
         			)}
         			</ul>
       			</div>

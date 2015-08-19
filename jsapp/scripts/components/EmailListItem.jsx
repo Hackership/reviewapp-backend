@@ -12,7 +12,7 @@ var React = require('react/addons'),
   {applications} = require('../stores/ApplicationStore'),
   markdown = require( "markdown" ).markdown,
   {User, Gravatar} = require("./User"),
-  {ApplicationListHeader} = require('./AppHeader'),
+  {AppHeader} = require('./AppHeader'),
   {AppHeaderMixin} = require('../mixins/AppHeaderMixin'),
   {user} = require('../stores/UserStore');
 

@@ -18,7 +18,7 @@ var React = require('react/addons'),
   Select = require('react-select'),
   {EmailBox} = require('./EmailBox'),
   {applications, getInstructionForStage} = require('../stores/ApplicationStore'),
-  {ApplicationListHeader} = require('./AppHeader'),
+  {AppHeader} = require('./AppHeader'),
   {AppHeaderMixin} = require('../mixins/AppHeaderMixin'),
   {AppToolBar} = require('./AppToolBar'),
   {CommentBox} = require('./CommentBox'),
@@ -478,7 +478,7 @@ var ApplicationsList = React.createClass({
        <div className="applicationList">
         <ul className="panel-group">
         {_.map(apps, (app, index) =>
-          <ApplicationListHeader app={app} />
+          <AppHeader link="appPage" app={app} />
         )}
         </ul>
       </div>
