@@ -1,6 +1,7 @@
 ##Get started
 
 ###Run npm install:
+From your project file:
 ```
 npm install
 ```
@@ -31,6 +32,7 @@ SQLALCHEMY_DATABASE_URI = "postgres://@localhost/db_name"
 ```
 
 ###Start server:
+from your virtual environment run:
 ```
 python manager.py runserver
 ```
@@ -38,7 +40,7 @@ python manager.py runserver
 ###Populate the Database:
 from your virtual environment:
 ```
-	python faker/test_post.py
+python faker/test_post.py
 ```
 There are other test scripts in the faker file, give them a try!
 
