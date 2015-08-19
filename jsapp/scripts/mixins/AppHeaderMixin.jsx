@@ -103,6 +103,4 @@ var AppHeaderMixin = {
 
 
 
-module.exports = {AppHeaderMixin: AppHeaderMixin,
-                  HeaderTxtRev: HeaderTxtRev,
-                  HeaderTxtMod: HeaderTxtMod};
+module.exports = {AppHeaderMixin: AppHeaderMixin};
