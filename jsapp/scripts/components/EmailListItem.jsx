@@ -12,7 +12,8 @@ var React = require('react/addons'),
   {applications} = require('../stores/ApplicationStore'),
   markdown = require( "markdown" ).markdown,
   {User, Gravatar} = require("./User"),
-  {AppHeaderMixin, ApplicationListHeader} = require('./AppHeader'),
+  {ApplicationListHeader} = require('./AppHeader'),
+  {AppHeaderMixin} = require('../mixins/AppHeaderMixin'),
   {user} = require('../stores/UserStore');
 
 var EmailListItem = React.createClass({
