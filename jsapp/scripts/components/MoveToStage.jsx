@@ -32,7 +32,7 @@ var MoveButton = React.createClass({
 		 if (user.attributes.can_moderate || user.attributes.can_admin){
        return (
         <div className="app-toolbar">
-        <DropdownButton bsStyle="info" className="pull-right" title="Manually Move Stage" block>
+        <DropdownButton bsStyle="info" className="" title="Move Stage" block>
             <MenuItem bsStyle="link" onClick={e => this.moveToStage('skyped', e)}>Skyped</MenuItem>
             <MenuItem bsStyle="link" onClick={e => this.moveToStage('grant_review', e)}>Grant Review</MenuItem>
             <MenuItem bsStyle="link" onClick={e => this.moveToStage('accepted', e)}>Accepted, no grant</MenuItem>
