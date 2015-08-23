@@ -1,7 +1,7 @@
 ##Welcome!
 ReviewApp is a web app aimed to remove unwelcome biases from the Hackership application review process - written in **React.js and Flask**. It allows an admin to anonymize student applications, after which reviewers can read, make comments, send e-mails and change the status of the application. In addition, it helps reviewers make skype appointments with applicants (during the non-anonymous phase of the review process).
 
-Please have a look at our [wiki](https://github.com/Hackership/reviewapp-backend/wiki/Introduction) for a quick overview of the app! Or, if you would like to run the app yourself, or contribute, follow the instructions below. Happy hacking!
+Please have a look at our [wiki](https://github.com/Hackership/reviewapp-backend/wiki) for a quick overview of the app! Or, if you would like to run the app yourself, or contribute, follow the instructions below. Happy hacking!
 
 ##Get started
 
