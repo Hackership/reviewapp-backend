@@ -24,7 +24,7 @@ var React = require('react/addons'),
 var $=require('jquery');
 
 
-var ApplicationsList = React.createClass({
+var ApplicationList = React.createClass({
 
   getInitialState: function(){
     return {};
@@ -53,19 +53,4 @@ var ApplicationsList = React.createClass({
 });
 
 
-var AppPage = React.createClass({
-  render(){
-    var app = applications.get(parseInt(this.props.params.appId));
-    return  (
-      <div className="main">
-        <div className="main-container">
-          <Application app={app} />
-        </div>
-      </div>
-      );
-  }
-})
-
-
-module.exports = {ApplicationList: ApplicationsList,
-                  ApplicationPage: AppPage};
+module.exports = {ApplicationList: ApplicationList};

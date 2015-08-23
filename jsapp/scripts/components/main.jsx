@@ -5,9 +5,10 @@
 'use strict';
 
 var {StagesView, AppsList, FocusReview, BatchFilterView} = require('./ReviewsApp'),
-	AddReviewer = require('./AddReviewer'),
-	CallSlots = require('./CallSlots'),
-	{ApplicationList, ApplicationPage} = require('./ApplicationList'),
+	{AddReviewer} = require('./AddReviewer'),
+	{CallSlots} = require('./CallSlots'),
+	{ApplicationList} = require('./ApplicationList'),
+	{AppPage} = require('./AppPage'),
 	{Gravatar} = require("./User"),
 	React = require('react'),
 	Router = require('react-router'),
@@ -125,7 +126,7 @@ var Routes = (
 	    		<Route name="appStage" path=":stage/" handler={AppsList} />
 	    	</Route>
 	    </Route>
-	    <Route name="appPage" path="/app/:appId" handler={ApplicationPage} />
+	    <Route name="appPage" path="/app/:appId" handler={AppPage} />
 	    <Route name="focus" path="/focus" handler={FocusReview} />
 	    <Route name="search" path="/search" handler={Search} />
 	</Route>
