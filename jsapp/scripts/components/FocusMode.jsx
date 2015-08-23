@@ -26,7 +26,7 @@ var Counter = React.createClass({
       )
   }
 })
-var FocusList = React.createClass({
+var FocusMode = React.createClass({
 
   getInitialState: function(){
     return {'key': 0};
@@ -84,4 +84,4 @@ var FocusList = React.createClass({
 });
 
 
-module.exports = {FocusList: FocusList};
+module.exports = {FocusMode: FocusMode};

@@ -10,7 +10,7 @@ var React = require('react/addons'),
   {Link, Route, RouteHandler} = require('react-router'),
   {ApplicationList} = require('./ApplicationList'),
   {applications, availableStages} = require('../stores/ApplicationStore'),
-  FocusList = require('./FocusMode'),
+  {FocusMode} = require('./FocusMode'),
   {user} = require('../stores/UserStore');
 
 // CSS
@@ -146,7 +146,7 @@ var FocusReview = React.createClass({
     return (
       <div className="main">
         <div className="main-container">
-         <FocusList apps={apps} />
+         <FocusMode apps={apps} />
         </div>
       </div>
     );
